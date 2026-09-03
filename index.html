@@ -10,7 +10,7 @@
 
 /* =========================================================
    FMT ENDURANCE
-   Design inspiré des codes graphiques ARC Raiders
+   Design FMT inspiré des lignes graphiques ARC Raiders
 ========================================================= */
 
 :root {
@@ -29,11 +29,7 @@
     --blue: #36a9ff;
     --yellow: #ffd447;
     --red: #ff4b55;
-    --purple: #b66cff;
 }
-
-
-/* RESET */
 
 * {
     box-sizing: border-box;
@@ -41,6 +37,7 @@
 
 body {
     margin: 0;
+    min-height: 100vh;
 
     background:
         radial-gradient(
@@ -55,13 +52,11 @@ body {
         Arial,
         Helvetica,
         sans-serif;
-
-    min-height: 100vh;
 }
 
 
 /* =========================================================
-   DECORATION
+   BARRE COULEURS
 ========================================================= */
 
 body::before {
@@ -93,20 +88,16 @@ body::before {
 
 
 /* =========================================================
-   CONTAINER
+   CONTENEUR
 ========================================================= */
 
 .container {
-
     width: 100%;
     max-width: 950px;
 
     margin: auto;
 
-    padding:
-        35px
-        18px
-        60px;
+    padding: 35px 18px 60px;
 }
 
 
@@ -116,21 +107,14 @@ body::before {
 
 header {
     text-align: center;
-
     margin-bottom: 35px;
-
-    position: relative;
 }
 
-
 .logo {
-
     font-size: 42px;
-
     font-weight: 900;
 
     letter-spacing: 4px;
-
     text-transform: uppercase;
 }
 
@@ -138,11 +122,8 @@ header {
     color: var(--green);
 }
 
-
 .logo-lines {
-
     display: flex;
-
     justify-content: center;
 
     gap: 5px;
@@ -153,7 +134,6 @@ header {
 }
 
 .logo-lines div {
-
     width: 38px;
     height: 4px;
 }
@@ -174,9 +154,7 @@ header {
     background: var(--red);
 }
 
-
 .subtitle {
-
     color: var(--muted);
 
     margin-top: 12px;
@@ -194,7 +172,6 @@ header {
 ========================================================= */
 
 .panel {
-
     background:
         linear-gradient(
             135deg,
@@ -203,9 +180,7 @@ header {
         ),
         var(--panel);
 
-    border:
-        1px solid
-        var(--border);
+    border: 1px solid var(--border);
 
     padding: 22px;
 
@@ -216,13 +191,7 @@ header {
     overflow: hidden;
 }
 
-
-/*
-   Petite bande ARC-like sur les panneaux
-*/
-
 .panel::before {
-
     content: "";
 
     position: absolute;
@@ -251,12 +220,10 @@ header {
 h1,
 h2,
 h3 {
-
     margin-top: 0;
 }
 
 h1 {
-
     font-size: 30px;
 
     text-transform: uppercase;
@@ -265,7 +232,6 @@ h1 {
 }
 
 h2 {
-
     font-size: 22px;
 
     letter-spacing: 1px;
@@ -277,12 +243,9 @@ h2 {
 ========================================================= */
 
 button {
-
     border: none;
 
-    padding:
-        12px
-        18px;
+    padding: 12px 18px;
 
     font-size: 14px;
 
@@ -298,51 +261,26 @@ button {
 }
 
 button:hover {
+    transform: translateY(-1px);
 
-    transform:
-        translateY(-1px);
-
-    filter:
-        brightness(1.08);
+    filter: brightness(1.08);
 }
-
 
 .btn-primary {
+    background: var(--green);
 
-    background:
-        var(--green);
-
-    color:
-        #050505;
+    color: #050505;
 }
-
 
 .btn-secondary {
+    background: var(--panel3);
 
-    background:
-        var(--panel3);
+    color: var(--text);
 
-    color:
-        var(--text);
-
-    border:
-        1px solid
-        var(--border);
+    border: 1px solid var(--border);
 }
-
-
-.btn-danger {
-
-    background:
-        var(--red);
-
-    color:
-        white;
-}
-
 
 .actions {
-
     display: flex;
 
     gap: 10px;
@@ -356,127 +294,84 @@ button:hover {
 ========================================================= */
 
 .form-group {
-
     margin-bottom: 18px;
 }
 
 label {
-
     display: block;
 
-    color:
-        var(--muted);
+    color: var(--muted);
 
-    font-size: 13px;
+    font-size: 12px;
 
     margin-bottom: 7px;
 
-    text-transform:
-        uppercase;
+    text-transform: uppercase;
 
-    letter-spacing:
-        0.5px;
+    letter-spacing: 0.6px;
 }
 
-
-input,
-select {
-
+input {
     width: 100%;
 
     padding: 12px;
 
-    background:
-        var(--panel2);
+    background: var(--panel2);
 
-    border:
-        1px solid
-        var(--border);
+    border: 1px solid var(--border);
 
-    color:
-        var(--text);
+    color: var(--text);
 
-    border-radius:
-        3px;
+    border-radius: 3px;
 
-    font-size:
-        15px;
+    font-size: 15px;
 
-    outline:
-        none;
+    outline: none;
 }
 
-
-input:focus,
-select:focus {
-
-    border-color:
-        var(--green);
+input:focus {
+    border-color: var(--green);
 }
 
 
 /* =========================================================
-   EVENT CARD
+   EVENEMENTS
 ========================================================= */
 
 .event-card {
+    background: var(--panel);
 
-    background:
-        var(--panel);
+    border: 1px solid var(--border);
 
-    border:
-        1px solid
-        var(--border);
+    padding: 20px;
 
-    padding:
-        20px;
+    margin-bottom: 14px;
 
-    margin-bottom:
-        14px;
+    cursor: pointer;
 
-    cursor:
-        pointer;
+    position: relative;
 
-    position:
-        relative;
+    overflow: hidden;
 
-    overflow:
-        hidden;
-
-    transition:
-        0.2s;
+    transition: 0.2s;
 }
-
 
 .event-card:hover {
+    border-color: var(--green);
 
-    border-color:
-        var(--green);
-
-    transform:
-        translateX(3px);
+    transform: translateX(3px);
 }
 
-
 .event-card::before {
+    content: "";
 
-    content:
-        "";
+    position: absolute;
 
-    position:
-        absolute;
+    left: 0;
+    top: 0;
 
-    left:
-        0;
-
-    top:
-        0;
-
-    width:
-        4px;
-
-    height:
-        100%;
+    width: 4px;
+    height: 100%;
 
     background:
         linear-gradient(
@@ -488,147 +383,93 @@ select:focus {
         );
 }
 
-
 .event-card h3 {
+    margin-bottom: 8px;
 
-    margin-bottom:
-        8px;
-
-    padding-left:
-        8px;
+    padding-left: 8px;
 }
-
 
 .event-info {
+    color: var(--muted);
 
-    color:
-        var(--muted);
+    padding-left: 8px;
 
-    padding-left:
-        8px;
-
-    font-size:
-        14px;
+    font-size: 14px;
 }
 
-
 .next-race {
+    color: var(--green);
 
-    color:
-        var(--green);
+    font-weight: bold;
 
-    font-weight:
-        bold;
+    margin-top: 12px;
 
-    margin-top:
-        12px;
-
-    padding-left:
-        8px;
+    padding-left: 8px;
 }
 
 
 /* =========================================================
-   DEPARTURE
+   DEPART
 ========================================================= */
 
 .departure {
+    background: var(--panel2);
 
-    background:
-        var(--panel2);
+    border: 1px solid var(--border);
 
-    border:
-        1px solid
-        var(--border);
+    padding: 18px;
 
-    padding:
-        18px;
+    margin-bottom: 15px;
 
-    margin-bottom:
-        15px;
-
-    position:
-        relative;
+    position: relative;
 }
-
 
 .departure::before {
+    content: "";
 
-    content:
-        "";
+    position: absolute;
 
-    position:
-        absolute;
+    left: 0;
+    top: 0;
 
-    left:
-        0;
+    width: 3px;
+    height: 100%;
 
-    top:
-        0;
-
-    width:
-        3px;
-
-    height:
-        100%;
-
-    background:
-        var(--green);
+    background: var(--green);
 }
-
 
 .departure-header {
+    display: flex;
 
-    display:
-        flex;
+    justify-content: space-between;
 
-    justify-content:
-        space-between;
+    align-items: center;
 
-    align-items:
-        center;
+    gap: 15px;
 
-    gap:
-        15px;
+    flex-wrap: wrap;
 
-    flex-wrap:
-        wrap;
-
-    margin-bottom:
-        15px;
+    margin-bottom: 15px;
 }
-
 
 .departure-number {
+    font-size: 18px;
 
-    font-size:
-        18px;
-
-    font-weight:
-        bold;
+    font-weight: bold;
 }
-
 
 .departure-date {
+    color: var(--muted);
 
-    color:
-        var(--muted);
-
-    margin-top:
-        5px;
+    margin-top: 5px;
 }
 
-
 .countdown {
+    color: var(--green);
 
-    color:
-        var(--green);
+    font-weight: bold;
 
-    font-weight:
-        bold;
-
-    font-size:
-        14px;
+    font-size: 14px;
 }
 
 
@@ -637,326 +478,249 @@ select:focus {
 ========================================================= */
 
 .pilot {
+    display: flex;
 
-    display:
-        flex;
+    justify-content: space-between;
 
-    justify-content:
-        space-between;
+    align-items: center;
 
-    align-items:
-        center;
+    gap: 10px;
 
-    gap:
-        10px;
+    padding: 11px 13px;
 
-    padding:
-        11px 13px;
+    background: #0d1115;
 
-    background:
-        #0d1115;
+    margin-top: 7px;
 
-    margin-top:
-        7px;
-
-    flex-wrap:
-        wrap;
+    flex-wrap: wrap;
 }
-
 
 .pilot-name {
-
-    font-weight:
-        bold;
+    font-weight: bold;
 }
-
 
 .pilot-info {
+    display: flex;
 
-    display:
-        flex;
+    gap: 6px;
 
-    gap:
-        6px;
-
-    flex-wrap:
-        wrap;
+    flex-wrap: wrap;
 }
 
-
 .badge {
+    padding: 5px 8px;
 
-    padding:
-        5px 8px;
+    background: #242b32;
 
-    background:
-        #242b32;
+    font-size: 11px;
 
-    font-size:
-        11px;
+    font-weight: bold;
 
-    font-weight:
-        bold;
-
-    border-radius:
-        3px;
+    border-radius: 3px;
 }
 
 
 /* =========================================================
-   CATEGORIES
+   FORMULAIRE DISPONIBILITES
 ========================================================= */
 
-.category-grid {
+.availability-form-departure {
+    background: var(--panel2);
 
-    display:
-        grid;
+    border: 1px solid var(--border);
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    position: relative;
+}
+
+
+/* ---------------------------------------------------------
+   EN-TETE DEPART
+--------------------------------------------------------- */
+
+.availability-departure-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+.availability-departure-title {
+    font-size: 16px;
+
+    font-weight: bold;
+}
+
+.availability-departure-date {
+    color: var(--muted);
+
+    font-size: 13px;
+
+    margin-top: 4px;
+}
+
+
+/* ---------------------------------------------------------
+   LIGNE DU FORMULAIRE
+--------------------------------------------------------- */
+
+.availability-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    gap: 20px;
+
+    align-items: start;
+}
+
+
+/* ---------------------------------------------------------
+   DISPONIBILITES
+--------------------------------------------------------- */
+
+.availability-section {
+    min-width: 0;
+}
+
+.availability-buttons {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+}
+
+.availability-btn {
+    padding: 9px 12px;
+
+    background: var(--panel3);
+
+    color: var(--muted);
+
+    border: 1px solid var(--border);
+
+    font-size: 11px;
+
+    border-radius: 3px;
+}
+
+.availability-btn:hover {
+    color: var(--text);
+
+    border-color: #4a545e;
+}
+
+.availability-btn.selected {
+    background: var(--green);
+
+    color: #000;
+
+    border-color: var(--green);
+}
+
+
+/* ---------------------------------------------------------
+   CATEGORIE A DROITE
+--------------------------------------------------------- */
+
+.category-section {
+    width: 250px;
+
+    flex-shrink: 0;
+}
+
+.category-section label {
+    text-align: right;
+}
+
+.category-grid {
+    display: grid;
 
     grid-template-columns:
         repeat(4, 1fr);
 
-    gap:
-        8px;
-
-    margin-top:
-        5px;
+    gap: 5px;
 }
-
 
 .category-card {
+    height: 48px;
 
-    background:
-        var(--panel3);
+    background: var(--panel3);
 
-    border:
-        1px solid
-        var(--border);
+    border: 1px solid var(--border);
 
-    min-height:
-        85px;
+    display: flex;
 
-    display:
-        flex;
+    flex-direction: column;
 
-    flex-direction:
-        column;
+    align-items: center;
 
-    align-items:
-        center;
+    justify-content: center;
 
-    justify-content:
-        center;
+    cursor: pointer;
 
-    cursor:
-        pointer;
+    transition: 0.2s;
 
-    transition:
-        0.2s;
+    text-align: center;
 
-    position:
-        relative;
-
-    text-align:
-        center;
+    border-radius: 3px;
 }
-
 
 .category-card:hover {
-
-    border-color:
-        var(--green);
+    border-color: var(--green);
 }
-
 
 .category-card.selected {
+    border: 2px solid var(--green);
 
-    border:
-        2px solid
-        var(--green);
-
-    background:
-        #1d2617;
+    background: #1d2617;
 
     box-shadow:
-        0 0 15px
-        rgba(156,255,0,0.12);
+        0 0 12px
+        rgba(156,255,0,0.10);
 }
-
 
 .category-icon {
+    font-size: 13px;
 
-    width:
-        35px;
+    font-weight: 900;
 
-    height:
-        35px;
-
-    margin-bottom:
-        7px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    font-size:
-        21px;
-
-    font-weight:
-        900;
+    margin-bottom: 2px;
 }
-
 
 .category-name {
+    font-size: 8px;
 
-    font-size:
-        12px;
+    font-weight: bold;
 
-    font-weight:
-        bold;
-
-    letter-spacing:
-        0.5px;
+    letter-spacing: 0.3px;
 }
 
-
-/* Couleurs des catégories */
-
 .hypercar .category-icon {
-    color:
-        var(--blue);
+    color: var(--blue);
 }
 
 .lmp2 .category-icon {
-    color:
-        var(--green);
+    color: var(--green);
 }
 
 .lmp3 .category-icon {
-    color:
-        var(--yellow);
+    color: var(--yellow);
 }
 
 .gt3 .category-icon {
-    color:
-        var(--red);
-}
-
-
-/* =========================================================
-   DISPONIBILITE
-========================================================= */
-
-.availability-buttons {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(5, 1fr);
-
-    gap:
-        7px;
-
-    margin-top:
-        8px;
-}
-
-
-.availability-btn {
-
-    padding:
-        10px 5px;
-
-    background:
-        var(--panel3);
-
-    color:
-        var(--muted);
-
-    border:
-        1px solid
-        var(--border);
-
-    font-size:
-        11px;
-}
-
-
-.availability-btn.selected {
-
-    color:
-        #000;
-
-    background:
-        var(--green);
-
-    border-color:
-        var(--green);
-}
-
-
-/* =========================================================
-   DEPARTURE FORM
-========================================================= */
-
-.departure-form {
-
-    background:
-        var(--panel2);
-
-    border:
-        1px solid
-        var(--border);
-
-    padding:
-        15px;
-
-    margin-bottom:
-        12px;
-}
-
-
-.departure-form-title {
-
-    font-weight:
-        bold;
-
-    margin-bottom:
-        15px;
-}
-
-
-.form-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap:
-        12px;
-}
-
-
-.remove-departure {
-
-    margin-top:
-        10px;
-
-    background:
-        transparent;
-
-    color:
-        var(--red);
-
-    padding:
-        5px 0;
+    color: var(--red);
 }
 
 
@@ -965,28 +729,59 @@ select:focus {
 ========================================================= */
 
 .info {
+    background: #151b20;
 
-    background:
-        #151b20;
+    border-left: 3px solid var(--green);
 
-    border-left:
-        3px solid
-        var(--green);
+    padding: 12px;
 
-    padding:
-        12px;
+    margin-bottom: 20px;
 
-    margin-bottom:
-        20px;
+    color: var(--muted);
 
-    color:
-        var(--muted);
+    font-size: 13px;
 
-    font-size:
-        13px;
+    line-height: 1.5;
+}
 
-    line-height:
-        1.5;
+
+/* =========================================================
+   CREATION DEPART
+========================================================= */
+
+.departure-form {
+    background: var(--panel2);
+
+    border: 1px solid var(--border);
+
+    padding: 15px;
+
+    margin-bottom: 12px;
+}
+
+.departure-form-title {
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px;
+}
+
+.remove-departure {
+    margin-top: 10px;
+
+    background: transparent;
+
+    color: var(--red);
+
+    padding: 5px 0;
 }
 
 
@@ -995,32 +790,24 @@ select:focus {
 ========================================================= */
 
 .empty {
+    color: var(--muted);
 
-    color:
-        var(--muted);
+    text-align: center;
 
-    text-align:
-        center;
-
-    padding:
-        30px 10px;
+    padding: 30px 10px;
 }
 
 
 /* =========================================================
-   UTILITIES
+   UTILITAIRES
 ========================================================= */
 
 .hidden {
-    display:
-        none;
+    display: none;
 }
 
-
 .back {
-
-    margin-bottom:
-        20px;
+    margin-bottom: 20px;
 }
 
 
@@ -1031,47 +818,52 @@ select:focus {
 @media (max-width: 700px) {
 
     .container {
-
         padding:
             25px 12px 50px;
     }
 
-
     .logo {
+        font-size: 30px;
 
-        font-size:
-            30px;
-
-        letter-spacing:
-            2px;
+        letter-spacing: 2px;
     }
 
+    .availability-row {
+        grid-template-columns: 1fr;
+
+        gap: 15px;
+    }
+
+    .category-section {
+        width: 100%;
+    }
+
+    .category-section label {
+        text-align: left;
+    }
 
     .category-grid {
-
         grid-template-columns:
-            repeat(2, 1fr);
+            repeat(4, 1fr);
     }
-
 
     .availability-buttons {
+        display: grid;
 
         grid-template-columns:
             repeat(2, 1fr);
     }
 
-
-    .form-grid {
-
-        grid-template-columns:
-            1fr;
+    .availability-btn {
+        width: 100%;
     }
 
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
 
-    .departure-header {
-
-        align-items:
-            flex-start;
+    .availability-departure-header {
+        align-items: flex-start;
     }
 }
 
@@ -1080,7 +872,6 @@ select:focus {
 
 
 <body>
-
 
 <div class="container">
 
@@ -1098,11 +889,8 @@ select:focus {
     <div class="logo-lines">
 
         <div class="line-blue"></div>
-
         <div class="line-green"></div>
-
         <div class="line-yellow"></div>
-
         <div class="line-red"></div>
 
     </div>
@@ -1120,8 +908,9 @@ select:focus {
 
 <div id="homePage">
 
-    <div class="actions"
-         style="margin-bottom:20px;">
+    <div
+        class="actions"
+        style="margin-bottom:20px;">
 
         <button
             class="btn-primary"
@@ -1143,8 +932,9 @@ select:focus {
      CREATION EVENEMENT
 ====================================================== -->
 
-<div id="createPage"
-     class="hidden">
+<div
+    id="createPage"
+    class="hidden">
 
 
     <button
@@ -1226,8 +1016,9 @@ select:focus {
      EVENEMENT
 ====================================================== -->
 
-<div id="eventPage"
-     class="hidden">
+<div
+    id="eventPage"
+    class="hidden">
 
 
     <button
@@ -1248,8 +1039,9 @@ select:focus {
      DISPONIBILITES
 ====================================================== -->
 
-<div id="availabilityPage"
-     class="hidden">
+<div
+    id="availabilityPage"
+    class="hidden">
 
 
     <button
@@ -1270,9 +1062,15 @@ select:focus {
 
         <div class="info">
 
-            Indique ton pseudo puis sélectionne
-            ta catégorie et ta disponibilité pour
-            chaque départ.
+            Sélectionne une ou plusieurs périodes
+            pour chaque départ.
+
+            <br>
+
+            Exemple :
+            <strong>Début + Milieu</strong>
+            ou
+            <strong>Milieu + Fin</strong>.
 
         </div>
 
@@ -2125,7 +1923,7 @@ function renderEvent(id) {
 
                                             <span class="badge">
 
-                                                ${availabilityLabel(
+                                                ${formatStatus(
                                                     pilot.status
                                                 )}
 
@@ -2208,109 +2006,27 @@ function showAvailabilityForm(id) {
                 return `
 
                     <div
-                        class="departure-form"
+                        class="availability-form-departure"
                         data-departure-form="${departure.id}">
 
-                        <div class="departure-form-title">
 
-                            DÉPART ${index + 1}
+                        <div
+                            class="availability-departure-header">
 
-                            <div class="pilot-info">
+                            <div>
 
-                                ${formatDate(
-                                    departure.date,
-                                    departure.time
-                                )}
+                                <div class="availability-departure-title">
 
-                            </div>
-
-                        </div>
-
-
-                        <label>
-
-                            CATÉGORIE
-
-                        </label>
-
-
-                        <div class="category-grid">
-
-
-                            <div
-                                class="category-card hypercar"
-                                data-category="Hypercar"
-                                onclick="selectCategory(this)">
-
-                                <div class="category-icon">
-
-                                    H
+                                    DÉPART ${index + 1}
 
                                 </div>
 
-                                <div class="category-name">
+                                <div class="availability-departure-date">
 
-                                    HYPERCAR
-
-                                </div>
-
-                            </div>
-
-
-                            <div
-                                class="category-card lmp2"
-                                data-category="LMP2"
-                                onclick="selectCategory(this)">
-
-                                <div class="category-icon">
-
-                                    2
-
-                                </div>
-
-                                <div class="category-name">
-
-                                    LMP2
-
-                                </div>
-
-                            </div>
-
-
-                            <div
-                                class="category-card lmp3"
-                                data-category="LMP3"
-                                onclick="selectCategory(this)">
-
-                                <div class="category-icon">
-
-                                    3
-
-                                </div>
-
-                                <div class="category-name">
-
-                                    LMP3
-
-                                </div>
-
-                            </div>
-
-
-                            <div
-                                class="category-card gt3"
-                                data-category="GT3"
-                                onclick="selectCategory(this)">
-
-                                <div class="category-icon">
-
-                                    GT
-
-                                </div>
-
-                                <div class="category-name">
-
-                                    GT3
+                                    ${formatDate(
+                                        departure.date,
+                                        departure.time
+                                    )}
 
                                 </div>
 
@@ -2319,86 +2035,174 @@ function showAvailabilityForm(id) {
                         </div>
 
 
-                        <input
-                            type="hidden"
-                            class="selected-category">
+                        <div class="availability-row">
 
 
-                        <div style="margin-top:18px;">
+                            <!-- DISPONIBILITE -->
 
-                            <label>
+                            <div class="availability-section">
 
-                                DISPONIBILITÉ
-
-                            </label>
-
-
-                            <div
-                                class="availability-buttons">
+                                <label>
+                                    Disponibilité
+                                </label>
 
 
-                                <button
-                                    type="button"
-                                    class="availability-btn selected"
-                                    data-status="unavailable"
-                                    onclick="selectAvailability(this)">
-
-                                    Indisponible
-
-                                </button>
+                                <div
+                                    class="availability-buttons">
 
 
-                                <button
-                                    type="button"
-                                    class="availability-btn"
-                                    data-status="beginning"
-                                    onclick="selectAvailability(this)">
+                                    <button
+                                        type="button"
+                                        class="availability-btn selected"
+                                        data-status="unavailable"
+                                        onclick="selectAvailability(this)">
 
-                                    Début
+                                        Indisponible
 
-                                </button>
-
-
-                                <button
-                                    type="button"
-                                    class="availability-btn"
-                                    data-status="middle"
-                                    onclick="selectAvailability(this)">
-
-                                    Milieu
-
-                                </button>
+                                    </button>
 
 
-                                <button
-                                    type="button"
-                                    class="availability-btn"
-                                    data-status="end"
-                                    onclick="selectAvailability(this)">
+                                    <button
+                                        type="button"
+                                        class="availability-btn"
+                                        data-status="beginning"
+                                        onclick="selectAvailability(this)">
 
-                                    Fin
+                                        Début
 
-                                </button>
+                                    </button>
 
 
-                                <button
-                                    type="button"
-                                    class="availability-btn"
-                                    data-status="whole"
-                                    onclick="selectAvailability(this)">
+                                    <button
+                                        type="button"
+                                        class="availability-btn"
+                                        data-status="middle"
+                                        onclick="selectAvailability(this)">
 
-                                    Toute la course
+                                        Milieu
 
-                                </button>
+                                    </button>
 
+
+                                    <button
+                                        type="button"
+                                        class="availability-btn"
+                                        data-status="end"
+                                        onclick="selectAvailability(this)">
+
+                                        Fin
+
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="availability-btn"
+                                        data-status="whole"
+                                        onclick="selectAvailability(this)">
+
+                                        Toute la course
+
+                                    </button>
+
+
+                                </div>
+
+
+                                <input
+                                    type="hidden"
+                                    class="selected-status"
+                                    value="unavailable">
 
                             </div>
 
 
-                            <input
-                                type="hidden"
-                                class="selected-status"
-                                value="unavailable">
+                            <!-- CATEGORIE -->
+
+                            <div class="category-section">
+
+                                <label>
+                                    Catégorie
+                                </label>
+
+
+                                <div class="category-grid">
+
+
+                                    <div
+                                        class="category-card hypercar"
+                                        data-category="Hypercar"
+                                        onclick="selectCategory(this)">
+
+                                        <div class="category-icon">
+                                            H
+                                        </div>
+
+                                        <div class="category-name">
+                                            HYPER
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        class="category-card lmp2"
+                                        data-category="LMP2"
+                                        onclick="selectCategory(this)">
+
+                                        <div class="category-icon">
+                                            2
+                                        </div>
+
+                                        <div class="category-name">
+                                            LMP2
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        class="category-card lmp3"
+                                        data-category="LMP3"
+                                        onclick="selectCategory(this)">
+
+                                        <div class="category-icon">
+                                            3
+                                        </div>
+
+                                        <div class="category-name">
+                                            LMP3
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        class="category-card gt3"
+                                        data-category="GT3"
+                                        onclick="selectCategory(this)">
+
+                                        <div class="category-icon">
+                                            GT
+                                        </div>
+
+                                        <div class="category-name">
+                                            GT3
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <input
+                                    type="hidden"
+                                    class="selected-category"
+                                    value="">
+
+                            </div>
+
 
                         </div>
 
@@ -2414,14 +2218,14 @@ function showAvailabilityForm(id) {
 
 
 /* =========================================================
-   CHOIX CATEGORIE
+   CATEGORIE
 ========================================================= */
 
 function selectCategory(card) {
 
     const parent =
         card.closest(
-            ".departure-form"
+            ".availability-form-departure"
         );
 
 
@@ -2452,40 +2256,175 @@ function selectCategory(card) {
 
 
 /* =========================================================
-   CHOIX DISPONIBILITE
+   DISPONIBILITE MULTIPLE
 ========================================================= */
 
 function selectAvailability(button) {
 
     const parent =
         button.closest(
-            ".departure-form"
+            ".availability-form-departure"
         );
 
 
-    parent
-        .querySelectorAll(
+    const status =
+        button.dataset.status;
+
+
+    const buttons =
+        parent.querySelectorAll(
             ".availability-btn"
-        )
-        .forEach(
+        );
+
+
+    /*
+       Toute la course
+       ou Indisponible
+       = choix exclusif
+    */
+
+    if(
+        status === "whole"
+        ||
+        status === "unavailable"
+    ) {
+
+        buttons.forEach(
             b =>
             b.classList.remove(
                 "selected"
             )
         );
 
+        button.classList.add(
+            "selected"
+        );
 
-    button.classList.add(
-        "selected"
-    );
+    }
+
+    /*
+       Début / Milieu / Fin
+       = multi sélection
+    */
+
+    else {
+
+        const unavailable =
+            parent.querySelector(
+                '[data-status="unavailable"]'
+            );
+
+        const whole =
+            parent.querySelector(
+                '[data-status="whole"]'
+            );
 
 
-    parent
-        .querySelector(
-            ".selected-status"
+        unavailable.classList.remove(
+            "selected"
+        );
+
+        whole.classList.remove(
+            "selected"
+        );
+
+
+        button.classList.toggle(
+            "selected"
+        );
+
+
+        /*
+           Si aucun choix n'est sélectionné,
+           on remet Indisponible.
+        */
+
+        const selectedPeriods =
+            parent.querySelectorAll(
+                '.availability-btn.selected'
+            );
+
+
+        if(
+            selectedPeriods.length === 0
+        ) {
+
+            unavailable.classList.add(
+                "selected"
+            );
+
+        }
+
+    }
+
+
+    updateSelectedStatus(parent);
+}
+
+
+/* =========================================================
+   RECUPERE LES DISPONIBILITES
+========================================================= */
+
+function updateSelectedStatus(parent) {
+
+    const selected =
+        Array.from(
+            parent.querySelectorAll(
+                ".availability-btn.selected"
+            )
         )
-        .value =
-        button.dataset.status;
+        .map(
+            button =>
+            button.dataset.status
+        );
+
+
+    parent.querySelector(
+        ".selected-status"
+    ).value =
+        selected.join(",");
+}
+
+
+/* =========================================================
+   TEXTE DISPONIBILITE
+========================================================= */
+
+function formatStatus(status) {
+
+    if(!status)
+        return "Indisponible";
+
+
+    if(status === "unavailable")
+        return "Indisponible";
+
+
+    if(status === "whole")
+        return "Toute la course";
+
+
+    const values =
+        status.split(",");
+
+
+    const labels = [];
+
+
+    if(values.includes("beginning"))
+        labels.push("Début");
+
+
+    if(values.includes("middle"))
+        labels.push("Milieu");
+
+
+    if(values.includes("end"))
+        labels.push("Fin");
+
+
+    return labels.join(" + ");
 }
 
 
@@ -2557,7 +2496,9 @@ function saveAvailability() {
         const status =
             form.querySelector(
                 ".selected-status"
-            ).value;
+            ).value
+            ||
+            "unavailable";
 
 
         if(!departure.availability) {
@@ -2624,32 +2565,6 @@ function saveAvailability() {
     showEvent(
         currentEventId
     );
-}
-
-
-/* =========================================================
-   LABEL DISPONIBILITE
-========================================================= */
-
-function availabilityLabel(status) {
-
-    switch(status) {
-
-        case "beginning":
-            return "Début";
-
-        case "middle":
-            return "Milieu";
-
-        case "end":
-            return "Fin";
-
-        case "whole":
-            return "Toute la course";
-
-        default:
-            return "Indisponible";
-    }
 }
 
 

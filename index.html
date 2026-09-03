@@ -1,1424 +1,636 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FMT Endurance Manager</title>
+
+<title>FMT Endurance</title>
 
 <style>
-:root {
-    --bg: #0b0d10;
-    --panel: #12161b;
-    --panel2: #181d23;
-    --border: #272e36;
-    --text: #f2f4f7;
-    --muted: #8f99a5;
-    --accent: #9cff00;
-    --accent-dark: #6fae00;
-    --danger: #ff4d5a;
-    --warning: #ffc857;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-}
-
-button {
-    font-family: inherit;
-}
-
-/* =========================
-   SIDEBAR
-========================= */
-
-.app {
-    display: flex;
-    min-height: 100vh;
-}
-
-.sidebar {
-    width: 250px;
-    background: #090b0e;
-    border-right: 1px solid var(--border);
-    padding: 24px 16px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-}
-
-.logo {
-    padding: 8px 12px 28px;
-}
-
-.logo-main {
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 3px;
-}
-
-.logo-main span {
-    color: var(--accent);
-}
-
-.logo-sub {
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: 2px;
-    margin-top: 5px;
-}
-
-.nav-title {
-    color: #59636e;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    margin: 18px 12px 8px;
-}
-
-.nav button {
-    width: 100%;
-    background: transparent;
-    border: 0;
-    color: #aeb6bf;
-    padding: 12px;
-    text-align: left;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-bottom: 3px;
-    font-size: 14px;
-}
-
-.nav button:hover,
-.nav button.active {
-    background: var(--panel2);
-    color: var(--text);
-}
-
-.nav button.active {
-    border-left: 3px solid var(--accent);
-    padding-left: 9px;
-}
-
-.nav-icon {
-    display: inline-block;
-    width: 25px;
-}
-
-/* =========================
-   MAIN
-========================= */
-
-.main {
-    margin-left: 250px;
-    width: calc(100% - 250px);
-}
-
-.topbar {
-    height: 72px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 32px;
-    background: rgba(11,13,16,0.92);
-}
-
-.page-title {
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-}
-
-.content {
-    padding: 32px;
-    max-width: 1500px;
-}
-
-/* =========================
-   DASHBOARD
-========================= */
-
-.welcome {
-    margin-bottom: 28px;
-}
-
-.welcome h1 {
-    font-size: 32px;
-    margin-bottom: 7px;
-}
-
-.welcome p {
-    color: var(--muted);
-}
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
-}
-
-.stat-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.stat-label {
-    color: var(--muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.stat-number {
-    font-size: 30px;
-    font-weight: 800;
-    margin-top: 10px;
-}
-
-.stat-info {
-    color: var(--accent);
-    font-size: 11px;
-    margin-top: 5px;
-}
-
-/* =========================
-   SECTIONS
-========================= */
-
-.section {
-    display: none;
-}
-
-.section.active {
-    display: block;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
-}
-
-.section-header h2 {
-    font-size: 20px;
-}
-
-.btn {
-    border: 0;
-    border-radius: 7px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 13px;
-}
-
-.btn-primary {
-    background: var(--accent);
-    color: #101400;
-}
-
-.btn-primary:hover {
-    background: #b4ff43;
-}
-
-.btn-secondary {
-    background: var(--panel2);
-    color: var(--text);
-    border: 1px solid var(--border);
-}
-
-/* =========================
-   RACES
-========================= */
-
-.races {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
-}
-
-.race-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.race-header {
-    height: 105px;
-    background:
-        linear-gradient(135deg, rgba(156,255,0,.13), transparent),
-        #171c21;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.race-game {
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.race-name {
-    font-size: 22px;
-    font-weight: 800;
-    margin-top: 7px;
-}
-
-.race-duration {
-    font-size: 24px;
-    font-weight: 900;
-}
-
-.race-body {
-    padding: 18px 20px;
-}
-
-.race-info {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 18px;
-}
-
-.info-label {
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: uppercase;
-}
-
-.info-value {
-    font-size: 13px;
-    margin-top: 4px;
-}
-
-.progress {
-    height: 5px;
-    background: #252b31;
-    border-radius: 5px;
-    overflow: hidden;
-    margin: 10px 0 6px;
-}
-
-.progress-bar {
-    height: 100%;
-    background: var(--accent);
-}
-
-.race-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 15px;
-    border-top: 1px solid var(--border);
-}
-
-.status {
-    font-size: 11px;
-    font-weight: bold;
-}
-
-.status.open {
-    color: var(--accent);
-}
-
-.status.closed {
-    color: var(--danger);
-}
-
-/* =========================
-   TABLE
-========================= */
-
-.table-container {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th {
-    background: #171c21;
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-align: left;
-    padding: 14px 18px;
-}
-
-td {
-    padding: 16px 18px;
-    border-top: 1px solid var(--border);
-    font-size: 13px;
-}
-
-.team {
-    font-weight: bold;
-}
-
-.badge {
-    display: inline-block;
-    padding: 5px 8px;
-    border-radius: 5px;
-    background: #222a31;
-    color: #c7d0d8;
-    font-size: 10px;
-}
-
-/* =========================
-   PLANNING
-========================= */
-
-.planning {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-}
-
-.panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.panel h3 {
-    margin-bottom: 18px;
-}
-
-.stint {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-}
-
-.stint:last-child {
-    border-bottom: 0;
-}
-
-.stint-time {
-    width: 65px;
-    font-size: 12px;
-    color: var(--accent);
-    font-weight: bold;
-}
-
-.stint-driver {
-    flex: 1;
-}
-
-.stint-driver strong {
-    display: block;
-    font-size: 13px;
-}
-
-.stint-driver span {
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.stint-type {
-    font-size: 10px;
-    padding: 5px 7px;
-    border-radius: 4px;
-    background: #222930;
-}
-
-/* =========================
-   MODAL
-========================= */
-
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.75);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-overlay.show {
-    display: flex;
-}
-
-.modal {
-    width: 520px;
-    max-width: calc(100% - 30px);
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 25px;
-}
-
-.modal h2 {
-    margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    color: var(--muted);
-    font-size: 11px;
-    margin-bottom: 7px;
-    text-transform: uppercase;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    background: #0b0e11;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 11px;
-    color: var(--text);
-    outline: none;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: var(--accent);
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media(max-width: 1000px) {
-    .stats {
-        grid-template-columns: repeat(2, 1fr);
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
     }
 
-    .races,
-    .planning {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media(max-width: 700px) {
-    .sidebar {
-        width: 70px;
-        padding: 15px 8px;
+    body {
+        font-family: Arial, sans-serif;
+        background: #0b0d10;
+        color: #f2f4f7;
+        min-height: 100vh;
     }
 
-    .logo-main {
-        font-size: 18px;
+    .container {
+        width: min(900px, 92%);
+        margin: auto;
+        padding: 40px 0;
+    }
+
+    header {
         text-align: center;
+        margin-bottom: 45px;
     }
 
-    .logo-sub,
-    .nav-title,
-    .nav-text {
+    .logo {
+        font-size: 30px;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+
+    .logo span {
+        color: #9cff00;
+    }
+
+    header p {
+        color: #8f99a5;
+        margin-top: 10px;
+    }
+
+    .card {
+        background: #12161b;
+        border: 1px solid #272e36;
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 26px;
+        margin-bottom: 10px;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    .button {
+        display: inline-block;
+        border: none;
+        border-radius: 10px;
+        padding: 13px 20px;
+        background: #9cff00;
+        color: #101400;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .button:hover {
+        background: #b4ff40;
+    }
+
+    .button.secondary {
+        background: #272e36;
+        color: white;
+    }
+
+    .button.danger {
+        background: #ff4d5a;
+        color: white;
+    }
+
+    .events {
+        margin-top: 25px;
+    }
+
+    .event {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        background: #181d23;
+        border: 1px solid #272e36;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    .event h3 {
+        margin-bottom: 8px;
+    }
+
+    .event-info {
+        color: #8f99a5;
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 7px;
+        color: #cbd1d8;
+        font-size: 14px;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 13px;
+        border-radius: 9px;
+        border: 1px solid #303841;
+        background: #0b0d10;
+        color: white;
+        font-size: 15px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    .hidden {
         display: none;
     }
 
-    .nav button {
+    .event-header {
         text-align: center;
-        padding: 12px 5px;
+        margin-bottom: 30px;
     }
 
-    .nav-icon {
-        width: auto;
+    .event-header .date {
+        color: #9cff00;
+        margin-top: 10px;
     }
 
-    .main {
-        margin-left: 70px;
-        width: calc(100% - 70px);
+    .availability {
+        margin-top: 25px;
     }
 
-    .content {
-        padding: 20px;
+    .person {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #272e36;
     }
 
-    .stats {
-        grid-template-columns: 1fr 1fr;
+    .person:last-child {
+        border-bottom: none;
     }
 
-    .welcome h1 {
-        font-size: 25px;
+    .status {
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
     }
-}
+
+    .available {
+        background: #203500;
+        color: #9cff00;
+    }
+
+    .maybe {
+        background: #443700;
+        color: #ffc857;
+    }
+
+    .unavailable {
+        background: #421c20;
+        color: #ff6b75;
+    }
+
+    .empty {
+        text-align: center;
+        color: #8f99a5;
+        padding: 30px 10px;
+    }
+
+    .back {
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 650px) {
+        .event {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .event .button {
+            width: 100%;
+        }
+
+        .buttons {
+            flex-direction: column;
+        }
+
+        .buttons .button {
+            width: 100%;
+        }
+    }
 </style>
-
 </head>
 
 <body>
 
-<div class="app">
+<div class="container">
 
-<!-- SIDEBAR -->
+    <!-- ACCUEIL -->
+    <section id="home">
 
-<aside class="sidebar">
+        <header>
+            <div class="logo">FMT <span>■</span> ENDURANCE</div>
+            <p>Organisation simple de vos événements endurance</p>
+        </header>
 
-```
-<div class="logo">
-    <div class="logo-main">FMT<span>■</span></div>
-    <div class="logo-sub">ENDURANCE MANAGER</div>
-</div>
+        <div class="card" style="text-align:center;">
+            <h1>Organiser un événement</h1>
+            <p style="color:#8f99a5; margin-bottom:20px;">
+                Crée un événement et laisse les pilotes indiquer leurs disponibilités.
+            </p>
 
-<div class="nav">
-
-    <div class="nav-title">GESTION</div>
-
-    <button class="active" onclick="showSection('dashboard', this)">
-        <span class="nav-icon">⌂</span>
-        <span class="nav-text">Dashboard</span>
-    </button>
-
-    <button onclick="showSection('courses', this)">
-        <span class="nav-icon">🏁</span>
-        <span class="nav-text">Courses</span>
-    </button>
-
-    <button onclick="showSection('teams', this)">
-        <span class="nav-icon">👥</span>
-        <span class="nav-text">Équipages</span>
-    </button>
-
-    <button onclick="showSection('drivers', this)">
-        <span class="nav-icon">🏎</span>
-        <span class="nav-text">Pilotes</span>
-    </button>
-
-    <button onclick="showSection('planning', this)">
-        <span class="nav-icon">◷</span>
-        <span class="nav-text">Planning</span>
-    </button>
-
-    <div class="nav-title">ANALYSE</div>
-
-    <button onclick="showSection('results', this)">
-        <span class="nav-icon">▤</span>
-        <span class="nav-text">Résultats</span>
-    </button>
-
-    <div class="nav-title">SYSTÈME</div>
-
-    <button onclick="showSection('admin', this)">
-        <span class="nav-icon">⚙</span>
-        <span class="nav-text">Administration</span>
-    </button>
-
-</div>
-```
-
-</aside>
-
-<!-- MAIN -->
-
-<main class="main">
-
-<header class="topbar">
-    <div class="page-title" id="pageTitle">Dashboard</div>
-
-```
-<div class="user">
-    <div>
-        <div style="font-size:13px;font-weight:bold;">McFly</div>
-        <div style="font-size:10px;color:#8f99a5;">Administrateur</div>
-    </div>
-
-    <div class="avatar">M</div>
-</div>
-```
-
-</header>
-
-<div class="content">
-
-<!-- ================= DASHBOARD ================= -->
-
-<section id="dashboard" class="section active">
-
-```
-<div class="welcome">
-    <h1>FMT Endurance Manager</h1>
-    <p>Bienvenue dans votre centre de gestion des courses d'endurance.</p>
-</div>
-
-<div class="stats">
-
-    <div class="stat-card">
-        <div class="stat-label">Courses prévues</div>
-        <div class="stat-number">4</div>
-        <div class="stat-info">+1 ce mois</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-label">Pilotes actifs</div>
-        <div class="stat-number">18</div>
-        <div class="stat-info">FMT Racing</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-label">Équipages</div>
-        <div class="stat-number">7</div>
-        <div class="stat-info">Prochaine course</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-label">Courses terminées</div>
-        <div class="stat-number">12</div>
-        <div class="stat-info">Saison 2026</div>
-    </div>
-
-</div>
-
-<div class="section-header">
-    <h2>Prochaines courses</h2>
-    <button class="btn btn-secondary" onclick="showSection('courses', document.querySelectorAll('.nav button')[1])">
-        Voir toutes les courses
-    </button>
-</div>
-
-<div class="races">
-
-    <div class="race-card">
-
-        <div class="race-header">
-            <div>
-                <div class="race-game">LE MANS ULTIMATE</div>
-                <div class="race-name">Spa-Francorchamps</div>
-            </div>
-
-            <div class="race-duration">6H</div>
+            <button class="button" onclick="showCreateEvent()">
+                + CRÉER UN ÉVÉNEMENT
+            </button>
         </div>
 
-        <div class="race-body">
+        <div class="card">
+            <h2>🏁 Événements</h2>
 
-            <div class="race-info">
-                <div>
-                    <div class="info-label">Date</div>
-                    <div class="info-value">14 Sept. 2026</div>
-                </div>
+            <div id="eventsList" class="events"></div>
+        </div>
 
-                <div>
-                    <div class="info-label">Catégorie</div>
-                    <div class="info-value">Hypercar</div>
-                </div>
+    </section>
 
-                <div>
-                    <div class="info-label">Équipages</div>
-                    <div class="info-value">7 / 8</div>
-                </div>
+
+    <!-- CREATION EVENEMENT -->
+    <section id="createEvent" class="hidden">
+
+        <div class="back">
+            <button class="button secondary" onclick="showHome()">
+                ← Retour
+            </button>
+        </div>
+
+        <div class="card">
+
+            <h1>Créer un événement</h1>
+
+            <div class="form-group">
+                <label>Nom de l'événement</label>
+                <input id="eventName" type="text" placeholder="Ex : Spa 6H">
             </div>
 
-            <div style="font-size:11px;color:#8f99a5;">Inscriptions</div>
-
-            <div class="progress">
-                <div class="progress-bar" style="width:87.5%"></div>
+            <div class="form-group">
+                <label>Date</label>
+                <input id="eventDate" type="date">
             </div>
 
-            <div class="race-footer">
-                <span class="status open">● INSCRIPTIONS OUVERTES</span>
-                <button class="btn btn-primary" onclick="alert('Page de la course — bientôt disponible')">
-                    Gérer
+            <div class="form-group">
+                <label>Heure</label>
+                <input id="eventTime" type="time">
+            </div>
+
+            <div class="form-group">
+                <label>Durée</label>
+                <select id="eventDuration">
+                    <option value="1 heure">1 heure</option>
+                    <option value="2 heures">2 heures</option>
+                    <option value="4 heures">4 heures</option>
+                    <option value="6 heures">6 heures</option>
+                    <option value="8 heures">8 heures</option>
+                    <option value="12 heures">12 heures</option>
+                    <option value="24 heures">24 heures</option>
+                </select>
+            </div>
+
+            <div class="buttons">
+                <button class="button" onclick="createEvent()">
+                    CRÉER L'ÉVÉNEMENT
+                </button>
+
+                <button class="button secondary" onclick="showHome()">
+                    ANNULER
                 </button>
             </div>
 
         </div>
-    </div>
+    </section>
 
-    <div class="race-card">
 
-        <div class="race-header">
-            <div>
-                <div class="race-game">LE MANS ULTIMATE</div>
-                <div class="race-name">Le Mans</div>
-            </div>
+    <!-- PAGE EVENEMENT -->
+    <section id="eventPage" class="hidden">
 
-            <div class="race-duration">24H</div>
+        <div class="back">
+            <button class="button secondary" onclick="showHome()">
+                ← Retour aux événements
+            </button>
         </div>
 
-        <div class="race-body">
+        <div class="card">
 
-            <div class="race-info">
-                <div>
-                    <div class="info-label">Date</div>
-                    <div class="info-value">10 Oct. 2026</div>
-                </div>
+            <div class="event-header">
 
-                <div>
-                    <div class="info-label">Catégorie</div>
-                    <div class="info-value">Multi-class</div>
-                </div>
+                <h1 id="eventTitle"></h1>
 
-                <div>
-                    <div class="info-label">Équipages</div>
-                    <div class="info-value">4 / 12</div>
-                </div>
+                <div id="eventDetails" class="date"></div>
+
             </div>
 
-            <div style="font-size:11px;color:#8f99a5;">Inscriptions</div>
+            <button class="button" onclick="showAvailability()">
+                + AJOUTER MA DISPONIBILITÉ
+            </button>
 
-            <div class="progress">
-                <div class="progress-bar" style="width:33%"></div>
+        </div>
+
+
+        <!-- AJOUT DISPONIBILITE -->
+
+        <div id="availabilityForm" class="card hidden">
+
+            <h2>Ma disponibilité</h2>
+
+            <div class="form-group">
+                <label>Ton pseudo</label>
+                <input id="driverName" type="text" placeholder="Ex : McFly">
             </div>
 
-            <div class="race-footer">
-                <span class="status open">● INSCRIPTIONS OUVERTES</span>
-                <button class="btn btn-primary" onclick="alert('Page de la course — bientôt disponible')">
-                    Gérer
+            <div class="form-group">
+                <label>Ta disponibilité</label>
+
+                <select id="driverStatus">
+                    <option value="available">🟢 Disponible</option>
+                    <option value="maybe">🟠 Peut-être</option>
+                    <option value="unavailable">🔴 Indisponible</option>
+                </select>
+            </div>
+
+            <div class="buttons">
+
+                <button class="button" onclick="addAvailability()">
+                    ENREGISTRER
                 </button>
+
+                <button class="button secondary" onclick="hideAvailability()">
+                    ANNULER
+                </button>
+
             </div>
 
         </div>
-    </div>
 
-</div>
-```
 
-</section>
+        <!-- DISPONIBILITES -->
 
-<!-- ================= COURSES ================= -->
+        <div class="card availability">
 
-<section id="courses" class="section">
+            <h2>👥 Disponibilités</h2>
 
-```
-<div class="section-header">
-    <h2>Courses</h2>
-    <button class="btn btn-primary" onclick="openModal()">
-        + Nouvelle course
-    </button>
-</div>
+            <div id="availabilityList"></div>
 
-<div class="races">
-
-    <div class="race-card">
-        <div class="race-header">
-            <div>
-                <div class="race-game">LE MANS ULTIMATE</div>
-                <div class="race-name">Spa-Francorchamps</div>
-            </div>
-            <div class="race-duration">6H</div>
         </div>
 
-        <div class="race-body">
-            <div class="race-info">
-                <div>
-                    <div class="info-label">Date</div>
-                    <div class="info-value">14/09/2026</div>
-                </div>
-                <div>
-                    <div class="info-label">Catégorie</div>
-                    <div class="info-value">Hypercar</div>
-                </div>
-                <div>
-                    <div class="info-label">Équipages</div>
-                    <div class="info-value">7 / 8</div>
-                </div>
-            </div>
-
-            <div class="race-footer">
-                <span class="status open">● OUVERTE</span>
-                <button class="btn btn-secondary">Ouvrir</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="race-card">
-        <div class="race-header">
-            <div>
-                <div class="race-game">LE MANS ULTIMATE</div>
-                <div class="race-name">Le Mans</div>
-            </div>
-            <div class="race-duration">24H</div>
-        </div>
-
-        <div class="race-body">
-            <div class="race-info">
-                <div>
-                    <div class="info-label">Date</div>
-                    <div class="info-value">10/10/2026</div>
-                </div>
-                <div>
-                    <div class="info-label">Catégorie</div>
-                    <div class="info-value">Multi-class</div>
-                </div>
-                <div>
-                    <div class="info-label">Équipages</div>
-                    <div class="info-value">4 / 12</div>
-                </div>
-            </div>
-
-            <div class="race-footer">
-                <span class="status open">● OUVERTE</span>
-                <button class="btn btn-secondary">Ouvrir</button>
-            </div>
-        </div>
-    </div>
+    </section>
 
 </div>
-```
 
-</section>
-
-<!-- ================= TEAMS ================= -->
-
-<section id="teams" class="section">
-
-```
-<div class="section-header">
-    <h2>Équipages</h2>
-
-    <button class="btn btn-primary">
-        + Ajouter un équipage
-    </button>
-</div>
-
-<div class="table-container">
-
-    <table>
-
-        <thead>
-            <tr>
-                <th>Équipe</th>
-                <th>Voiture</th>
-                <th>Catégorie</th>
-                <th>Pilotes</th>
-                <th>Course</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            <tr>
-                <td class="team">FMT Racing #01</td>
-                <td>Ferrari 499P</td>
-                <td><span class="badge">Hypercar</span></td>
-                <td>McFly / Raph</td>
-                <td>Spa 6H</td>
-                <td><span class="status open">INSCRIT</span></td>
-            </tr>
-
-            <tr>
-                <td class="team">FMT Racing #02</td>
-                <td>Porsche 963</td>
-                <td><span class="badge">Hypercar</span></td>
-                <td>Alex / Max</td>
-                <td>Spa 6H</td>
-                <td><span class="status open">INSCRIT</span></td>
-            </tr>
-
-            <tr>
-                <td class="team">FMT Racing #03</td>
-                <td>BMW M Hybrid V8</td>
-                <td><span class="badge">Hypercar</span></td>
-                <td>Tom / Nico</td>
-                <td>Spa 6H</td>
-                <td><span class="status open">INSCRIT</span></td>
-            </tr>
-
-            <tr>
-                <td class="team">FMT Racing #04</td>
-                <td>Cadillac V-Series.R</td>
-                <td><span class="badge">Hypercar</span></td>
-                <td>Lucas / Ben</td>
-                <td>Spa 6H</td>
-                <td><span class="status open">INSCRIT</span></td>
-            </tr>
-
-        </tbody>
-
-    </table>
-
-</div>
-```
-
-</section>
-
-<!-- ================= DRIVERS ================= -->
-
-<section id="drivers" class="section">
-
-```
-<div class="section-header">
-    <h2>Pilotes</h2>
-
-    <button class="btn btn-primary">
-        + Ajouter un pilote
-    </button>
-</div>
-
-<div class="table-container">
-
-    <table>
-
-        <thead>
-            <tr>
-                <th>Pilote</th>
-                <th>Équipe</th>
-                <th>Courses</th>
-                <th>Relais</th>
-                <th>Temps de conduite</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            <tr>
-                <td class="team">McFly</td>
-                <td>FMT Racing #01</td>
-                <td>8</td>
-                <td>24</td>
-                <td>31h 20m</td>
-                <td><span class="status open">ACTIF</span></td>
-            </tr>
-
-            <tr>
-                <td class="team">Raph</td>
-                <td>FMT Racing #01</td>
-                <td>7</td>
-                <td>21</td>
-                <td>27h 45m</td>
-                <td><span class="status open">ACTIF</span></td>
-            </tr>
-
-            <tr>
-                <td class="team">Alex</td>
-                <td>FMT Racing #02</td>
-                <td>6</td>
-                <td>18</td>
-                <td>23h 10m</td>
-                <td><span class="status open">ACTIF</span></td>
-            </tr>
-
-        </tbody>
-
-    </table>
-
-</div>
-```
-
-</section>
-
-<!-- ================= PLANNING ================= -->
-
-<section id="planning" class="section">
-
-```
-<div class="section-header">
-    <h2>Planning des relais</h2>
-
-    <button class="btn btn-primary">
-        Générer le planning
-    </button>
-</div>
-
-<div class="planning">
-
-    <div class="panel">
-
-        <h3>FMT Racing #01 — Spa 6H</h3>
-
-        <div class="stint">
-            <div class="stint-time">00:00</div>
-            <div class="stint-driver">
-                <strong>McFly</strong>
-                <span>Relais 1 · 45 min</span>
-            </div>
-            <div class="stint-type">DÉPART</div>
-        </div>
-
-        <div class="stint">
-            <div class="stint-time">00:45</div>
-            <div class="stint-driver">
-                <strong>Raph</strong>
-                <span>Relais 2 · 45 min</span>
-            </div>
-            <div class="stint-type">PIT</div>
-        </div>
-
-        <div class="stint">
-            <div class="stint-time">01:30</div>
-            <div class="stint-driver">
-                <strong>McFly</strong>
-                <span>Relais 3 · 45 min</span>
-            </div>
-            <div class="stint-type">PIT</div>
-        </div>
-
-        <div class="stint">
-            <div class="stint-time">02:15</div>
-            <div class="stint-driver">
-                <strong>Raph</strong>
-                <span>Relais 4 · 45 min</span>
-            </div>
-            <div class="stint-type">PIT</div>
-        </div>
-
-        <div class="stint">
-            <div class="stint-time">03:00</div>
-            <div class="stint-driver">
-                <strong>McFly</strong>
-                <span>Relais 5 · 45 min</span>
-            </div>
-            <div class="stint-type">PIT</div>
-        </div>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h3>Stratégie</h3>
-
-        <div style="margin-bottom:20px;">
-            <div class="info-label">Durée de course</div>
-            <div style="font-size:22px;font-weight:bold;margin-top:6px;">6h 00m</div>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <div class="info-label">Nombre de relais</div>
-            <div style="font-size:22px;font-weight:bold;margin-top:6px;">8</div>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <div class="info-label">Temps moyen par pilote</div>
-            <div style="font-size:22px;font-weight:bold;margin-top:6px;">3h 00m</div>
-        </div>
-
-        <div>
-            <div class="info-label">Pneus disponibles</div>
-            <div style="font-size:22px;font-weight:bold;margin-top:6px;">24</div>
-        </div>
-
-    </div>
-
-</div>
-```
-
-</section>
-
-<!-- ================= RESULTS ================= -->
-
-<section id="results" class="section">
-
-```
-<div class="section-header">
-    <h2>Résultats</h2>
-</div>
-
-<div class="table-container">
-
-    <table>
-
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Équipe</th>
-                <th>Voiture</th>
-                <th>Tours</th>
-                <th>Temps</th>
-                <th>Écart</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            <tr>
-                <td>1</td>
-                <td class="team">FMT Racing #01</td>
-                <td>Ferrari 499P</td>
-                <td>154</td>
-                <td>6:01:24</td>
-                <td>—</td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td class="team">FMT Racing #02</td>
-                <td>Porsche 963</td>
-                <td>153</td>
-                <td>6:00:58</td>
-                <td>+1 tour</td>
-            </tr>
-
-            <tr>
-                <td>3</td>
-                <td class="team">FMT Racing #03</td>
-                <td>BMW M Hybrid V8</td>
-                <td>152</td>
-                <td>6:01:11</td>
-                <td>+2 tours</td>
-            </tr>
-
-        </tbody>
-
-    </table>
-
-</div>
-```
-
-</section>
-
-<!-- ================= ADMIN ================= -->
-
-<section id="admin" class="section">
-
-```
-<div class="section-header">
-    <h2>Administration</h2>
-</div>
-
-<div class="planning">
-
-    <div class="panel">
-
-        <h3>Configuration</h3>
-
-        <div class="form-group">
-            <label>Nom de la communauté</label>
-            <input value="French McFly Team">
-        </div>
-
-        <div class="form-group">
-            <label>Nom de l'application</label>
-            <input value="FMT Endurance Manager">
-        </div>
-
-        <div class="form-group">
-            <label>Jeu principal</label>
-            <select>
-                <option>Le Mans Ultimate</option>
-                <option>Assetto Corsa Competizione</option>
-                <option>iRacing</option>
-                <option>Rennsport</option>
-            </select>
-        </div>
-
-        <button class="btn btn-primary" onclick="alert('Configuration sauvegardée !')">
-            Sauvegarder
-        </button>
-
-    </div>
-
-    <div class="panel">
-
-        <h3>Informations</h3>
-
-        <p style="color:#8f99a5;font-size:13px;line-height:1.7;">
-            Cette section permettra plus tard de gérer les paramètres
-            généraux de l'application, les administrateurs, les rôles
-            Discord et les règles des courses.
-        </p>
-
-    </div>
-
-</div>
-```
-
-</section>
-
-</div>
-
-</main>
-
-</div>
-
-<!-- ================= MODAL NEW RACE ================= -->
-
-<div class="modal-overlay" id="raceModal">
-
-```
-<div class="modal">
-
-    <h2>Créer une nouvelle course</h2>
-
-    <div class="form-group">
-        <label>Nom du circuit</label>
-        <input id="circuit" placeholder="Ex : Spa-Francorchamps">
-    </div>
-
-    <div class="form-group">
-        <label>Jeu</label>
-
-        <select id="game">
-            <option>Le Mans Ultimate</option>
-            <option>Assetto Corsa Competizione</option>
-            <option>iRacing</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Durée</label>
-
-        <select id="duration">
-            <option>2H</option>
-            <option>4H</option>
-            <option>6H</option>
-            <option>12H</option>
-            <option>24H</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Catégorie</label>
-
-        <select id="category">
-            <option>Hypercar</option>
-            <option>LMP2</option>
-            <option>GT3</option>
-            <option>Multi-class</option>
-        </select>
-    </div>
-
-    <div class="modal-actions">
-
-        <button class="btn btn-secondary" onclick="closeModal()">
-            Annuler
-        </button>
-
-        <button class="btn btn-primary" onclick="createRace()">
-            Créer la course
-        </button>
-
-    </div>
-
-</div>
-```
-
-</div>
 
 <script>
 
-/* =========================
-   NAVIGATION
-========================= */
-
-function showSection(id, button) {
-
-    document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-    });
-
-    document.getElementById(id).classList.add('active');
-
-    document.querySelectorAll('.nav button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    if(button) {
-        button.classList.add('active');
+let events = [
+    {
+        id: 1,
+        name: "Spa-Francorchamps 6H",
+        date: "2026-09-14",
+        time: "20:00",
+        duration: "6 heures",
+        availability: []
     }
+];
 
-    const titles = {
-        dashboard: "Dashboard",
-        courses: "Courses",
-        teams: "Équipages",
-        drivers: "Pilotes",
-        planning: "Planning",
-        results: "Résultats",
-        admin: "Administration"
-    };
+let currentEvent = null;
 
-    document.getElementById('pageTitle').textContent = titles[id];
+
+// AFFICHAGE DES PAGES
+
+function hideAll() {
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("createEvent").classList.add("hidden");
+    document.getElementById("eventPage").classList.add("hidden");
+}
+
+function showHome() {
+    hideAll();
+    document.getElementById("home").classList.remove("hidden");
+    displayEvents();
+}
+
+function showCreateEvent() {
+    hideAll();
+    document.getElementById("createEvent").classList.remove("hidden");
 }
 
 
-/* =========================
-   MODAL
-========================= */
+// CREER EVENEMENT
 
-function openModal() {
-    document.getElementById('raceModal').classList.add('show');
-}
+function createEvent() {
 
-function closeModal() {
-    document.getElementById('raceModal').classList.remove('show');
-}
+    const name = document.getElementById("eventName").value;
+    const date = document.getElementById("eventDate").value;
+    const time = document.getElementById("eventTime").value;
+    const duration = document.getElementById("eventDuration").value;
 
-
-/* =========================
-   CREATE RACE
-========================= */
-
-function createRace() {
-
-    const circuit = document.getElementById('circuit').value;
-    const duration = document.getElementById('duration').value;
-    const category = document.getElementById('category').value;
-
-    if(!circuit) {
-        alert("Merci d'indiquer le circuit.");
+    if (!name || !date || !time) {
+        alert("Merci de remplir tous les champs.");
         return;
     }
 
-    alert(
-        "Course créée !\n\n" +
-        circuit + " — " +
-        duration + "\n" +
-        "Catégorie : " + category +
-        "\n\nLa sauvegarde réelle sera ajoutée dans une prochaine étape."
-    );
+    const newEvent = {
+        id: Date.now(),
+        name: name,
+        date: date,
+        time: time,
+        duration: duration,
+        availability: []
+    };
 
-    closeModal();
+    events.push(newEvent);
+
+    openEvent(newEvent.id);
 }
 
 
-/* Fermer le modal en cliquant à côté */
+// AFFICHER LES EVENEMENTS
 
-document.getElementById('raceModal').addEventListener('click', function(e) {
+function displayEvents() {
 
-    if(e.target === this) {
-        closeModal();
+    const list = document.getElementById("eventsList");
+
+    if (events.length === 0) {
+        list.innerHTML = `
+            <div class="empty">
+                Aucun événement pour le moment.
+            </div>
+        `;
+        return;
     }
 
-});
+    list.innerHTML = "";
+
+    events.forEach(event => {
+
+        const date = formatDate(event.date);
+
+        list.innerHTML += `
+            <div class="event">
+
+                <div>
+                    <h3>🏁 ${event.name}</h3>
+
+                    <div class="event-info">
+                        📅 ${date} à ${event.time}
+                        · ⏱️ ${event.duration}
+                    </div>
+                </div>
+
+                <button class="button"
+                    onclick="openEvent(${event.id})">
+                    VOIR
+                </button>
+
+            </div>
+        `;
+    });
+}
+
+
+// OUVRIR EVENEMENT
+
+function openEvent(id) {
+
+    currentEvent = events.find(event => event.id === id);
+
+    if (!currentEvent) return;
+
+    hideAll();
+
+    document.getElementById("eventPage").classList.remove("hidden");
+
+    document.getElementById("eventTitle").textContent =
+        currentEvent.name;
+
+    document.getElementById("eventDetails").textContent =
+        "📅 " + formatDate(currentEvent.date)
+        + " · 🕐 " + currentEvent.time
+        + " · ⏱️ " + currentEvent.duration;
+
+    displayAvailability();
+}
+
+
+// FORMULAIRE DISPONIBILITE
+
+function showAvailability() {
+    document.getElementById("availabilityForm")
+        .classList.remove("hidden");
+}
+
+function hideAvailability() {
+    document.getElementById("availabilityForm")
+        .classList.add("hidden");
+}
+
+
+// AJOUTER DISPONIBILITE
+
+function addAvailability() {
+
+    const name = document.getElementById("driverName").value;
+    const status = document.getElementById("driverStatus").value;
+
+    if (!name) {
+        alert("Merci d'indiquer ton pseudo.");
+        return;
+    }
+
+    currentEvent.availability.push({
+        name: name,
+        status: status
+    });
+
+    document.getElementById("driverName").value = "";
+
+    hideAvailability();
+
+    displayAvailability();
+}
+
+
+// AFFICHER DISPONIBILITES
+
+function displayAvailability() {
+
+    const list = document.getElementById("availabilityList");
+
+    if (currentEvent.availability.length === 0) {
+
+        list.innerHTML = `
+            <div class="empty">
+                Personne n'a encore indiqué sa disponibilité.
+            </div>
+        `;
+
+        return;
+    }
+
+    list.innerHTML = "";
+
+    currentEvent.availability.forEach(person => {
+
+        let text = "";
+        let className = "";
+
+        if (person.status === "available") {
+            text = "Disponible";
+            className = "available";
+        }
+
+        if (person.status === "maybe") {
+            text = "Peut-être";
+            className = "maybe";
+        }
+
+        if (person.status === "unavailable") {
+            text = "Indisponible";
+            className = "unavailable";
+        }
+
+        list.innerHTML += `
+            <div class="person">
+
+                <strong>${person.name}</strong>
+
+                <span class="status ${className}">
+                    ${text}
+                </span>
+
+            </div>
+        `;
+    });
+}
+
+
+// DATE
+
+function formatDate(dateString) {
+
+    const date = new Date(dateString + "T00:00:00");
+
+    return date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
+}
+
+
+// DEMARRAGE
+
+showHome();
 
 </script>
 

@@ -7,6 +7,7 @@
 <title>FMT Endurance</title>
 
 <style>
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -15,13 +16,13 @@
 
 body {
     font-family: Arial, sans-serif;
-    background:  #0b0d10;
+    background: #0b0d10;
     color: #f2f4f7;
     min-height: 100vh;
 }
 
 .container {
-    width: min(900px, 92%);
+    width: min(950px, 92%);
     margin: auto;
     padding: 40px 0;
 }
@@ -55,12 +56,16 @@ header p {
 }
 
 h1 {
-    font-size: 26px;
+    font-size: 28px;
     margin-bottom: 10px;
 }
 
 h2 {
     margin-bottom: 20px;
+}
+
+h3 {
+    margin-bottom: 8px;
 }
 
 .button {
@@ -84,6 +89,11 @@ h2 {
     color: white;
 }
 
+.button.danger {
+    background: #ff4d5a;
+    color: white;
+}
+
 .events {
     margin-top: 25px;
 }
@@ -92,16 +102,12 @@ h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 25px;
+    gap: 20px;
     padding: 20px;
     background: #181d23;
     border: 1px solid #272e36;
     border-radius: 12px;
     margin-bottom: 12px;
-}
-
-.event h3 {
-    margin-bottom: 8px;
 }
 
 .event-info {
@@ -110,7 +116,7 @@ h2 {
 }
 
 .countdown {
-    min-width: 210px;
+    min-width: 220px;
     text-align: center;
     padding: 12px;
     background: #0b0d10;
@@ -127,16 +133,12 @@ h2 {
 
 .countdown-time {
     color: #9cff00;
-    font-size: 20px;
+    font-size: 19px;
     font-weight: bold;
 }
 
 .countdown.running {
     border-color: #9cff00;
-}
-
-.countdown.running .countdown-time {
-    color: #9cff00;
 }
 
 .countdown.finished {
@@ -179,6 +181,10 @@ select {
     display: none;
 }
 
+.back {
+    margin-bottom: 20px;
+}
+
 .event-header {
     text-align: center;
     margin-bottom: 30px;
@@ -189,15 +195,61 @@ select {
     margin-top: 10px;
 }
 
-.availability {
+.departures {
     margin-top: 25px;
+}
+
+.departure {
+    background: #181d23;
+    border: 1px solid #272e36;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+}
+
+.departure.next {
+    border-color: #9cff00;
+}
+
+.departure-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.departure-date {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.departure-time {
+    color: #9cff00;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.next-label {
+    background: #9cff00;
+    color: #101400;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.departure-form {
+    background: #0b0d10;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
 }
 
 .person {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 13px;
     border-bottom: 1px solid #272e36;
 }
 
@@ -230,14 +282,34 @@ select {
 .empty {
     text-align: center;
     color: #8f99a5;
-    padding: 30px 10px;
+    padding: 25px 10px;
 }
 
-.back {
-    margin-bottom: 20px;
+.departure-list {
+    margin-top: 15px;
 }
 
-@media (max-width: 700px) {
+.small-button {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.departure-builder {
+    background: #181d23;
+    border: 1px solid #272e36;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+}
+
+.departure-builder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 750px) {
 
     .event {
         flex-direction: column;
@@ -252,6 +324,11 @@ select {
         width: 100%;
     }
 
+    .departure-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .buttons {
         flex-direction: column;
     }
@@ -260,6 +337,7 @@ select {
         width: 100%;
     }
 }
+
 </style>
 </head>
 
@@ -267,290 +345,187 @@ select {
 
 <div class="container">
 
-    <!-- ========================= -->
-    <!-- ACCUEIL -->
-    <!-- ========================= -->
+<!-- ================================= -->
+<!-- ACCUEIL -->
+<!-- ================================= -->
 
-    <section id="home">
+<section id="home">
 
-        <header>
-            <div class="logo">
-                FMT <span>■</span> ENDURANCE
-            </div>
+<header>
 
-            <p>
-                Organisation simple de vos événements endurance
-            </p>
-        </header>
+    <div class="logo">
+        FMT <span>■</span> ENDURANCE
+    </div>
 
+    <p>
+        Organisation simple de vos événements endurance
+    </p>
 
-        <div class="card" style="text-align:center;">
+</header>
 
-            <h1>Organiser un événement</h1>
 
-            <p style="color:#8f99a5; margin-bottom:20px;">
-                Crée un événement et laisse les pilotes indiquer leurs disponibilités.
-            </p>
+<div class="card" style="text-align:center;">
 
-            <button class="button" onclick="showCreateEvent()">
-                + CRÉER UN ÉVÉNEMENT
-            </button>
+    <h1>Organiser un événement</h1>
 
-        </div>
+    <p style="color:#8f99a5; margin-bottom:20px;">
+        Crée un événement et propose plusieurs départs
+        aux pilotes.
+    </p>
 
+    <button
+        class="button"
+        onclick="showCreateEvent()"
+    >
+        + CRÉER UN ÉVÉNEMENT
+    </button>
 
-        <div class="card">
+</div>
 
-            <h2>🏁 Événements</h2>
 
-            <div id="eventsList" class="events"></div>
+<div class="card">
 
-        </div>
+    <h2>🏁 Événements</h2>
 
-    </section>
+    <div id="eventsList"></div>
 
+</div>
 
-    <!-- ========================= -->
-    <!-- CREATION EVENEMENT -->
-    <!-- ========================= -->
+</section>
 
-    <section id="createEvent" class="hidden">
 
-        <div class="back">
+<!-- ================================= -->
+<!-- CREATION EVENEMENT -->
+<!-- ================================= -->
 
-            <button class="button secondary" onclick="showHome()">
-                ← Retour
-            </button>
+<section id="createEvent" class="hidden">
 
-        </div>
+<div class="back">
 
+    <button
+        class="button secondary"
+        onclick="showHome()"
+    >
+        ← Retour
+    </button>
 
-        <div class="card">
+</div>
 
-            <h1>Créer un événement</h1>
 
+<div class="card">
 
-            <div class="form-group">
+<h1>Créer un événement</h1>
 
-                <label>Nom de l'événement</label>
+<div class="form-group">
 
-                <input
-                    id="eventName"
-                    type="text"
-                    placeholder="Ex : Spa 6H"
-                >
+    <label>Nom de l'événement</label>
 
-            </div>
+    <input
+        id="eventName"
+        type="text"
+        placeholder="Ex : Spa-Francorchamps"
+    >
 
+</div>
 
-            <div class="form-group">
 
-                <label>Date</label>
+<h2 style="margin-top:30px;">
+    🏁 Départs
+</h2>
 
-                <input
-                    id="eventDate"
-                    type="date"
-                >
+<p style="color:#8f99a5; margin-bottom:20px;">
+    Ajoute les différents jours et horaires proposés.
+</p>
 
-            </div>
 
+<div id="departureBuilder"></div>
 
-            <div class="form-group">
 
-                <label>Heure</label>
+<button
+    class="button secondary"
+    onclick="addDepartureField()"
+>
+    + AJOUTER UN DÉPART
+</button>
 
-                <input
-                    id="eventTime"
-                    type="time"
-                >
 
-            </div>
+<div class="buttons">
 
+    <button
+        class="button"
+        onclick="createEvent()"
+    >
+        CRÉER L'ÉVÉNEMENT
+    </button>
 
-            <div class="form-group">
+    <button
+        class="button secondary"
+        onclick="showHome()"
+    >
+        ANNULER
+    </button>
 
-                <label>Durée</label>
+</div>
 
-                <select id="eventDuration">
+</div>
 
-                    <option value="1 heure">
-                        1 heure
-                    </option>
+</section>
 
-                    <option value="2 heures">
-                        2 heures
-                    </option>
 
-                    <option value="4 heures">
-                        4 heures
-                    </option>
+<!-- ================================= -->
+<!-- PAGE EVENEMENT -->
+<!-- ================================= -->
 
-                    <option value="6 heures">
-                        6 heures
-                    </option>
+<section id="eventPage" class="hidden">
 
-                    <option value="8 heures">
-                        8 heures
-                    </option>
+<div class="back">
 
-                    <option value="12 heures">
-                        12 heures
-                    </option>
+    <button
+        class="button secondary"
+        onclick="showHome()"
+    >
+        ← Retour aux événements
+    </button>
 
-                    <option value="24 heures">
-                        24 heures
-                    </option>
+</div>
 
-                </select>
 
-            </div>
+<div class="card">
 
+    <div class="event-header">
 
-            <div class="buttons">
-
-                <button
-                    class="button"
-                    onclick="createEvent()"
-                >
-                    CRÉER L'ÉVÉNEMENT
-                </button>
-
-
-                <button
-                    class="button secondary"
-                    onclick="showHome()"
-                >
-                    ANNULER
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- PAGE EVENEMENT -->
-    <!-- ========================= -->
-
-    <section id="eventPage" class="hidden">
-
-        <div class="back">
-
-            <button
-                class="button secondary"
-                onclick="showHome()"
-            >
-                ← Retour aux événements
-            </button>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="event-header">
-
-                <h1 id="eventTitle"></h1>
-
-                <div
-                    id="eventDetails"
-                    class="date"
-                ></div>
-
-            </div>
-
-
-            <button
-                class="button"
-                onclick="showAvailability()"
-            >
-                + AJOUTER MA DISPONIBILITÉ
-            </button>
-
-        </div>
-
-
-        <!-- FORMULAIRE DISPONIBILITE -->
+        <h1 id="eventTitle"></h1>
 
         <div
-            id="availabilityForm"
-            class="card hidden"
+            id="nextCountdown"
+            class="countdown"
+            style="margin:20px auto 0;"
         >
 
-            <h2>Ma disponibilité</h2>
-
-
-            <div class="form-group">
-
-                <label>Ton pseudo</label>
-
-                <input
-                    id="driverName"
-                    type="text"
-                    placeholder="Ex : McFly"
-                >
-
+            <div class="countdown-title">
+                ⏳ Prochain départ
             </div>
 
-
-            <div class="form-group">
-
-                <label>Ta disponibilité</label>
-
-                <select id="driverStatus">
-
-                    <option value="available">
-                        🟢 Disponible
-                    </option>
-
-                    <option value="maybe">
-                        🟠 Peut-être
-                    </option>
-
-                    <option value="unavailable">
-                        🔴 Indisponible
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="buttons">
-
-                <button
-                    class="button"
-                    onclick="addAvailability()"
-                >
-                    ENREGISTRER
-                </button>
-
-
-                <button
-                    class="button secondary"
-                    onclick="hideAvailability()"
-                >
-                    ANNULER
-                </button>
-
+            <div class="countdown-time">
+                Calcul...
             </div>
 
         </div>
 
+    </div>
 
-        <!-- DISPONIBILITES -->
+</div>
 
-        <div class="card availability">
 
-            <h2>👥 Disponibilités</h2>
+<div class="card">
 
-            <div id="availabilityList"></div>
+    <h2>🏁 Départs</h2>
 
-        </div>
+    <div id="departuresList"></div>
 
-    </section>
+</div>
+
+</section>
 
 </div>
 
@@ -566,15 +541,25 @@ let events = [
     {
         id: 1,
 
-        name: "Spa-Francorchamps 6H",
+        name: "Spa-Francorchamps",
 
-        date: "2026-09-14",
+        departures: [
 
-        time: "20:00",
+            {
+                id: 101,
+                date: "2026-09-14",
+                time: "20:00",
+                availability: []
+            },
 
-        duration: "6 heures",
+            {
+                id: 102,
+                date: "2026-09-15",
+                time: "20:00",
+                availability: []
+            }
 
-        availability: []
+        ]
 
     }
 
@@ -590,16 +575,13 @@ let currentEvent = null;
 
 function hideAll() {
 
-    document
-        .getElementById("home")
+    document.getElementById("home")
         .classList.add("hidden");
 
-    document
-        .getElementById("createEvent")
+    document.getElementById("createEvent")
         .classList.add("hidden");
 
-    document
-        .getElementById("eventPage")
+    document.getElementById("eventPage")
         .classList.add("hidden");
 
 }
@@ -609,8 +591,7 @@ function showHome() {
 
     hideAll();
 
-    document
-        .getElementById("home")
+    document.getElementById("home")
         .classList.remove("hidden");
 
     displayEvents();
@@ -622,35 +603,154 @@ function showCreateEvent() {
 
     hideAll();
 
-    document
-        .getElementById("createEvent")
+    document.getElementById("createEvent")
         .classList.remove("hidden");
+
+    document.getElementById("departureBuilder")
+        .innerHTML = "";
+
+    addDepartureField();
 
 }
 
 
 // ==========================================
-// CREER UN EVENEMENT
+// AJOUTER UN DEPART DANS LE FORMULAIRE
+// ==========================================
+
+function addDepartureField() {
+
+    const container =
+        document.getElementById("departureBuilder");
+
+    const id = Date.now() + Math.random();
+
+
+    const div =
+        document.createElement("div");
+
+    div.className = "departure-builder";
+
+    div.dataset.id = id;
+
+
+    div.innerHTML = `
+
+        <div class="departure-builder-header">
+
+            <strong>
+                🏁 Départ
+            </strong>
+
+            <button
+                class="button danger small-button"
+                onclick="this.parentElement.parentElement.remove()"
+            >
+                Supprimer
+            </button>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Date</label>
+
+            <input
+                type="date"
+                class="departure-date-input"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Heure</label>
+
+            <input
+                type="time"
+                class="departure-time-input"
+            >
+
+        </div>
+
+    `;
+
+
+    container.appendChild(div);
+
+}
+
+
+// ==========================================
+// CREER EVENEMENT
 // ==========================================
 
 function createEvent() {
 
     const name =
-        document.getElementById("eventName").value;
-
-    const date =
-        document.getElementById("eventDate").value;
-
-    const time =
-        document.getElementById("eventTime").value;
-
-    const duration =
-        document.getElementById("eventDuration").value;
+        document.getElementById("eventName").value.trim();
 
 
-    if (!name || !date || !time) {
+    if (!name) {
 
-        alert("Merci de remplir tous les champs.");
+        alert(
+            "Merci d'indiquer le nom de l'événement."
+        );
+
+        return;
+
+    }
+
+
+    const builders =
+        document.querySelectorAll(
+            ".departure-builder"
+        );
+
+
+    const departures = [];
+
+
+    builders.forEach(builder => {
+
+        const date =
+            builder.querySelector(
+                ".departure-date-input"
+            ).value;
+
+
+        const time =
+            builder.querySelector(
+                ".departure-time-input"
+            ).value;
+
+
+        if (date && time) {
+
+            departures.push({
+
+                id: Date.now() + Math.random(),
+
+                date: date,
+
+                time: time,
+
+                availability: []
+
+            });
+
+        }
+
+    });
+
+
+    if (departures.length === 0) {
+
+        alert(
+            "Ajoute au moins un départ."
+        );
 
         return;
 
@@ -663,13 +763,7 @@ function createEvent() {
 
         name: name,
 
-        date: date,
-
-        time: time,
-
-        duration: duration,
-
-        availability: []
+        departures: departures
 
     };
 
@@ -683,7 +777,7 @@ function createEvent() {
 
 
 // ==========================================
-// AFFICHER LES EVENEMENTS
+// AFFICHER EVENEMENTS
 // ==========================================
 
 function displayEvents() {
@@ -695,9 +789,11 @@ function displayEvents() {
     if (events.length === 0) {
 
         list.innerHTML = `
+
             <div class="empty">
                 Aucun événement pour le moment.
             </div>
+
         `;
 
         return;
@@ -710,28 +806,16 @@ function displayEvents() {
 
     events.forEach(event => {
 
-        list.innerHTML += `
+        const next =
+            getNextDeparture(event);
 
-            <div class="event">
 
-                <div style="flex:1">
+        let countdownHTML = "";
 
-                    <h3>
-                        🏁 ${event.name}
-                    </h3>
 
-                    <div class="event-info">
+        if (next) {
 
-                        📅 ${formatDate(event.date)}
-
-                        · 🕐 ${event.time}
-
-                        · ⏱️ ${event.duration}
-
-                    </div>
-
-                </div>
-
+            countdownHTML = `
 
                 <div
                     class="countdown"
@@ -739,7 +823,7 @@ function displayEvents() {
                 >
 
                     <div class="countdown-title">
-                        ⏳ Départ dans
+                        ⏳ Prochain départ
                     </div>
 
                     <div class="countdown-time">
@@ -747,6 +831,51 @@ function displayEvents() {
                     </div>
 
                 </div>
+
+            `;
+
+        } else {
+
+            countdownHTML = `
+
+                <div class="countdown finished">
+
+                    <div class="countdown-title">
+                        🏁 Événement terminé
+                    </div>
+
+                    <div class="countdown-time">
+                        Terminé
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+
+        list.innerHTML += `
+
+            <div class="event">
+
+                <div style="flex:1">
+
+                    <h3>
+                        🏁 ${escapeHTML(event.name)}
+                    </h3>
+
+                    <div class="event-info">
+
+                        ${event.departures.length}
+                        départ${event.departures.length > 1 ? "s" : ""}
+
+                    </div>
+
+                </div>
+
+
+                ${countdownHTML}
 
 
                 <button
@@ -769,6 +898,62 @@ function displayEvents() {
 
 
 // ==========================================
+// PROCHAIN DEPART
+// ==========================================
+
+function getNextDeparture(event) {
+
+    const now = new Date();
+
+
+    const future =
+        event.departures
+
+        .map(departure => {
+
+            return {
+
+                departure: departure,
+
+                date: getDepartureDate(departure)
+
+            };
+
+        })
+
+        .filter(item => item.date > now)
+
+        .sort(
+            (a, b) => a.date - b.date
+        );
+
+
+    if (future.length === 0) {
+
+        return null;
+
+    }
+
+
+    return future[0].departure;
+
+}
+
+
+// ==========================================
+// DATE DE DEPART
+// ==========================================
+
+function getDepartureDate(departure) {
+
+    return new Date(
+        `${departure.date}T${departure.time}:00`
+    );
+
+}
+
+
+// ==========================================
 // COMPTE A REBOURS
 // ==========================================
 
@@ -785,174 +970,184 @@ function updateCountdowns() {
         if (!element) return;
 
 
-        const start =
-            new Date(
-                `${event.date}T${event.time}:00`
-            );
+        const next =
+            getNextDeparture(event);
 
 
-        const now =
-            new Date();
+        if (!next) {
 
-
-        const difference =
-            start - now;
-
-
-        const title =
-            element.querySelector(
-                ".countdown-title"
-            );
-
-        const time =
-            element.querySelector(
-                ".countdown-time"
-            );
-
-
-        // EVENEMENT A VENIR
-
-        if (difference > 0) {
-
-            const totalSeconds =
-                Math.floor(
-                    difference / 1000
-                );
-
-
-            const days =
-                Math.floor(
-                    totalSeconds / 86400
-                );
-
-
-            const hours =
-                Math.floor(
-                    (totalSeconds % 86400) / 3600
-                );
-
-
-            const minutes =
-                Math.floor(
-                    (totalSeconds % 3600) / 60
-                );
-
-
-            const seconds =
-                totalSeconds % 60;
-
-
-            time.textContent =
-                `${days}j ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
-
-
-            title.textContent =
-                "⏳ Départ dans";
-
-
-            element.classList.remove(
-                "running",
+            element.classList.add(
                 "finished"
             );
 
+            element.querySelector(
+                ".countdown-title"
+            ).textContent =
+                "🏁 Événement terminé";
+
+
+            element.querySelector(
+                ".countdown-time"
+            ).textContent =
+                "Terminé";
+
+
+            return;
+
+        }
+
+
+        const difference =
+            getDepartureDate(next) - new Date();
+
+
+        if (difference <= 0) {
+
+            displayEvents();
+
+            return;
+
         }
 
 
-        // EVENEMENT EN COURS
-
-        else {
-
-            const durationHours =
-                parseDuration(
-                    event.duration
-                );
+        const totalSeconds =
+            Math.floor(
+                difference / 1000
+            );
 
 
-            const end =
-                new Date(
-                    start.getTime()
-                    +
-                    durationHours * 60 * 60 * 1000
-                );
+        const days =
+            Math.floor(
+                totalSeconds / 86400
+            );
 
 
-            const remaining =
-                end - now;
+        const hours =
+            Math.floor(
+                (totalSeconds % 86400) / 3600
+            );
 
 
-            if (remaining > 0) {
-
-                title.textContent =
-                    "🟢 Événement en cours";
-
-                time.textContent =
-                    "Course en cours";
-
-                element.classList.add(
-                    "running"
-                );
-
-                element.classList.remove(
-                    "finished"
-                );
-
-            }
+        const minutes =
+            Math.floor(
+                (totalSeconds % 3600) / 60
+            );
 
 
-            // EVENEMENT TERMINE
+        const seconds =
+            totalSeconds % 60;
 
-            else {
 
-                title.textContent =
-                    "🏁 Événement terminé";
+        element.querySelector(
+            ".countdown-time"
+        ).textContent =
 
-                time.textContent =
-                    "Terminé";
-
-                element.classList.add(
-                    "finished"
-                );
-
-                element.classList.remove(
-                    "running"
-                );
-
-            }
-
-        }
+            `${days}j `
+            +
+            `${pad(hours)}h `
+            +
+            `${pad(minutes)}m `
+            +
+            `${pad(seconds)}s`;
 
     });
 
-}
 
-
-// ==========================================
-// UTILITAIRES COMPTEUR
-// ==========================================
-
-function pad(number) {
-
-    return String(number).padStart(2, "0");
-
-}
-
-
-function parseDuration(duration) {
-
-    const match =
-        duration.match(/\d+/);
-
-
-    if (!match) return 1;
-
-
-    return parseInt(match[0]);
+    updateEventPageCountdown();
 
 }
 
 
 // ==========================================
-// OUVRIR UN EVENEMENT
+// COMPTEUR PAGE EVENEMENT
+// ==========================================
+
+function updateEventPageCountdown() {
+
+    if (!currentEvent) return;
+
+
+    const element =
+        document.getElementById(
+            "nextCountdown"
+        );
+
+
+    if (!element) return;
+
+
+    const next =
+        getNextDeparture(currentEvent);
+
+
+    if (!next) {
+
+        element.querySelector(
+            ".countdown-title"
+        ).textContent =
+            "🏁 Événement terminé";
+
+
+        element.querySelector(
+            ".countdown-time"
+        ).textContent =
+            "Terminé";
+
+
+        return;
+
+    }
+
+
+    const difference =
+        getDepartureDate(next) - new Date();
+
+
+    const totalSeconds =
+        Math.floor(
+            difference / 1000
+        );
+
+
+    const days =
+        Math.floor(
+            totalSeconds / 86400
+        );
+
+
+    const hours =
+        Math.floor(
+            (totalSeconds % 86400) / 3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (totalSeconds % 3600) / 60
+        );
+
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    element.querySelector(
+        ".countdown-time"
+    ).textContent =
+
+        `${days}j `
+        +
+        `${pad(hours)}h `
+        +
+        `${pad(minutes)}m `
+        +
+        `${pad(seconds)}s`;
+
+}
+
+
+// ==========================================
+// OUVRIR EVENEMENT
 // ==========================================
 
 function openEvent(id) {
@@ -969,37 +1164,271 @@ function openEvent(id) {
     hideAll();
 
 
-    document
-        .getElementById("eventPage")
+    document.getElementById("eventPage")
         .classList.remove("hidden");
 
 
-    document
-        .getElementById("eventTitle")
+    document.getElementById("eventTitle")
         .textContent =
         currentEvent.name;
 
 
-    document
-        .getElementById("eventDetails")
-        .textContent =
+    displayDepartures();
 
-        "📅 "
-        +
-        formatDate(currentEvent.date)
+    updateEventPageCountdown();
 
-        +
-        " · 🕐 "
-        +
-        currentEvent.time
-
-        +
-        " · ⏱️ "
-        +
-        currentEvent.duration;
+}
 
 
-    displayAvailability();
+// ==========================================
+// AFFICHER LES DEPARTS
+// ==========================================
+
+function displayDepartures() {
+
+    const list =
+        document.getElementById(
+            "departuresList"
+        );
+
+
+    const sorted =
+        [...currentEvent.departures]
+        .sort(
+            (a, b) =>
+                getDepartureDate(a)
+                -
+                getDepartureDate(b)
+        );
+
+
+    const next =
+        getNextDeparture(currentEvent);
+
+
+    list.innerHTML = "";
+
+
+    sorted.forEach(departure => {
+
+        const isNext =
+            next &&
+            departure.id === next.id;
+
+
+        const date =
+            formatDate(
+                departure.date
+            );
+
+
+        const availability =
+            departure.availability;
+
+
+        let peopleHTML = "";
+
+
+        if (availability.length === 0) {
+
+            peopleHTML = `
+
+                <div class="empty">
+                    Aucune disponibilité renseignée.
+                </div>
+
+            `;
+
+        } else {
+
+            availability.forEach(person => {
+
+                let text;
+                let className;
+
+
+                if (
+                    person.status === "available"
+                ) {
+
+                    text = "Disponible";
+                    className = "available";
+
+                }
+
+
+                if (
+                    person.status === "maybe"
+                ) {
+
+                    text = "Peut-être";
+                    className = "maybe";
+
+                }
+
+
+                if (
+                    person.status === "unavailable"
+                ) {
+
+                    text = "Indisponible";
+                    className = "unavailable";
+
+                }
+
+
+                peopleHTML += `
+
+                    <div class="person">
+
+                        <strong>
+                            ${escapeHTML(person.name)}
+                        </strong>
+
+                        <span
+                            class="status ${className}"
+                        >
+                            ${text}
+                        </span>
+
+                    </div>
+
+                `;
+
+            });
+
+        }
+
+
+        list.innerHTML += `
+
+            <div
+                class="departure
+                ${isNext ? "next" : ""}"
+            >
+
+                <div class="departure-header">
+
+                    <div>
+
+                        <div class="departure-date">
+
+                            📅 ${date}
+
+                        </div>
+
+                        <div class="departure-time">
+
+                            🕐 ${departure.time}
+
+                        </div>
+
+                    </div>
+
+
+                    ${
+                        isNext
+                        ?
+                        `
+                        <span class="next-label">
+                            PROCHAIN DÉPART
+                        </span>
+                        `
+                        :
+                        ""
+                    }
+
+                </div>
+
+
+                <button
+                    class="button"
+                    style="margin-top:15px;"
+                    onclick="showDepartureForm(${departure.id})"
+                >
+                    + MA DISPONIBILITÉ
+                </button>
+
+
+                <div
+                    id="form-${departure.id}"
+                    class="departure-form hidden"
+                >
+
+                    <div class="form-group">
+
+                        <label>
+                            Ton pseudo
+                        </label>
+
+                        <input
+                            id="name-${departure.id}"
+                            type="text"
+                            placeholder="Ex : McFly"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Ta disponibilité
+                        </label>
+
+                        <select
+                            id="status-${departure.id}"
+                        >
+
+                            <option value="available">
+                                🟢 Disponible
+                            </option>
+
+                            <option value="maybe">
+                                🟠 Peut-être
+                            </option>
+
+                            <option value="unavailable">
+                                🔴 Indisponible
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="buttons">
+
+                        <button
+                            class="button"
+                            onclick="addAvailability(${departure.id})"
+                        >
+                            ENREGISTRER
+                        </button>
+
+                        <button
+                            class="button secondary"
+                            onclick="hideDepartureForm(${departure.id})"
+                        >
+                            ANNULER
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="departure-list">
+
+                    ${peopleHTML}
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
 
 }
 
@@ -1008,19 +1437,19 @@ function openEvent(id) {
 // FORMULAIRE DISPONIBILITE
 // ==========================================
 
-function showAvailability() {
+function showDepartureForm(id) {
 
     document
-        .getElementById("availabilityForm")
+        .getElementById(`form-${id}`)
         .classList.remove("hidden");
 
 }
 
 
-function hideAvailability() {
+function hideDepartureForm(id) {
 
     document
-        .getElementById("availabilityForm")
+        .getElementById(`form-${id}`)
         .classList.add("hidden");
 
 }
@@ -1030,14 +1459,28 @@ function hideAvailability() {
 // AJOUTER DISPONIBILITE
 // ==========================================
 
-function addAvailability() {
+function addAvailability(departureId) {
+
+    const departure =
+        currentEvent.departures.find(
+            departure =>
+                departure.id === departureId
+        );
+
+
+    if (!departure) return;
+
 
     const name =
-        document.getElementById("driverName").value;
+        document.getElementById(
+            `name-${departureId}`
+        ).value.trim();
 
 
     const status =
-        document.getElementById("driverStatus").value;
+        document.getElementById(
+            `status-${departureId}`
+        ).value;
 
 
     if (!name) {
@@ -1051,131 +1494,51 @@ function addAvailability() {
     }
 
 
-    currentEvent.availability.push({
+    // Si le pilote existe déjà,
+    // on modifie sa disponibilité.
 
-        name: name,
-
-        status: status
-
-    });
-
-
-    document
-        .getElementById("driverName")
-        .value = "";
-
-
-    hideAvailability();
-
-
-    displayAvailability();
-
-}
-
-
-// ==========================================
-// AFFICHER DISPONIBILITES
-// ==========================================
-
-function displayAvailability() {
-
-    const list =
-        document.getElementById(
-            "availabilityList"
+    const existing =
+        departure.availability.find(
+            person =>
+                person.name.toLowerCase()
+                ===
+                name.toLowerCase()
         );
 
 
-    if (
-        currentEvent.availability.length === 0
-    ) {
+    if (existing) {
 
-        list.innerHTML = `
+        existing.status = status;
 
-            <div class="empty">
+    } else {
 
-                Personne n'a encore indiqué
-                sa disponibilité.
+        departure.availability.push({
 
-            </div>
+            name: name,
 
-        `;
+            status: status
 
-        return;
+        });
 
     }
 
 
-    list.innerHTML = "";
-
-
-    currentEvent.availability.forEach(
-        person => {
-
-            let text = "";
-
-            let className = "";
-
-
-            if (
-                person.status === "available"
-            ) {
-
-                text = "Disponible";
-
-                className = "available";
-
-            }
-
-
-            if (
-                person.status === "maybe"
-            ) {
-
-                text = "Peut-être";
-
-                className = "maybe";
-
-            }
-
-
-            if (
-                person.status === "unavailable"
-            ) {
-
-                text = "Indisponible";
-
-                className = "unavailable";
-
-            }
-
-
-            list.innerHTML += `
-
-                <div class="person">
-
-                    <strong>
-                        ${person.name}
-                    </strong>
-
-                    <span
-                        class="status ${className}"
-                    >
-                        ${text}
-                    </span>
-
-                </div>
-
-            `;
-
-        }
-    );
+    displayDepartures();
 
 }
 
 
 // ==========================================
-// DATE
+// UTILITAIRES
 // ==========================================
+
+function pad(number) {
+
+    return String(number)
+        .padStart(2, "0");
+
+}
+
 
 function formatDate(dateString) {
 
@@ -1188,8 +1551,9 @@ function formatDate(dateString) {
     return date.toLocaleDateString(
         "fr-FR",
         {
+            weekday: "long",
             day: "2-digit",
-            month: "2-digit",
+            month: "long",
             year: "numeric"
         }
     );
@@ -1197,11 +1561,21 @@ function formatDate(dateString) {
 }
 
 
-// ==========================================
-// COMPTEUR AUTOMATIQUE
-// ==========================================
+function escapeHTML(text) {
 
-// Mise à jour toutes les secondes
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+
+// ==========================================
+// COMPTEUR
+// ==========================================
 
 setInterval(
     updateCountdowns,

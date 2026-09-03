@@ -7,221 +7,259 @@
 <title>FMT Endurance</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    body {
-        font-family: Arial, sans-serif;
-        background: #0b0d10;
-        color: #f2f4f7;
-        min-height: 100vh;
-    }
+body {
+    font-family: Arial, sans-serif;
+    background: #0b0d10;
+    color: #f2f4f7;
+    min-height: 100vh;
+}
 
-    .container {
-        width: min(900px, 92%);
-        margin: auto;
-        padding: 40px 0;
-    }
+.container {
+    width: min(900px, 92%);
+    margin: auto;
+    padding: 40px 0;
+}
 
-    header {
-        text-align: center;
-        margin-bottom: 45px;
-    }
+header {
+    text-align: center;
+    margin-bottom: 45px;
+}
 
-    .logo {
-        font-size: 30px;
-        font-weight: bold;
-        letter-spacing: 2px;
-    }
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
 
-    .logo span {
-        color: #9cff00;
-    }
+.logo span {
+    color: #9cff00;
+}
 
-    header p {
-        color: #8f99a5;
-        margin-top: 10px;
-    }
+header p {
+    color: #8f99a5;
+    margin-top: 10px;
+}
 
-    .card {
-        background: #12161b;
-        border: 1px solid #272e36;
-        border-radius: 16px;
-        padding: 25px;
-        margin-bottom: 20px;
-    }
+.card {
+    background: #12161b;
+    border: 1px solid #272e36;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
 
-    h1 {
-        font-size: 26px;
-        margin-bottom: 10px;
-    }
+h1 {
+    font-size: 26px;
+    margin-bottom: 10px;
+}
 
-    h2 {
-        margin-bottom: 20px;
-    }
+h2 {
+    margin-bottom: 20px;
+}
 
-    .button {
-        display: inline-block;
-        border: none;
-        border-radius: 10px;
-        padding: 13px 20px;
-        background: #9cff00;
-        color: #101400;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 15px;
-    }
+.button {
+    display: inline-block;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 20px;
+    background: #9cff00;
+    color: #101400;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+}
 
-    .button:hover {
-        background: #b4ff40;
-    }
+.button:hover {
+    background: #b4ff40;
+}
 
-    .button.secondary {
-        background: #272e36;
-        color: white;
-    }
+.button.secondary {
+    background: #272e36;
+    color: white;
+}
 
-    .button.danger {
-        background: #ff4d5a;
-        color: white;
-    }
+.events {
+    margin-top: 25px;
+}
 
-    .events {
-        margin-top: 25px;
-    }
+.event {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+    padding: 20px;
+    background: #181d23;
+    border: 1px solid #272e36;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.event h3 {
+    margin-bottom: 8px;
+}
+
+.event-info {
+    color: #8f99a5;
+    font-size: 14px;
+}
+
+.countdown {
+    min-width: 210px;
+    text-align: center;
+    padding: 12px;
+    background: #0b0d10;
+    border-radius: 10px;
+    border: 1px solid #272e36;
+}
+
+.countdown-title {
+    color: #8f99a5;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.countdown-time {
+    color: #9cff00;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.countdown.running {
+    border-color: #9cff00;
+}
+
+.countdown.running .countdown-time {
+    color: #9cff00;
+}
+
+.countdown.finished {
+    border-color: #ff4d5a;
+}
+
+.countdown.finished .countdown-time {
+    color: #ff6b75;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    color: #cbd1d8;
+    font-size: 14px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 13px;
+    border-radius: 9px;
+    border: 1px solid #303841;
+    background: #0b0d10;
+    color: white;
+    font-size: 15px;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.hidden {
+    display: none;
+}
+
+.event-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.event-header .date {
+    color: #9cff00;
+    margin-top: 10px;
+}
+
+.availability {
+    margin-top: 25px;
+}
+
+.person {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #272e36;
+}
+
+.person:last-child {
+    border-bottom: none;
+}
+
+.status {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.available {
+    background: #203500;
+    color: #9cff00;
+}
+
+.maybe {
+    background: #443700;
+    color: #ffc857;
+}
+
+.unavailable {
+    background: #421c20;
+    color: #ff6b75;
+}
+
+.empty {
+    text-align: center;
+    color: #8f99a5;
+    padding: 30px 10px;
+}
+
+.back {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 700px) {
 
     .event {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-        background: #181d23;
-        border: 1px solid #272e36;
-        border-radius: 12px;
-        margin-bottom: 12px;
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .event h3 {
-        margin-bottom: 8px;
-    }
-
-    .event-info {
-        color: #8f99a5;
-        font-size: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 18px;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 7px;
-        color: #cbd1d8;
-        font-size: 14px;
-    }
-
-    input,
-    select {
+    .countdown {
         width: 100%;
-        padding: 13px;
-        border-radius: 9px;
-        border: 1px solid #303841;
-        background: #0b0d10;
-        color: white;
-        font-size: 15px;
+    }
+
+    .event .button {
+        width: 100%;
     }
 
     .buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 25px;
+        flex-direction: column;
     }
 
-    .hidden {
-        display: none;
+    .buttons .button {
+        width: 100%;
     }
-
-    .event-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .event-header .date {
-        color: #9cff00;
-        margin-top: 10px;
-    }
-
-    .availability {
-        margin-top: 25px;
-    }
-
-    .person {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px;
-        border-bottom: 1px solid #272e36;
-    }
-
-    .person:last-child {
-        border-bottom: none;
-    }
-
-    .status {
-        padding: 6px 10px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: bold;
-    }
-
-    .available {
-        background: #203500;
-        color: #9cff00;
-    }
-
-    .maybe {
-        background: #443700;
-        color: #ffc857;
-    }
-
-    .unavailable {
-        background: #421c20;
-        color: #ff6b75;
-    }
-
-    .empty {
-        text-align: center;
-        color: #8f99a5;
-        padding: 30px 10px;
-    }
-
-    .back {
-        margin-bottom: 20px;
-    }
-
-    @media (max-width: 650px) {
-        .event {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .event .button {
-            width: 100%;
-        }
-
-        .buttons {
-            flex-direction: column;
-        }
-
-        .buttons .button {
-            width: 100%;
-        }
-    }
+}
 </style>
 </head>
 
@@ -229,16 +267,27 @@
 
 <div class="container">
 
+    <!-- ========================= -->
     <!-- ACCUEIL -->
+    <!-- ========================= -->
+
     <section id="home">
 
         <header>
-            <div class="logo">FMT <span>■</span> ENDURANCE</div>
-            <p>Organisation simple de vos événements endurance</p>
+            <div class="logo">
+                FMT <span>■</span> ENDURANCE
+            </div>
+
+            <p>
+                Organisation simple de vos événements endurance
+            </p>
         </header>
 
+
         <div class="card" style="text-align:center;">
+
             <h1>Organiser un événement</h1>
+
             <p style="color:#8f99a5; margin-bottom:20px;">
                 Crée un événement et laisse les pilotes indiquer leurs disponibilités.
             </p>
@@ -246,80 +295,158 @@
             <button class="button" onclick="showCreateEvent()">
                 + CRÉER UN ÉVÉNEMENT
             </button>
+
         </div>
 
+
         <div class="card">
+
             <h2>🏁 Événements</h2>
 
             <div id="eventsList" class="events"></div>
+
         </div>
 
     </section>
 
 
+    <!-- ========================= -->
     <!-- CREATION EVENEMENT -->
+    <!-- ========================= -->
+
     <section id="createEvent" class="hidden">
 
         <div class="back">
+
             <button class="button secondary" onclick="showHome()">
                 ← Retour
             </button>
+
         </div>
+
 
         <div class="card">
 
             <h1>Créer un événement</h1>
 
+
             <div class="form-group">
+
                 <label>Nom de l'événement</label>
-                <input id="eventName" type="text" placeholder="Ex : Spa 6H">
+
+                <input
+                    id="eventName"
+                    type="text"
+                    placeholder="Ex : Spa 6H"
+                >
+
             </div>
 
+
             <div class="form-group">
+
                 <label>Date</label>
-                <input id="eventDate" type="date">
+
+                <input
+                    id="eventDate"
+                    type="date"
+                >
+
             </div>
 
+
             <div class="form-group">
+
                 <label>Heure</label>
-                <input id="eventTime" type="time">
+
+                <input
+                    id="eventTime"
+                    type="time"
+                >
+
             </div>
 
+
             <div class="form-group">
+
                 <label>Durée</label>
+
                 <select id="eventDuration">
-                    <option value="1 heure">1 heure</option>
-                    <option value="2 heures">2 heures</option>
-                    <option value="4 heures">4 heures</option>
-                    <option value="6 heures">6 heures</option>
-                    <option value="8 heures">8 heures</option>
-                    <option value="12 heures">12 heures</option>
-                    <option value="24 heures">24 heures</option>
+
+                    <option value="1 heure">
+                        1 heure
+                    </option>
+
+                    <option value="2 heures">
+                        2 heures
+                    </option>
+
+                    <option value="4 heures">
+                        4 heures
+                    </option>
+
+                    <option value="6 heures">
+                        6 heures
+                    </option>
+
+                    <option value="8 heures">
+                        8 heures
+                    </option>
+
+                    <option value="12 heures">
+                        12 heures
+                    </option>
+
+                    <option value="24 heures">
+                        24 heures
+                    </option>
+
                 </select>
+
             </div>
+
 
             <div class="buttons">
-                <button class="button" onclick="createEvent()">
+
+                <button
+                    class="button"
+                    onclick="createEvent()"
+                >
                     CRÉER L'ÉVÉNEMENT
                 </button>
 
-                <button class="button secondary" onclick="showHome()">
+
+                <button
+                    class="button secondary"
+                    onclick="showHome()"
+                >
                     ANNULER
                 </button>
+
             </div>
 
         </div>
+
     </section>
 
 
+    <!-- ========================= -->
     <!-- PAGE EVENEMENT -->
+    <!-- ========================= -->
+
     <section id="eventPage" class="hidden">
 
         <div class="back">
-            <button class="button secondary" onclick="showHome()">
+
+            <button
+                class="button secondary"
+                onclick="showHome()"
+            >
                 ← Retour aux événements
             </button>
+
         </div>
+
 
         <div class="card">
 
@@ -327,45 +454,84 @@
 
                 <h1 id="eventTitle"></h1>
 
-                <div id="eventDetails" class="date"></div>
+                <div
+                    id="eventDetails"
+                    class="date"
+                ></div>
 
             </div>
 
-            <button class="button" onclick="showAvailability()">
+
+            <button
+                class="button"
+                onclick="showAvailability()"
+            >
                 + AJOUTER MA DISPONIBILITÉ
             </button>
 
         </div>
 
 
-        <!-- AJOUT DISPONIBILITE -->
+        <!-- FORMULAIRE DISPONIBILITE -->
 
-        <div id="availabilityForm" class="card hidden">
+        <div
+            id="availabilityForm"
+            class="card hidden"
+        >
 
             <h2>Ma disponibilité</h2>
 
-            <div class="form-group">
-                <label>Ton pseudo</label>
-                <input id="driverName" type="text" placeholder="Ex : McFly">
-            </div>
 
             <div class="form-group">
+
+                <label>Ton pseudo</label>
+
+                <input
+                    id="driverName"
+                    type="text"
+                    placeholder="Ex : McFly"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
                 <label>Ta disponibilité</label>
 
                 <select id="driverStatus">
-                    <option value="available">🟢 Disponible</option>
-                    <option value="maybe">🟠 Peut-être</option>
-                    <option value="unavailable">🔴 Indisponible</option>
+
+                    <option value="available">
+                        🟢 Disponible
+                    </option>
+
+                    <option value="maybe">
+                        🟠 Peut-être
+                    </option>
+
+                    <option value="unavailable">
+                        🔴 Indisponible
+                    </option>
+
                 </select>
+
             </div>
+
 
             <div class="buttons">
 
-                <button class="button" onclick="addAvailability()">
+                <button
+                    class="button"
+                    onclick="addAvailability()"
+                >
                     ENREGISTRER
                 </button>
 
-                <button class="button secondary" onclick="hideAvailability()">
+
+                <button
+                    class="button secondary"
+                    onclick="hideAvailability()"
+                >
                     ANNULER
                 </button>
 
@@ -391,244 +557,661 @@
 
 <script>
 
+// ==========================================
+// DONNEES
+// ==========================================
+
 let events = [
+
     {
         id: 1,
+
         name: "Spa-Francorchamps 6H",
+
         date: "2026-09-14",
+
         time: "20:00",
+
         duration: "6 heures",
+
         availability: []
+
     }
+
 ];
+
 
 let currentEvent = null;
 
 
-// AFFICHAGE DES PAGES
+// ==========================================
+// NAVIGATION
+// ==========================================
 
 function hideAll() {
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("createEvent").classList.add("hidden");
-    document.getElementById("eventPage").classList.add("hidden");
+
+    document
+        .getElementById("home")
+        .classList.add("hidden");
+
+    document
+        .getElementById("createEvent")
+        .classList.add("hidden");
+
+    document
+        .getElementById("eventPage")
+        .classList.add("hidden");
+
 }
+
 
 function showHome() {
+
     hideAll();
-    document.getElementById("home").classList.remove("hidden");
+
+    document
+        .getElementById("home")
+        .classList.remove("hidden");
+
     displayEvents();
+
 }
+
 
 function showCreateEvent() {
+
     hideAll();
-    document.getElementById("createEvent").classList.remove("hidden");
+
+    document
+        .getElementById("createEvent")
+        .classList.remove("hidden");
+
 }
 
 
-// CREER EVENEMENT
+// ==========================================
+// CREER UN EVENEMENT
+// ==========================================
 
 function createEvent() {
 
-    const name = document.getElementById("eventName").value;
-    const date = document.getElementById("eventDate").value;
-    const time = document.getElementById("eventTime").value;
-    const duration = document.getElementById("eventDuration").value;
+    const name =
+        document.getElementById("eventName").value;
+
+    const date =
+        document.getElementById("eventDate").value;
+
+    const time =
+        document.getElementById("eventTime").value;
+
+    const duration =
+        document.getElementById("eventDuration").value;
+
 
     if (!name || !date || !time) {
+
         alert("Merci de remplir tous les champs.");
+
         return;
+
     }
 
+
     const newEvent = {
+
         id: Date.now(),
+
         name: name,
+
         date: date,
+
         time: time,
+
         duration: duration,
+
         availability: []
+
     };
+
 
     events.push(newEvent);
 
+
     openEvent(newEvent.id);
+
 }
 
 
+// ==========================================
 // AFFICHER LES EVENEMENTS
+// ==========================================
 
 function displayEvents() {
 
-    const list = document.getElementById("eventsList");
+    const list =
+        document.getElementById("eventsList");
+
 
     if (events.length === 0) {
+
         list.innerHTML = `
             <div class="empty">
                 Aucun événement pour le moment.
             </div>
         `;
+
         return;
+
     }
+
 
     list.innerHTML = "";
 
+
     events.forEach(event => {
 
-        const date = formatDate(event.date);
-
         list.innerHTML += `
+
             <div class="event">
 
-                <div>
-                    <h3>🏁 ${event.name}</h3>
+                <div style="flex:1">
+
+                    <h3>
+                        🏁 ${event.name}
+                    </h3>
 
                     <div class="event-info">
-                        📅 ${date} à ${event.time}
+
+                        📅 ${formatDate(event.date)}
+
+                        · 🕐 ${event.time}
+
                         · ⏱️ ${event.duration}
+
                     </div>
+
                 </div>
 
-                <button class="button"
-                    onclick="openEvent(${event.id})">
+
+                <div
+                    class="countdown"
+                    id="countdown-${event.id}"
+                >
+
+                    <div class="countdown-title">
+                        ⏳ Départ dans
+                    </div>
+
+                    <div class="countdown-time">
+                        Calcul...
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="button"
+                    onclick="openEvent(${event.id})"
+                >
                     VOIR
                 </button>
 
             </div>
+
         `;
+
     });
+
+
+    updateCountdowns();
+
 }
 
 
-// OUVRIR EVENEMENT
+// ==========================================
+// COMPTE A REBOURS
+// ==========================================
+
+function updateCountdowns() {
+
+    events.forEach(event => {
+
+        const element =
+            document.getElementById(
+                `countdown-${event.id}`
+            );
+
+
+        if (!element) return;
+
+
+        const start =
+            new Date(
+                `${event.date}T${event.time}:00`
+            );
+
+
+        const now =
+            new Date();
+
+
+        const difference =
+            start - now;
+
+
+        const title =
+            element.querySelector(
+                ".countdown-title"
+            );
+
+        const time =
+            element.querySelector(
+                ".countdown-time"
+            );
+
+
+        // EVENEMENT A VENIR
+
+        if (difference > 0) {
+
+            const totalSeconds =
+                Math.floor(
+                    difference / 1000
+                );
+
+
+            const days =
+                Math.floor(
+                    totalSeconds / 86400
+                );
+
+
+            const hours =
+                Math.floor(
+                    (totalSeconds % 86400) / 3600
+                );
+
+
+            const minutes =
+                Math.floor(
+                    (totalSeconds % 3600) / 60
+                );
+
+
+            const seconds =
+                totalSeconds % 60;
+
+
+            time.textContent =
+                `${days}j ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+
+
+            title.textContent =
+                "⏳ Départ dans";
+
+
+            element.classList.remove(
+                "running",
+                "finished"
+            );
+
+        }
+
+
+        // EVENEMENT EN COURS
+
+        else {
+
+            const durationHours =
+                parseDuration(
+                    event.duration
+                );
+
+
+            const end =
+                new Date(
+                    start.getTime()
+                    +
+                    durationHours * 60 * 60 * 1000
+                );
+
+
+            const remaining =
+                end - now;
+
+
+            if (remaining > 0) {
+
+                title.textContent =
+                    "🟢 Événement en cours";
+
+                time.textContent =
+                    "Course en cours";
+
+                element.classList.add(
+                    "running"
+                );
+
+                element.classList.remove(
+                    "finished"
+                );
+
+            }
+
+
+            // EVENEMENT TERMINE
+
+            else {
+
+                title.textContent =
+                    "🏁 Événement terminé";
+
+                time.textContent =
+                    "Terminé";
+
+                element.classList.add(
+                    "finished"
+                );
+
+                element.classList.remove(
+                    "running"
+                );
+
+            }
+
+        }
+
+    });
+
+}
+
+
+// ==========================================
+// UTILITAIRES COMPTEUR
+// ==========================================
+
+function pad(number) {
+
+    return String(number).padStart(2, "0");
+
+}
+
+
+function parseDuration(duration) {
+
+    const match =
+        duration.match(/\d+/);
+
+
+    if (!match) return 1;
+
+
+    return parseInt(match[0]);
+
+}
+
+
+// ==========================================
+// OUVRIR UN EVENEMENT
+// ==========================================
 
 function openEvent(id) {
 
-    currentEvent = events.find(event => event.id === id);
+    currentEvent =
+        events.find(
+            event => event.id === id
+        );
+
 
     if (!currentEvent) return;
 
+
     hideAll();
 
-    document.getElementById("eventPage").classList.remove("hidden");
 
-    document.getElementById("eventTitle").textContent =
+    document
+        .getElementById("eventPage")
+        .classList.remove("hidden");
+
+
+    document
+        .getElementById("eventTitle")
+        .textContent =
         currentEvent.name;
 
-    document.getElementById("eventDetails").textContent =
-        "📅 " + formatDate(currentEvent.date)
-        + " · 🕐 " + currentEvent.time
-        + " · ⏱️ " + currentEvent.duration;
+
+    document
+        .getElementById("eventDetails")
+        .textContent =
+
+        "📅 "
+        +
+        formatDate(currentEvent.date)
+
+        +
+        " · 🕐 "
+        +
+        currentEvent.time
+
+        +
+        " · ⏱️ "
+        +
+        currentEvent.duration;
+
 
     displayAvailability();
+
 }
 
 
+// ==========================================
 // FORMULAIRE DISPONIBILITE
+// ==========================================
 
 function showAvailability() {
-    document.getElementById("availabilityForm")
+
+    document
+        .getElementById("availabilityForm")
         .classList.remove("hidden");
+
 }
+
 
 function hideAvailability() {
-    document.getElementById("availabilityForm")
+
+    document
+        .getElementById("availabilityForm")
         .classList.add("hidden");
+
 }
 
 
+// ==========================================
 // AJOUTER DISPONIBILITE
+// ==========================================
 
 function addAvailability() {
 
-    const name = document.getElementById("driverName").value;
-    const status = document.getElementById("driverStatus").value;
+    const name =
+        document.getElementById("driverName").value;
+
+
+    const status =
+        document.getElementById("driverStatus").value;
+
 
     if (!name) {
-        alert("Merci d'indiquer ton pseudo.");
+
+        alert(
+            "Merci d'indiquer ton pseudo."
+        );
+
         return;
+
     }
 
+
     currentEvent.availability.push({
+
         name: name,
+
         status: status
+
     });
 
-    document.getElementById("driverName").value = "";
+
+    document
+        .getElementById("driverName")
+        .value = "";
+
 
     hideAvailability();
 
+
     displayAvailability();
+
 }
 
 
+// ==========================================
 // AFFICHER DISPONIBILITES
+// ==========================================
 
 function displayAvailability() {
 
-    const list = document.getElementById("availabilityList");
+    const list =
+        document.getElementById(
+            "availabilityList"
+        );
 
-    if (currentEvent.availability.length === 0) {
+
+    if (
+        currentEvent.availability.length === 0
+    ) {
 
         list.innerHTML = `
+
             <div class="empty">
-                Personne n'a encore indiqué sa disponibilité.
+
+                Personne n'a encore indiqué
+                sa disponibilité.
+
             </div>
+
         `;
 
         return;
+
     }
+
 
     list.innerHTML = "";
 
-    currentEvent.availability.forEach(person => {
 
-        let text = "";
-        let className = "";
+    currentEvent.availability.forEach(
+        person => {
 
-        if (person.status === "available") {
-            text = "Disponible";
-            className = "available";
+            let text = "";
+
+            let className = "";
+
+
+            if (
+                person.status === "available"
+            ) {
+
+                text = "Disponible";
+
+                className = "available";
+
+            }
+
+
+            if (
+                person.status === "maybe"
+            ) {
+
+                text = "Peut-être";
+
+                className = "maybe";
+
+            }
+
+
+            if (
+                person.status === "unavailable"
+            ) {
+
+                text = "Indisponible";
+
+                className = "unavailable";
+
+            }
+
+
+            list.innerHTML += `
+
+                <div class="person">
+
+                    <strong>
+                        ${person.name}
+                    </strong>
+
+                    <span
+                        class="status ${className}"
+                    >
+                        ${text}
+                    </span>
+
+                </div>
+
+            `;
+
         }
+    );
 
-        if (person.status === "maybe") {
-            text = "Peut-être";
-            className = "maybe";
-        }
-
-        if (person.status === "unavailable") {
-            text = "Indisponible";
-            className = "unavailable";
-        }
-
-        list.innerHTML += `
-            <div class="person">
-
-                <strong>${person.name}</strong>
-
-                <span class="status ${className}">
-                    ${text}
-                </span>
-
-            </div>
-        `;
-    });
 }
 
 
+// ==========================================
 // DATE
+// ==========================================
 
 function formatDate(dateString) {
 
-    const date = new Date(dateString + "T00:00:00");
+    const date =
+        new Date(
+            dateString + "T00:00:00"
+        );
 
-    return date.toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-    });
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
+
 }
 
 
+// ==========================================
+// COMPTEUR AUTOMATIQUE
+// ==========================================
+
+// Mise à jour toutes les secondes
+
+setInterval(
+    updateCountdowns,
+    1000
+);
+
+
+// ==========================================
 // DEMARRAGE
+// ==========================================
 
 showHome();
 

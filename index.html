@@ -1,2698 +1,1676 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>FMT Endurance</title>
-
-<style>
-
-/* =========================================================
-   FMT ENDURANCE
-   Design FMT inspiré des lignes graphiques ARC Raiders
-========================================================= */
-
-:root {
-    --bg: #080a0d;
-    --panel: #101419;
-    --panel2: #151a20;
-    --panel3: #1b2128;
-
-    --border: #293039;
-
-    --text: #f1f3f5;
-    --muted: #89939e;
-
-    --green: #9cff00;
-
-    --blue: #36a9ff;
-    --yellow: #ffd447;
-    --red: #ff4b55;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    min-height: 100vh;
-
-    background:
-        radial-gradient(
-            circle at top,
-            #151a20 0%,
-            #080a0d 55%
-        );
-
-    color: var(--text);
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-}
-
-
-/* =========================================================
-   BARRE COULEURS
-========================================================= */
-
-body::before {
-    content: "";
-
-    position: fixed;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 4px;
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--blue) 0%,
-            var(--blue) 25%,
-            var(--green) 25%,
-            var(--green) 50%,
-            var(--yellow) 50%,
-            var(--yellow) 75%,
-            var(--red) 75%,
-            var(--red) 100%
-        );
-
-    z-index: 100;
-}
-
-
-/* =========================================================
-   CONTENEUR
-========================================================= */
-
-.container {
-    width: 100%;
-    max-width: 950px;
-
-    margin: auto;
-
-    padding: 35px 18px 60px;
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-header {
-    text-align: center;
-    margin-bottom: 35px;
-}
-
-.logo {
-    font-size: 42px;
-    font-weight: 900;
-
-    letter-spacing: 4px;
-    text-transform: uppercase;
-}
-
-.logo span {
-    color: var(--green);
-}
-
-.logo-lines {
-    display: flex;
-    justify-content: center;
-
-    gap: 5px;
-
-    margin-top: 12px;
-
-    transform: skewX(-25deg);
-}
-
-.logo-lines div {
-    width: 38px;
-    height: 4px;
-}
-
-.line-blue {
-    background: var(--blue);
-}
-
-.line-green {
-    background: var(--green);
-}
-
-.line-yellow {
-    background: var(--yellow);
-}
-
-.line-red {
-    background: var(--red);
-}
-
-.subtitle {
-    color: var(--muted);
-
-    margin-top: 12px;
-
-    font-size: 13px;
-
-    letter-spacing: 2px;
-
-    text-transform: uppercase;
-}
-
-
-/* =========================================================
-   PANELS
-========================================================= */
-
-.panel {
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,0.025),
-            transparent
-        ),
-        var(--panel);
-
-    border: 1px solid var(--border);
-
-    padding: 22px;
-
-    margin-bottom: 20px;
-
-    position: relative;
-
-    overflow: hidden;
-}
-
-.panel::before {
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 2px;
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--blue),
-            var(--green),
-            var(--yellow),
-            var(--red)
-        );
-}
-
-
-/* =========================================================
-   TITRES
-========================================================= */
-
-h1,
-h2,
-h3 {
-    margin-top: 0;
-}
-
-h1 {
-    font-size: 30px;
-
-    text-transform: uppercase;
-
-    letter-spacing: 2px;
-}
-
-h2 {
-    font-size: 22px;
-
-    letter-spacing: 1px;
-}
-
-
-/* =========================================================
-   BOUTONS
-========================================================= */
-
-button {
-    border: none;
-
-    padding: 12px 18px;
-
-    font-size: 14px;
-
-    font-weight: 800;
-
-    letter-spacing: 0.5px;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
-    border-radius: 3px;
-}
-
-button:hover {
-    transform: translateY(-1px);
-
-    filter: brightness(1.08);
-}
-
-.btn-primary {
-    background: var(--green);
-
-    color: #050505;
-}
-
-.btn-secondary {
-    background: var(--panel3);
-
-    color: var(--text);
-
-    border: 1px solid var(--border);
-}
-
-.actions {
-    display: flex;
-
-    gap: 10px;
-
-    flex-wrap: wrap;
-}
-
-
-/* =========================================================
-   FORMULAIRES
-========================================================= */
-
-.form-group {
-    margin-bottom: 18px;
-}
-
-label {
-    display: block;
-
-    color: var(--muted);
-
-    font-size: 12px;
-
-    margin-bottom: 7px;
-
-    text-transform: uppercase;
-
-    letter-spacing: 0.6px;
-}
-
-input {
-    width: 100%;
-
-    padding: 12px;
-
-    background: var(--panel2);
-
-    border: 1px solid var(--border);
-
-    color: var(--text);
-
-    border-radius: 3px;
-
-    font-size: 15px;
-
-    outline: none;
-}
-
-input:focus {
-    border-color: var(--green);
-}
-
-
-/* =========================================================
-   EVENEMENTS
-========================================================= */
-
-.event-card {
-    background: var(--panel);
-
-    border: 1px solid var(--border);
-
-    padding: 20px;
-
-    margin-bottom: 14px;
-
-    cursor: pointer;
-
-    position: relative;
-
-    overflow: hidden;
-
-    transition: 0.2s;
-}
-
-.event-card:hover {
-    border-color: var(--green);
-
-    transform: translateX(3px);
-}
-
-.event-card::before {
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 4px;
-    height: 100%;
-
-    background:
-        linear-gradient(
-            to bottom,
-            var(--blue),
-            var(--green),
-            var(--yellow),
-            var(--red)
-        );
-}
-
-.event-card h3 {
-    margin-bottom: 8px;
-
-    padding-left: 8px;
-}
-
-.event-info {
-    color: var(--muted);
-
-    padding-left: 8px;
-
-    font-size: 14px;
-}
-
-.next-race {
-    color: var(--green);
-
-    font-weight: bold;
-
-    margin-top: 12px;
-
-    padding-left: 8px;
-}
-
-
-/* =========================================================
-   DEPART
-========================================================= */
-
-.departure {
-    background: var(--panel2);
-
-    border: 1px solid var(--border);
-
-    padding: 18px;
-
-    margin-bottom: 15px;
-
-    position: relative;
-}
-
-.departure::before {
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 3px;
-    height: 100%;
-
-    background: var(--green);
-}
-
-.departure-header {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    gap: 15px;
-
-    flex-wrap: wrap;
-
-    margin-bottom: 15px;
-}
-
-.departure-number {
-    font-size: 18px;
-
-    font-weight: bold;
-}
-
-.departure-date {
-    color: var(--muted);
-
-    margin-top: 5px;
-}
-
-.countdown {
-    color: var(--green);
-
-    font-weight: bold;
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   PILOTES
-========================================================= */
-
-.pilot {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 11px 13px;
-
-    background: #0d1115;
-
-    margin-top: 7px;
-
-    flex-wrap: wrap;
-}
-
-.pilot-name {
-    font-weight: bold;
-}
-
-.pilot-info {
-    display: flex;
-
-    gap: 6px;
-
-    flex-wrap: wrap;
-}
-
-.badge {
-    padding: 5px 8px;
-
-    background: #242b32;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    border-radius: 3px;
-}
-
-
-/* =========================================================
-   FORMULAIRE DISPONIBILITES
-========================================================= */
-
-.availability-form-departure {
-    background: var(--panel2);
-
-    border: 1px solid var(--border);
-
-    padding: 16px;
-
-    margin-bottom: 12px;
-
-    position: relative;
-}
-
-
-/* ---------------------------------------------------------
-   EN-TETE DEPART
---------------------------------------------------------- */
-
-.availability-departure-header {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    gap: 15px;
-
-    margin-bottom: 15px;
-}
-
-.availability-departure-title {
-    font-size: 16px;
-
-    font-weight: bold;
-}
-
-.availability-departure-date {
-    color: var(--muted);
-
-    font-size: 13px;
-
-    margin-top: 4px;
-}
-
-
-/* ---------------------------------------------------------
-   LIGNE DU FORMULAIRE
---------------------------------------------------------- */
-
-.availability-row {
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        auto;
-
-    gap: 20px;
-
-    align-items: start;
-}
-
-
-/* ---------------------------------------------------------
-   DISPONIBILITES
---------------------------------------------------------- */
-
-.availability-section {
-    min-width: 0;
-}
-
-.availability-buttons {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 6px;
-}
-
-.availability-btn {
-    padding: 9px 12px;
-
-    background: var(--panel3);
-
-    color: var(--muted);
-
-    border: 1px solid var(--border);
-
-    font-size: 11px;
-
-    border-radius: 3px;
-}
-
-.availability-btn:hover {
-    color: var(--text);
-
-    border-color: #4a545e;
-}
-
-.availability-btn.selected {
-    background: var(--green);
-
-    color: #000;
-
-    border-color: var(--green);
-}
-
-
-/* ---------------------------------------------------------
-   CATEGORIE A DROITE
---------------------------------------------------------- */
-
-.category-section {
-    width: 250px;
-
-    flex-shrink: 0;
-}
-
-.category-section label {
-    text-align: right;
-}
-
-.category-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap: 5px;
-}
-
-.category-card {
-    height: 48px;
-
-    background: var(--panel3);
-
-    border: 1px solid var(--border);
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
-    text-align: center;
-
-    border-radius: 3px;
-}
-
-.category-card:hover {
-    border-color: var(--green);
-}
-
-.category-card.selected {
-    border: 2px solid var(--green);
-
-    background: #1d2617;
-
-    box-shadow:
-        0 0 12px
-        rgba(156,255,0,0.10);
-}
-
-.category-icon {
-    font-size: 13px;
-
-    font-weight: 900;
-
-    margin-bottom: 2px;
-}
-
-.category-name {
-    font-size: 8px;
-
-    font-weight: bold;
-
-    letter-spacing: 0.3px;
-}
-
-.hypercar .category-icon {
-    color: var(--blue);
-}
-
-.lmp2 .category-icon {
-    color: var(--green);
-}
-
-.lmp3 .category-icon {
-    color: var(--yellow);
-}
-
-.gt3 .category-icon {
-    color: var(--red);
-}
-
-
-/* =========================================================
-   INFO
-========================================================= */
-
-.info {
-    background: #151b20;
-
-    border-left: 3px solid var(--green);
-
-    padding: 12px;
-
-    margin-bottom: 20px;
-
-    color: var(--muted);
-
-    font-size: 13px;
-
-    line-height: 1.5;
-}
-
-
-/* =========================================================
-   CREATION DEPART
-========================================================= */
-
-.departure-form {
-    background: var(--panel2);
-
-    border: 1px solid var(--border);
-
-    padding: 15px;
-
-    margin-bottom: 12px;
-}
-
-.departure-form-title {
-    font-weight: bold;
-
-    margin-bottom: 15px;
-}
-
-.form-grid {
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 12px;
-}
-
-.remove-departure {
-    margin-top: 10px;
-
-    background: transparent;
-
-    color: var(--red);
-
-    padding: 5px 0;
-}
-
-
-/* =========================================================
-   EMPTY
-========================================================= */
-
-.empty {
-    color: var(--muted);
-
-    text-align: center;
-
-    padding: 30px 10px;
-}
-
-
-/* =========================================================
-   UTILITAIRES
-========================================================= */
-
-.hidden {
-    display: none;
-}
-
-.back {
-    margin-bottom: 20px;
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 700px) {
-
-    .container {
-        padding:
-            25px 12px 50px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FMT Endurance</title>
+
+  <style>
+    :root {
+      --bg: #080a0d;
+      --panel: #101419;
+      --panel2: #151a20;
+      --panel3: #1b2128;
+      --border: #293039;
+
+      --text: #f1f3f5;
+      --muted: #89939e;
+
+      --green: #9cff00;
+      --blue: #36a9ff;
+      --yellow: #ffd447;
+      --red: #ff4b55;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(156,255,0,0.05), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .top-bars {
+      display: flex;
+      height: 6px;
+      width: 100%;
+    }
+
+    .top-bars div {
+      flex: 1;
+    }
+
+    .bar-blue {
+      background: var(--blue);
+    }
+
+    .bar-green {
+      background: var(--green);
+    }
+
+    .bar-yellow {
+      background: var(--yellow);
+    }
+
+    .bar-red {
+      background: var(--red);
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,10,13,0.95);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
     }
 
     .logo {
-        font-size: 30px;
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
 
-        letter-spacing: 2px;
+    .logo span {
+      color: var(--green);
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 3px;
+    }
+
+    /* =========================
+       CONTAINER
+    ========================= */
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 35px 20px 60px;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin: 0 0 8px;
+    }
+
+    h2 {
+      font-size: 21px;
+      margin: 0 0 18px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin: 0;
+    }
+
+    .description {
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font-weight: 800;
+      transition: 0.15s ease;
+      font-family: inherit;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #071000;
+      padding: 12px 18px;
+      border-radius: 7px;
+    }
+
+    .btn-secondary {
+      background: var(--panel3);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 11px 17px;
+      border-radius: 7px;
+    }
+
+    .btn-danger {
+      background: rgba(255,75,85,0.12);
+      color: var(--red);
+      border: 1px solid rgba(255,75,85,0.35);
+      padding: 10px 14px;
+      border-radius: 7px;
+    }
+
+    /* =========================
+       HOME
+    ========================= */
+
+    .home-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 35px;
+      flex-wrap: wrap;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .event-card {
+      position: relative;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .event-card:hover {
+      border-color: #46515c;
+      transform: translateY(-2px);
+    }
+
+    .event-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(
+        to bottom,
+        var(--blue),
+        var(--green),
+        var(--yellow),
+        var(--red)
+      );
+    }
+
+    .event-name {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      padding-left: 8px;
+    }
+
+    .event-info {
+      color: var(--muted);
+      font-size: 13px;
+      padding-left: 8px;
+      line-height: 1.7;
+    }
+
+    .countdown {
+      color: var(--green);
+      font-weight: 900;
+      font-size: 13px;
+      margin-top: 12px;
+      padding-left: 8px;
+    }
+
+    .finished {
+      color: var(--muted);
+    }
+
+    /* =========================
+       FORMULAIRE CREATION
+    ========================= */
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 12px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input:focus {
+      border-color: var(--green);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .departure {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+
+    .departure-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .remove-departure {
+      height: 42px;
+      padding: 0 13px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* =========================
+       EVENT
+    ========================= */
+
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .event-title {
+      font-size: 31px;
+      font-weight: 900;
+    }
+
+    .event-subtitle {
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .departure-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .departure-header {
+      padding: 17px 20px;
+      background: var(--panel2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .departure-date {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .departure-time {
+      color: var(--green);
+      font-weight: 900;
+      margin-left: 8px;
+    }
+
+    .departure-countdown {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .departure-body {
+      padding: 18px 20px;
+    }
+
+    /* =========================
+       PILOTES
+    ========================= */
+
+    .pilot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pilot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      padding: 10px 13px;
+      border-radius: 7px;
+      font-size: 13px;
+    }
+
+    .pilot-name {
+      font-weight: 800;
+    }
+
+    .pilot-details {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .category-badge {
+      display: inline-block;
+      color: #111;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      margin-right: 5px;
+    }
+
+    .cat-Hypercar {
+      background: var(--blue);
+    }
+
+    .cat-LMP2 {
+      background: var(--green);
+    }
+
+    .cat-LMP3 {
+      background: var(--yellow);
+    }
+
+    .cat-GT3 {
+      background: var(--red);
+      color: white;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 5px 0 15px;
+    }
+
+    /* =========================
+       DISPONIBILITES
+    ========================= */
+
+    .availability-form {
+      background: #0b0e12;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 15px;
+    }
+
+    .availability-title {
+      font-size: 14px;
+      font-weight: 900;
+      margin-bottom: 12px;
     }
 
     .availability-row {
-        grid-template-columns: 1fr;
-
-        gap: 15px;
-    }
-
-    .category-section {
-        width: 100%;
-    }
-
-    .category-section label {
-        text-align: left;
-    }
-
-    .category-grid {
-        grid-template-columns:
-            repeat(4, 1fr);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      gap: 15px;
+      align-items: center;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px;
+      margin-bottom: 8px;
     }
 
     .availability-buttons {
-        display: grid;
-
-        grid-template-columns:
-            repeat(2, 1fr);
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .availability-btn {
-        width: 100%;
+      background: var(--panel3);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: 11px;
     }
 
-    .form-grid {
+    .availability-btn.selected {
+      background: var(--green);
+      border-color: var(--green);
+      color: #071000;
+    }
+
+    .availability-btn.unavailable.selected {
+      background: var(--red);
+      border-color: var(--red);
+      color: white;
+    }
+
+    /* =========================
+       CATEGORIES
+    ========================= */
+
+    .category-section {
+      min-width: 0;
+    }
+
+    .category-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 900;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    .category-card {
+      min-width: 0;
+      background: #11161b;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 4px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .category-card:hover {
+      border-color: #56616c;
+    }
+
+    .category-card.selected {
+      border-color: var(--green);
+      background: rgba(156,255,0,0.08);
+      color: var(--green);
+    }
+
+    .category-icon {
+      font-size: 15px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .availability-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .edit-button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--green);
+      border-radius: 5px;
+      padding: 6px 9px;
+      font-size: 10px;
+    }
+
+    /* =========================
+       MESSAGES
+    ========================= */
+
+    .notice {
+      border: 1px solid rgba(156,255,0,0.25);
+      background: rgba(156,255,0,0.05);
+      color: var(--muted);
+      padding: 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 700px) {
+      .container {
+        padding: 25px 12px 45px;
+      }
+
+      .header-inner {
+        padding: 15px 12px;
+      }
+
+      .event-title {
+        font-size: 25px;
+      }
+
+      .departure-grid {
         grid-template-columns: 1fr;
-    }
+      }
 
-    .availability-departure-header {
+      .remove-departure {
+        width: 100%;
+      }
+
+      .availability-row {
+        grid-template-columns: 1fr;
+      }
+
+      .categories {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .pilot {
         align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .pilot-details {
+        text-align: left;
+      }
     }
-}
-
-</style>
+  </style>
 </head>
-
 
 <body>
 
-<div class="container">
+  <div class="top-bars">
+    <div class="bar-blue"></div>
+    <div class="bar-green"></div>
+    <div class="bar-yellow"></div>
+    <div class="bar-red"></div>
+  </div>
 
-
-<!-- =====================================================
-     HEADER
-====================================================== -->
-
-<header>
-
-    <div class="logo">
-        FMT <span>ENDURANCE</span>
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="logo">FMT <span>ENDURANCE</span></div>
+        <div class="subtitle">FRENCH MCFLY TEAM</div>
+      </div>
     </div>
-
-    <div class="logo-lines">
-
-        <div class="line-blue"></div>
-        <div class="line-green"></div>
-        <div class="line-yellow"></div>
-        <div class="line-red"></div>
-
-    </div>
-
-    <div class="subtitle">
-        French McFly Team
-    </div>
-
-</header>
-
-
-<!-- =====================================================
-     ACCUEIL
-====================================================== -->
-
-<div id="homePage">
-
-    <div
-        class="actions"
-        style="margin-bottom:20px;">
-
-        <button
-            class="btn-primary"
-            onclick="showCreateEvent()">
-
-            + CRÉER UN ÉVÉNEMENT
-
-        </button>
-
-    </div>
-
-
-    <div id="eventsList"></div>
-
-</div>
-
-
-<!-- =====================================================
-     CREATION EVENEMENT
-====================================================== -->
-
-<div
-    id="createPage"
-    class="hidden">
-
-
-    <button
-        class="btn-secondary back"
-        onclick="showHome()">
-
-        ← Retour
-
-    </button>
-
-
-    <div class="panel">
-
-        <h2>
-            Créer un événement
-        </h2>
-
-
-        <div class="form-group">
-
-            <label>
-                Nom de l'événement
-            </label>
-
-            <input
-                type="text"
-                id="eventName"
-                placeholder="Ex : Spa-Francorchamps">
-
-        </div>
-
-
-        <h3>
-            Départs
-        </h3>
-
-
-        <div id="departuresForm"></div>
-
-
-        <button
-            class="btn-secondary"
-            onclick="addDepartureForm()">
-
-            + Ajouter un départ
-
-        </button>
-
-
-        <div
-            class="actions"
-            style="margin-top:20px;">
-
-            <button
-                class="btn-primary"
-                onclick="createEvent()">
-
-                CRÉER L'ÉVÉNEMENT
-
-            </button>
-
-
-            <button
-                class="btn-secondary"
-                onclick="showHome()">
-
-                Annuler
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     EVENEMENT
-====================================================== -->
-
-<div
-    id="eventPage"
-    class="hidden">
-
-
-    <button
-        class="btn-secondary back"
-        onclick="showHome()">
-
-        ← Retour aux événements
-
-    </button>
-
-
-    <div id="eventContent"></div>
-
-</div>
-
-
-<!-- =====================================================
-     DISPONIBILITES
-====================================================== -->
-
-<div
-    id="availabilityPage"
-    class="hidden">
-
-
-    <button
-        class="btn-secondary back"
-        onclick="showEvent(currentEventId)">
-
-        ← Retour à l'événement
-
-    </button>
-
-
-    <div class="panel">
-
-        <h2>
-            Mes disponibilités
-        </h2>
-
-
-        <div class="info">
-
-            Sélectionne une ou plusieurs périodes
-            pour chaque départ.
-
-            <br>
-
-            Exemple :
-            <strong>Début + Milieu</strong>
-            ou
-            <strong>Milieu + Fin</strong>.
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Ton pseudo
-            </label>
-
-            <input
-                type="text"
-                id="pilotName"
-                placeholder="Ex : McFly">
-
-        </div>
-
-
-        <div id="availabilityForm"></div>
-
-
-        <div class="actions">
-
-            <button
-                class="btn-primary"
-                onclick="saveAvailability()">
-
-                ENREGISTRER MES DISPONIBILITÉS
-
-            </button>
-
-
-            <button
-                class="btn-secondary"
-                onclick="showEvent(currentEventId)">
-
-                Annuler
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-</div>
-
-
-<script>
-
-
-/* =========================================================
-   DONNEES
-========================================================= */
-
-let events =
-    JSON.parse(
-        localStorage.getItem("fmtEvents")
-    ) || [];
-
-
-let currentEventId = null;
-
-let departureFormCount = 0;
-
-
-/* =========================================================
-   SAUVEGARDE
-========================================================= */
-
-function saveEvents() {
-
-    localStorage.setItem(
-        "fmtEvents",
-        JSON.stringify(events)
-    );
-}
-
-
-/* =========================================================
-   ID
-========================================================= */
-
-function generateId() {
-
-    return Date.now().toString(36)
-        +
-        Math.random()
-        .toString(36)
-        .substring(2,7);
-}
-
-
-/* =========================================================
-   SECURITE HTML
-========================================================= */
-
-function escapeHTML(text) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        text || "";
-
-    return div.innerHTML;
-}
-
-
-/* =========================================================
-   DATES
-========================================================= */
-
-function getDepartureDate(departure) {
-
-    return new Date(
-        `${departure.date}T${departure.time}`
-    );
-}
-
-
-function formatDate(date,time) {
-
-    const d =
-        new Date(`${date}T${time}`);
-
-    return d.toLocaleDateString(
-        "fr-FR",
-        {
-            weekday:"long",
-            day:"numeric",
-            month:"long",
-            year:"numeric"
-        }
-    )
-    +
-    " à "
-    +
-    time;
-}
-
-
-/* =========================================================
-   PROCHAIN DEPART
-========================================================= */
-
-function getNextDeparture(event) {
-
-    const now =
-        new Date();
-
-    const upcoming =
-        event.departures
-        .filter(
-            d =>
-            getDepartureDate(d)
-            >
-            now
-        )
-        .sort(
-            (a,b) =>
-            getDepartureDate(a)
-            -
-            getDepartureDate(b)
-        );
-
-    return upcoming.length
-        ? upcoming[0]
-        : null;
-}
-
-
-/* =========================================================
-   COUNTDOWN
-========================================================= */
-
-function countdownText(departure) {
-
-    const target =
-        getDepartureDate(departure);
-
-    const now =
-        new Date();
-
-    let diff =
-        target - now;
-
-
-    if(diff <= 0) {
-
-        return "🏁 Départ passé";
+  </header>
+
+  <main class="container" id="app"></main>
+
+  <script>
+    /* ==========================================================
+       DONNEES
+    ========================================================== */
+
+    let events = JSON.parse(localStorage.getItem("fmt_events") || "[]");
+
+    let currentEventId = null;
+    let editingPilotName = null;
+
+    const categories = [
+      {
+        id: "Hypercar",
+        label: "HYPER",
+        icon: "H",
+        className: "cat-Hypercar"
+      },
+      {
+        id: "LMP2",
+        label: "LMP2",
+        icon: "2",
+        className: "cat-LMP2"
+      },
+      {
+        id: "LMP3",
+        label: "LMP3",
+        icon: "3",
+        className: "cat-LMP3"
+      },
+      {
+        id: "GT3",
+        label: "GT3",
+        icon: "GT",
+        className: "cat-GT3"
+      }
+    ];
+
+    /* ==========================================================
+       SAUVEGARDE
+    ========================================================== */
+
+    function saveEvents() {
+      localStorage.setItem("fmt_events", JSON.stringify(events));
     }
 
+    /* ==========================================================
+       OUTILS
+    ========================================================== */
 
-    const days =
-        Math.floor(
-            diff / 86400000
-        );
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+    }
 
-    diff %= 86400000;
+    function getEventById(id) {
+      return events.find(event => event.id === id);
+    }
 
+    function formatDate(date, time) {
+      const d = new Date(`${date}T${time}`);
 
-    const hours =
-        Math.floor(
-            diff / 3600000
-        );
+      return d.toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      });
+    }
 
-    diff %= 3600000;
+    function getDateTime(departure) {
+      return new Date(`${departure.date}T${departure.time}`);
+    }
 
+    function getNextDeparture(event) {
+      const now = new Date();
 
-    const minutes =
-        Math.floor(
-            diff / 60000
-        );
+      return [...event.departures]
+        .map(dep => ({
+          dep,
+          date: getDateTime(dep)
+        }))
+        .filter(item => item.date > now)
+        .sort((a, b) => a.date - b.date)[0] || null;
+    }
 
-    diff %= 60000;
+    function formatCountdown(target) {
+      const now = new Date();
+      const diff = target - now;
 
+      if (diff <= 0) {
+        return "🏁 Départ en cours / terminé";
+      }
 
-    const seconds =
-        Math.floor(
-            diff / 1000
-        );
+      const totalSeconds = Math.floor(diff / 1000);
 
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
 
-    let result = "";
+      if (days > 0) {
+        return `${days}j ${hours}h ${minutes}m ${seconds}s`;
+      }
 
+      return `${hours}h ${minutes}m ${seconds}s`;
+    }
 
-    if(days > 0)
-        result += days + "j ";
+    function formatStatus(status) {
+      if (!status || status === "unavailable") {
+        return "Indisponible";
+      }
 
+      if (status === "whole") {
+        return "Toute la course";
+      }
 
-    if(hours > 0 || days > 0)
-        result += hours + "h ";
+      const values = status.split(",");
 
+      const labels = {
+        beginning: "Début",
+        middle: "Milieu",
+        end: "Fin"
+      };
 
-    if(minutes > 0 || hours > 0 || days > 0)
-        result += minutes + "m ";
+      return values
+        .map(value => labels[value] || value)
+        .join(" + ");
+    }
 
+    /* ==========================================================
+       PAGE ACCUEIL
+    ========================================================== */
 
-    result += seconds + "s";
+    function renderHome() {
+      currentEventId = null;
+      editingPilotName = null;
 
+      let html = `
+        <h1>Endurance Manager</h1>
+        <div class="description">
+          Organisez simplement vos courses d'endurance et récupérez
+          les disponibilités de vos pilotes.
+        </div>
 
-    return result;
-}
+        <div class="home-actions">
+          <button class="btn-primary" onclick="renderCreateEvent()">
+            + Créer un événement
+          </button>
+        </div>
 
+        <h2>Événements</h2>
+      `;
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-function hideAllPages() {
-
-    document
-        .getElementById("homePage")
-        .classList.add("hidden");
-
-    document
-        .getElementById("createPage")
-        .classList.add("hidden");
-
-    document
-        .getElementById("eventPage")
-        .classList.add("hidden");
-
-    document
-        .getElementById("availabilityPage")
-        .classList.add("hidden");
-}
-
-
-function showHome() {
-
-    hideAllPages();
-
-    document
-        .getElementById("homePage")
-        .classList
-        .remove("hidden");
-
-    renderEvents();
-}
-
-
-function showCreateEvent() {
-
-    hideAllPages();
-
-    document
-        .getElementById("createPage")
-        .classList
-        .remove("hidden");
-
-
-    document
-        .getElementById("eventName")
-        .value = "";
-
-
-    document
-        .getElementById("departuresForm")
-        .innerHTML = "";
-
-
-    departureFormCount = 0;
-
-    addDepartureForm();
-}
-
-
-function showEvent(id) {
-
-    currentEventId = id;
-
-    hideAllPages();
-
-    document
-        .getElementById("eventPage")
-        .classList
-        .remove("hidden");
-
-    renderEvent(id);
-}
-
-
-/* =========================================================
-   ACCUEIL
-========================================================= */
-
-function renderEvents() {
-
-    const container =
-        document.getElementById(
-            "eventsList"
-        );
-
-
-    if(events.length === 0) {
-
-        container.innerHTML = `
-
-            <div class="panel empty">
-
-                Aucun événement pour le moment.
-
-                <br><br>
-
-                Crée ton premier événement !
-
+      if (events.length === 0) {
+        html += `
+          <div class="panel">
+            <div class="empty">
+              Aucun événement pour le moment.
             </div>
-
+          </div>
         `;
+      } else {
+        html += `<div class="events-grid">`;
 
-        return;
-    }
+        events.forEach(event => {
+          const next = getNextDeparture(event);
 
+          html += `
+            <div class="event-card" onclick="openEvent('${event.id}')">
+              <div class="event-name">${escapeHtml(event.name)}</div>
 
-    container.innerHTML =
-        events.map(event => {
+              <div class="event-info">
+                ${event.departures.length}
+                départ${event.departures.length > 1 ? "s" : ""}
+              </div>
+          `;
 
-            const next =
-                getNextDeparture(event);
-
-
-            return `
-
-                <div
-                    class="event-card"
-                    onclick="showEvent('${event.id}')">
-
-                    <h3>
-                        ${escapeHTML(event.name)}
-                    </h3>
-
-                    <div class="event-info">
-
-                        ${event.departures.length}
-                        départ${event.departures.length > 1 ? "s" : ""}
-
-                    </div>
-
-
-                    ${
-                        next
-                        ?
-                        `
-
-                        <div class="next-race">
-
-                            ⏳ Prochain départ
-
-                            <br>
-
-                            ${formatDate(
-                                next.date,
-                                next.time
-                            )}
-
-                            <br>
-
-                            <span class="countdown">
-
-                                ${countdownText(next)}
-
-                            </span>
-
-                        </div>
-
-                        `
-                        :
-                        `
-
-                        <div class="next-race">
-
-                            🏁 Événement terminé
-
-                        </div>
-
-                        `
-                    }
-
-                </div>
-
+          if (next) {
+            html += `
+              <div class="countdown">
+                Prochain départ : ${formatCountdown(next.date)}
+              </div>
             `;
-
-        }).join("");
-}
-
-
-/* =========================================================
-   AJOUT DEPART
-========================================================= */
-
-function addDepartureForm() {
-
-    departureFormCount++;
-
-
-    const id =
-        departureFormCount;
-
-
-    const container =
-        document.getElementById(
-            "departuresForm"
-        );
-
-
-    const div =
-        document.createElement("div");
-
-
-    div.className =
-        "departure-form";
-
-
-    div.id =
-        "departureForm_" + id;
-
-
-    div.innerHTML = `
-
-        <div class="departure-form-title">
-
-            Départ ${id}
-
-        </div>
-
-
-        <div class="form-grid">
-
-            <div>
-
-                <label>
-                    Date
-                </label>
-
-                <input
-                    type="date"
-                    class="departure-date-input">
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Heure
-                </label>
-
-                <input
-                    type="time"
-                    class="departure-time-input">
-
-            </div>
-
-        </div>
-
-
-        ${
-            id > 1
-            ?
-            `
-
-            <button
-                type="button"
-                class="remove-departure"
-                onclick="removeDeparture(${id})">
-
-                ✕ Supprimer ce départ
-
-            </button>
-
-            `
-            :
-            ""
-        }
-
-    `;
-
-
-    container.appendChild(div);
-}
-
-
-function removeDeparture(id) {
-
-    const element =
-        document.getElementById(
-            "departureForm_" + id
-        );
-
-
-    if(element) {
-
-        element.remove();
-    }
-}
-
-
-/* =========================================================
-   CREATION EVENEMENT
-========================================================= */
-
-function createEvent() {
-
-    const name =
-        document
-        .getElementById("eventName")
-        .value
-        .trim();
-
-
-    if(!name) {
-
-        alert(
-            "Merci de donner un nom à l'événement."
-        );
-
-        return;
-    }
-
-
-    const dateInputs =
-        document.querySelectorAll(
-            ".departure-date-input"
-        );
-
-
-    const timeInputs =
-        document.querySelectorAll(
-            ".departure-time-input"
-        );
-
-
-    const departures = [];
-
-
-    for(
-        let i = 0;
-        i < dateInputs.length;
-        i++
-    ) {
-
-        if(
-            !dateInputs[i].value
-            ||
-            !timeInputs[i].value
-        ) {
-
-            alert(
-                "Merci de compléter chaque départ."
-            );
-
-            return;
-        }
-
-
-        departures.push({
-
-            id:
-                generateId(),
-
-            date:
-                dateInputs[i].value,
-
-            time:
-                timeInputs[i].value,
-
-            availability:
-                []
-
+          } else {
+            html += `
+              <div class="countdown finished">
+                🏁 Événement terminé
+              </div>
+            `;
+          }
+
+          html += `</div>`;
         });
 
+        html += `</div>`;
+      }
+
+      document.getElementById("app").innerHTML = html;
     }
 
+    /* ==========================================================
+       CREATION EVENEMENT
+    ========================================================== */
 
-    departures.sort(
-        (a,b) =>
-        getDepartureDate(a)
-        -
-        getDepartureDate(b)
-    );
+    function renderCreateEvent() {
+      currentEventId = null;
 
+      document.getElementById("app").innerHTML = `
+        <h1>Créer un événement</h1>
 
-    const event = {
-
-        id:
-            generateId(),
-
-        name:
-            name,
-
-        departures:
-            departures
-
-    };
-
-
-    events.push(event);
-
-    saveEvents();
-
-    showEvent(event.id);
-}
-
-
-/* =========================================================
-   AFFICHAGE EVENEMENT
-========================================================= */
-
-function renderEvent(id) {
-
-    const event =
-        events.find(
-            e => e.id === id
-        );
-
-
-    if(!event) {
-
-        showHome();
-
-        return;
-    }
-
-
-    const next =
-        getNextDeparture(event);
-
-
-    const container =
-        document.getElementById(
-            "eventContent"
-        );
-
-
-    let html = `
+        <div class="description">
+          Ajoutez autant de départs que nécessaire.
+        </div>
 
         <div class="panel">
 
-            <h1>
-                ${escapeHTML(event.name)}
-            </h1>
+          <div class="field">
+            <label>Nom de l'événement</label>
+            <input
+              type="text"
+              id="eventName"
+              placeholder="Ex : Spa-Francorchamps"
+            >
+          </div>
 
+          <h3 style="margin-bottom:15px;">
+            Départs
+          </h3>
 
-            ${
-                next
-                ?
-                `
+          <div id="departures"></div>
 
-                <div class="next-race">
+          <button
+            class="btn-secondary"
+            onclick="addDepartureField()"
+          >
+            + Ajouter un départ
+          </button>
 
-                    ⏳ PROCHAIN DÉPART
+          <div class="form-actions">
+            <button
+              class="btn-primary"
+              onclick="createEvent()"
+            >
+              Créer l'événement
+            </button>
 
-                    <br>
+            <button
+              class="btn-secondary"
+              onclick="renderHome()"
+            >
+              Annuler
+            </button>
+          </div>
 
-                    ${formatDate(
-                        next.date,
-                        next.time
-                    )}
+        </div>
+      `;
 
-                    <br>
+      addDepartureField();
+    }
 
-                    <span class="countdown">
+    function addDepartureField(date = "", time = "") {
+      const container = document.getElementById("departures");
 
-                        ${countdownText(next)}
+      const wrapper = document.createElement("div");
+      wrapper.className = "departure";
 
-                    </span>
+      wrapper.innerHTML = `
+        <div class="departure-grid">
 
-                </div>
+          <div>
+            <label>Date</label>
+            <input
+              type="date"
+              class="departure-date-input"
+              value="${date}"
+            >
+          </div>
 
-                `
-                :
-                `
+          <div>
+            <label>Heure</label>
+            <input
+              type="time"
+              class="departure-time-input"
+              value="${time}"
+            >
+          </div>
 
-                <div class="next-race">
+          <button
+            class="btn-danger remove-departure"
+            onclick="this.parentElement.parentElement.remove()"
+          >
+            ✕
+          </button>
 
-                    🏁 TOUS LES DÉPARTS SONT TERMINÉS
+        </div>
+      `;
 
-                </div>
+      container.appendChild(wrapper);
+    }
 
-                `
-            }
+    function createEvent() {
+      const name = document.getElementById("eventName").value.trim();
 
+      if (!name) {
+        alert("Veuillez renseigner le nom de l'événement.");
+        return;
+      }
 
-            <div style="margin-top:20px;">
+      const dateInputs = document.querySelectorAll(".departure-date-input");
+      const timeInputs = document.querySelectorAll(".departure-time-input");
 
-                <button
-                    class="btn-primary"
-                    onclick="showAvailabilityForm('${event.id}')">
+      const departures = [];
 
-                    + AJOUTER / MODIFIER MES DISPONIBILITÉS
+      for (let i = 0; i < dateInputs.length; i++) {
+        const date = dateInputs[i].value;
+        const time = timeInputs[i].value;
 
-                </button>
+        if (!date || !time) {
+          alert("Veuillez renseigner la date et l'heure de chaque départ.");
+          return;
+        }
+
+        departures.push({
+          id: generateId(),
+          date,
+          time,
+          availability: []
+        });
+      }
+
+      if (departures.length === 0) {
+        alert("Ajoutez au moins un départ.");
+        return;
+      }
+
+      departures.sort((a, b) => {
+        return getDateTime(a) - getDateTime(b);
+      });
+
+      const event = {
+        id: generateId(),
+        name,
+        departures
+      };
+
+      events.push(event);
+
+      saveEvents();
+
+      openEvent(event.id);
+    }
+
+    /* ==========================================================
+       PAGE EVENEMENT
+    ========================================================== */
+
+    function openEvent(id) {
+      currentEventId = id;
+      editingPilotName = null;
+      renderEvent();
+    }
+
+    function renderEvent() {
+      const event = getEventById(currentEventId);
+
+      if (!event) {
+        renderHome();
+        return;
+      }
+
+      let html = `
+        <div class="event-header">
+          <div>
+            <div class="event-title">
+              ${escapeHtml(event.name)}
+            </div>
+
+            <div class="event-subtitle">
+              ${event.departures.length}
+              départ${event.departures.length > 1 ? "s" : ""}
+            </div>
+          </div>
+
+          <button
+            class="btn-secondary"
+            onclick="renderHome()"
+          >
+            ← Retour
+          </button>
+        </div>
+      `;
+
+      event.departures.forEach(departure => {
+        const departureDate = getDateTime(departure);
+        const passed = departureDate <= new Date();
+
+        html += `
+          <div class="departure-card">
+
+            <div class="departure-header">
+
+              <div>
+                <span class="departure-date">
+                  ${formatDate(departure.date, departure.time)}
+                </span>
+
+                <span class="departure-time">
+                  ${departure.time}
+                </span>
+              </div>
+
+              <div class="departure-countdown ${
+                passed ? "finished" : ""
+              }">
+                ${
+                  passed
+                    ? "🏁 Départ passé"
+                    : "⏱ " + formatCountdown(departureDate)
+                }
+              </div>
 
             </div>
 
-        </div>
-
-    `;
-
-
-    html += event.departures
-        .map(
-            (departure,index) => {
-
-
-                const pilots =
-                    departure.availability
-                    ||
-                    [];
-
-
-                return `
-
-                    <div class="departure">
-
-
-                        <div class="departure-header">
-
-                            <div>
-
-                                <div class="departure-number">
-
-                                    DÉPART ${index + 1}
-
-                                </div>
-
-                                <div class="departure-date">
-
-                                    ${formatDate(
-                                        departure.date,
-                                        departure.time
-                                    )}
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="countdown">
-
-                                ${
-                                    getDepartureDate(departure)
-                                    >
-                                    new Date()
-                                    ?
-                                    countdownText(departure)
-                                    :
-                                    "🏁 Départ passé"
-                                }
-
-                            </div>
-
-                        </div>
-
-
-                        ${
-                            pilots.length === 0
-                            ?
-
-                            `
-
-                            <div class="empty">
-
-                                Aucun pilote inscrit pour ce départ.
-
-                            </div>
-
-                            `
-
-                            :
-
-                            pilots
-                            .map(
-                                pilot => `
-
-                                    <div class="pilot">
-
-                                        <div class="pilot-name">
-
-                                            👤
-                                            ${escapeHTML(pilot.name)}
-
-                                        </div>
-
-
-                                        <div class="pilot-info">
-
-                                            ${
-                                                pilot.category
-                                                ?
-                                                `
-
-                                                <span class="badge">
-
-                                                    ${escapeHTML(
-                                                        pilot.category
-                                                    )}
-
-                                                </span>
-
-                                                `
-                                                :
-                                                ""
-                                            }
-
-
-                                            <span class="badge">
-
-                                                ${formatStatus(
-                                                    pilot.status
-                                                )}
-
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                `
-                            )
-                            .join("")
-                        }
-
-
-                    </div>
-
-                `;
-
-            }
-        )
-        .join("");
-
-
-    container.innerHTML =
-        html;
-}
-
-
-/* =========================================================
-   FORMULAIRE DISPONIBILITES
-========================================================= */
-
-function showAvailabilityForm(id) {
-
-    currentEventId =
-        id;
-
-
-    const event =
-        events.find(
-            e => e.id === id
-        );
-
-
-    if(!event)
-        return;
-
-
-    hideAllPages();
-
-
-    document
-        .getElementById(
-            "availabilityPage"
-        )
-        .classList
-        .remove("hidden");
-
-
-    document
-        .getElementById(
-            "pilotName"
-        )
-        .value = "";
-
-
-    const container =
-        document.getElementById(
-            "availabilityForm"
-        );
-
-
-    container.innerHTML =
-        event.departures
-        .map(
-            (departure,index) => {
-
-
-                return `
-
-                    <div
-                        class="availability-form-departure"
-                        data-departure-form="${departure.id}">
-
-
-                        <div
-                            class="availability-departure-header">
-
-                            <div>
-
-                                <div class="availability-departure-title">
-
-                                    DÉPART ${index + 1}
-
-                                </div>
-
-                                <div class="availability-departure-date">
-
-                                    ${formatDate(
-                                        departure.date,
-                                        departure.time
-                                    )}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="availability-row">
-
-
-                            <!-- DISPONIBILITE -->
-
-                            <div class="availability-section">
-
-                                <label>
-                                    Disponibilité
-                                </label>
-
-
-                                <div
-                                    class="availability-buttons">
-
-
-                                    <button
-                                        type="button"
-                                        class="availability-btn selected"
-                                        data-status="unavailable"
-                                        onclick="selectAvailability(this)">
-
-                                        Indisponible
-
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        class="availability-btn"
-                                        data-status="beginning"
-                                        onclick="selectAvailability(this)">
-
-                                        Début
-
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        class="availability-btn"
-                                        data-status="middle"
-                                        onclick="selectAvailability(this)">
-
-                                        Milieu
-
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        class="availability-btn"
-                                        data-status="end"
-                                        onclick="selectAvailability(this)">
-
-                                        Fin
-
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        class="availability-btn"
-                                        data-status="whole"
-                                        onclick="selectAvailability(this)">
-
-                                        Toute la course
-
-                                    </button>
-
-
-                                </div>
-
-
-                                <input
-                                    type="hidden"
-                                    class="selected-status"
-                                    value="unavailable">
-
-                            </div>
-
-
-                            <!-- CATEGORIE -->
-
-                            <div class="category-section">
-
-                                <label>
-                                    Catégorie
-                                </label>
-
-
-                                <div class="category-grid">
-
-
-                                    <div
-                                        class="category-card hypercar"
-                                        data-category="Hypercar"
-                                        onclick="selectCategory(this)">
-
-                                        <div class="category-icon">
-                                            H
-                                        </div>
-
-                                        <div class="category-name">
-                                            HYPER
-                                        </div>
-
-                                    </div>
-
-
-                                    <div
-                                        class="category-card lmp2"
-                                        data-category="LMP2"
-                                        onclick="selectCategory(this)">
-
-                                        <div class="category-icon">
-                                            2
-                                        </div>
-
-                                        <div class="category-name">
-                                            LMP2
-                                        </div>
-
-                                    </div>
-
-
-                                    <div
-                                        class="category-card lmp3"
-                                        data-category="LMP3"
-                                        onclick="selectCategory(this)">
-
-                                        <div class="category-icon">
-                                            3
-                                        </div>
-
-                                        <div class="category-name">
-                                            LMP3
-                                        </div>
-
-                                    </div>
-
-
-                                    <div
-                                        class="category-card gt3"
-                                        data-category="GT3"
-                                        onclick="selectCategory(this)">
-
-                                        <div class="category-icon">
-                                            GT
-                                        </div>
-
-                                        <div class="category-name">
-                                            GT3
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-
-
-                                <input
-                                    type="hidden"
-                                    class="selected-category"
-                                    value="">
-
-                            </div>
-
-
-                        </div>
-
-
-                    </div>
-
-                `;
-
-            }
-        )
-        .join("");
-}
-
-
-/* =========================================================
-   CATEGORIE
-========================================================= */
-
-function selectCategory(card) {
-
-    const parent =
-        card.closest(
-            ".availability-form-departure"
-        );
-
-
-    parent
-        .querySelectorAll(
-            ".category-card"
-        )
-        .forEach(
-            c =>
-            c.classList.remove(
-                "selected"
-            )
-        );
-
-
-    card.classList.add(
-        "selected"
-    );
-
-
-    parent
-        .querySelector(
-            ".selected-category"
-        )
-        .value =
-        card.dataset.category;
-}
-
-
-/* =========================================================
-   DISPONIBILITE MULTIPLE
-========================================================= */
-
-function selectAvailability(button) {
-
-    const parent =
-        button.closest(
-            ".availability-form-departure"
-        );
-
-
-    const status =
-        button.dataset.status;
-
-
-    const buttons =
-        parent.querySelectorAll(
-            ".availability-btn"
-        );
-
-
-    /*
-       Toute la course
-       ou Indisponible
-       = choix exclusif
-    */
-
-    if(
-        status === "whole"
-        ||
-        status === "unavailable"
-    ) {
-
-        buttons.forEach(
-            b =>
-            b.classList.remove(
-                "selected"
-            )
-        );
-
-        button.classList.add(
-            "selected"
-        );
-
-    }
-
-    /*
-       Début / Milieu / Fin
-       = multi sélection
-    */
-
-    else {
-
-        const unavailable =
-            parent.querySelector(
-                '[data-status="unavailable"]'
-            );
-
-        const whole =
-            parent.querySelector(
-                '[data-status="whole"]'
-            );
-
-
-        unavailable.classList.remove(
-            "selected"
-        );
-
-        whole.classList.remove(
-            "selected"
-        );
-
-
-        button.classList.toggle(
-            "selected"
-        );
-
-
-        /*
-           Si aucun choix n'est sélectionné,
-           on remet Indisponible.
-        */
-
-        const selectedPeriods =
-            parent.querySelectorAll(
-                '.availability-btn.selected'
-            );
-
-
-        if(
-            selectedPeriods.length === 0
-        ) {
-
-            unavailable.classList.add(
-                "selected"
-            );
-
+            <div class="departure-body">
+
+              <h3 style="margin-bottom:12px;">
+                Pilotes disponibles
+              </h3>
+        `;
+
+        if (departure.availability.length === 0) {
+          html += `
+            <div class="empty">
+              Aucun pilote renseigné pour ce départ.
+            </div>
+          `;
+        } else {
+          html += `<div class="pilot-list">`;
+
+          departure.availability.forEach(pilot => {
+            html += `
+              <div class="pilot">
+
+                <div>
+                  <div class="pilot-name">
+                    ${escapeHtml(pilot.name)}
+                  </div>
+                </div>
+
+                <div class="pilot-details">
+                  ${
+                    pilot.category
+                      ? `
+                        <span class="category-badge ${getCategoryClass(pilot.category)}">
+                          ${escapeHtml(pilot.category)}
+                        </span>
+                      `
+                      : ""
+                  }
+
+                  ${formatStatus(pilot.status)}
+
+                  <button
+                    class="edit-button"
+                    onclick="editPilot('${escapeHtml(pilot.name)}')"
+                  >
+                    ✏️ Modifier
+                  </button>
+                </div>
+
+              </div>
+            `;
+          });
+
+          html += `</div>`;
         }
 
+        html += `
+              <div class="availability-form">
+
+                <div class="availability-title">
+                  ${
+                    editingPilotName
+                      ? `Modifier les disponibilités de ${escapeHtml(editingPilotName)}`
+                      : "Renseigner mes disponibilités"
+                  }
+                </div>
+
+                <div class="field">
+                  <label>Nom / Pseudo</label>
+
+                  <input
+                    type="text"
+                    class="pilot-name-input"
+                    value="${
+                      editingPilotName
+                        ? escapeHtml(editingPilotName)
+                        : ""
+                    }"
+                    placeholder="Ex : McFly"
+                    ${
+                      editingPilotName
+                        ? 'readonly style="opacity:.7;"'
+                        : ""
+                    }
+                  >
+                </div>
+        `;
+
+        event.departures.forEach(dep => {
+          const existing =
+            editingPilotName
+              ? dep.availability.find(
+                  pilot =>
+                    pilot.name.toLowerCase() ===
+                    editingPilotName.toLowerCase()
+                )
+              : null;
+
+          const status = existing?.status || "unavailable";
+          const category = existing?.category || "";
+
+          const selectedBeginning =
+            status === "whole" ||
+            status.split(",").includes("beginning");
+
+          const selectedMiddle =
+            status === "whole" ||
+            status.split(",").includes("middle");
+
+          const selectedEnd =
+            status === "whole" ||
+            status.split(",").includes("end");
+
+          const unavailable = status === "unavailable";
+
+          html += `
+            <div
+              class="availability-row"
+              data-departure-id="${dep.id}"
+            >
+
+              <div>
+
+                <div class="category-label">
+                  ${formatDate(dep.date, dep.time)}
+                  — ${dep.time}
+                </div>
+
+                <div class="availability-buttons">
+
+                  <button
+                    type="button"
+                    class="availability-btn unavailable ${
+                      unavailable ? "selected" : ""
+                    }"
+                    onclick="selectAvailability(this, 'unavailable')"
+                  >
+                    Indisponible
+                  </button>
+
+                  <button
+                    type="button"
+                    class="availability-btn ${
+                      selectedBeginning ? "selected" : ""
+                    }"
+                    onclick="selectAvailability(this, 'beginning')"
+                  >
+                    Début
+                  </button>
+
+                  <button
+                    type="button"
+                    class="availability-btn ${
+                      selectedMiddle ? "selected" : ""
+                    }"
+                    onclick="selectAvailability(this, 'middle')"
+                  >
+                    Milieu
+                  </button>
+
+                  <button
+                    type="button"
+                    class="availability-btn ${
+                      selectedEnd ? "selected" : ""
+                    }"
+                    onclick="selectAvailability(this, 'end')"
+                  >
+                    Fin
+                  </button>
+
+                  <button
+                    type="button"
+                    class="availability-btn ${
+                      status === "whole" ? "selected" : ""
+                    }"
+                    onclick="selectAvailability(this, 'whole')"
+                  >
+                    Toute la course
+                  </button>
+
+                </div>
+
+                <input
+                  type="hidden"
+                  class="status-input"
+                  value="${status}"
+                >
+
+              </div>
+
+              <div class="category-section">
+
+                <div class="category-label">
+                  Catégorie
+                </div>
+
+                <div class="categories">
+
+                  ${categories.map(cat => `
+                    <div
+                      class="category-card ${
+                        category === cat.id ? "selected" : ""
+                      }"
+                      data-category="${cat.id}"
+                      onclick="selectCategory(this)"
+                    >
+                      <span class="category-icon">
+                        ${cat.icon}
+                      </span>
+                      ${cat.label}
+                    </div>
+                  `).join("")}
+
+                </div>
+
+              </div>
+
+            </div>
+          `;
+        });
+
+        html += `
+                <div class="availability-actions">
+
+                  ${
+                    editingPilotName
+                      ? `
+                        <button
+                          class="btn-secondary"
+                          onclick="cancelEdit()"
+                        >
+                          Annuler
+                        </button>
+                      `
+                      : ""
+                  }
+
+                  <button
+                    class="btn-primary"
+                    onclick="saveAvailability()"
+                  >
+                    ${
+                      editingPilotName
+                        ? "Mettre à jour mes disponibilités"
+                        : "Enregistrer mes disponibilités"
+                    }
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById("app").innerHTML = html;
     }
 
+    /* ==========================================================
+       DISPONIBILITES
+    ========================================================== */
 
-    updateSelectedStatus(parent);
-}
+    function selectAvailability(button, type) {
+      const row = button.closest(".availability-row");
 
+      const buttons =
+        row.querySelectorAll(".availability-btn");
 
-/* =========================================================
-   RECUPERE LES DISPONIBILITES
-========================================================= */
+      const statusInput =
+        row.querySelector(".status-input");
 
-function updateSelectedStatus(parent) {
+      if (type === "whole") {
+        buttons.forEach(btn => {
+          btn.classList.remove("selected");
+        });
 
-    const selected =
-        Array.from(
-            parent.querySelectorAll(
-                ".availability-btn.selected"
-            )
-        )
-        .map(
-            button =>
-            button.dataset.status
-        );
+        button.classList.add("selected");
 
-
-    parent.querySelector(
-        ".selected-status"
-    ).value =
-        selected.join(",");
-}
-
-
-/* =========================================================
-   TEXTE DISPONIBILITE
-========================================================= */
-
-function formatStatus(status) {
-
-    if(!status)
-        return "Indisponible";
-
-
-    if(status === "unavailable")
-        return "Indisponible";
-
-
-    if(status === "whole")
-        return "Toute la course";
-
-
-    const values =
-        status.split(",");
-
-
-    const labels = [];
-
-
-    if(values.includes("beginning"))
-        labels.push("Début");
-
-
-    if(values.includes("middle"))
-        labels.push("Milieu");
-
-
-    if(values.includes("end"))
-        labels.push("Fin");
-
-
-    return labels.join(" + ");
-}
-
-
-/* =========================================================
-   SAUVEGARDE DISPONIBILITES
-========================================================= */
-
-function saveAvailability() {
-
-    const event =
-        events.find(
-            e => e.id === currentEventId
-        );
-
-
-    if(!event)
-        return;
-
-
-    const name =
-        document
-        .getElementById(
-            "pilotName"
-        )
-        .value
-        .trim();
-
-
-    if(!name) {
-
-        alert(
-            "Merci d'indiquer ton pseudo."
-        );
+        statusInput.value = "whole";
 
         return;
+      }
+
+      if (type === "unavailable") {
+        buttons.forEach(btn => {
+          btn.classList.remove("selected");
+        });
+
+        button.classList.add("selected");
+
+        statusInput.value = "unavailable";
+
+        return;
+      }
+
+      /*
+        Si on sélectionne Début / Milieu / Fin,
+        on retire "Indisponible" et "Toute la course".
+      */
+
+      const unavailableButton =
+        row.querySelector(".availability-btn.unavailable");
+
+      const wholeButton =
+        [...buttons].find(btn =>
+          btn.textContent.trim() === "Toute la course"
+        );
+
+      unavailableButton.classList.remove("selected");
+      wholeButton.classList.remove("selected");
+
+      button.classList.toggle("selected");
+
+      const selected = [];
+
+      const map = {
+        "Début": "beginning",
+        "Milieu": "middle",
+        "Fin": "end"
+      };
+
+      buttons.forEach(btn => {
+        const label = btn.textContent.trim();
+
+        if (
+          btn.classList.contains("selected") &&
+          map[label]
+        ) {
+          selected.push(map[label]);
+        }
+      });
+
+      /*
+        Aucun segment sélectionné :
+        on revient automatiquement à Indisponible.
+      */
+
+      if (selected.length === 0) {
+        unavailableButton.classList.add("selected");
+        statusInput.value = "unavailable";
+        return;
+      }
+
+      /*
+        Si Début + Milieu + Fin sont sélectionnés,
+        on transforme automatiquement en Toute la course.
+      */
+
+      if (
+        selected.includes("beginning") &&
+        selected.includes("middle") &&
+        selected.includes("end")
+      ) {
+        buttons.forEach(btn => {
+          btn.classList.remove("selected");
+        });
+
+        wholeButton.classList.add("selected");
+
+        statusInput.value = "whole";
+
+        return;
+      }
+
+      statusInput.value = selected.join(",");
     }
 
+    function selectCategory(card) {
+      const row = card.closest(".availability-row");
 
-    const forms =
-        document.querySelectorAll(
-            "[data-departure-form]"
-        );
+      row
+        .querySelectorAll(".category-card")
+        .forEach(item => {
+          item.classList.remove("selected");
+        });
 
+      card.classList.add("selected");
+    }
 
-    forms.forEach(form => {
+    /* ==========================================================
+       ENREGISTRER / MODIFIER
+    ========================================================== */
 
+    function saveAvailability() {
+      const event = getEventById(currentEventId);
 
+      if (!event) return;
+
+      const nameInput =
+        document.querySelector(".pilot-name-input");
+
+      if (!nameInput) return;
+
+      const name = nameInput.value.trim();
+
+      if (!name) {
+        alert("Veuillez renseigner votre nom ou votre pseudo.");
+        return;
+      }
+
+      /*
+        On récupère tous les départs du formulaire
+      */
+
+      const rows =
+        document.querySelectorAll(".availability-row");
+
+      const pilotData = [];
+
+      for (const row of rows) {
         const departureId =
-            form.dataset.departureForm;
-
-
-        const departure =
-            event.departures.find(
-                d =>
-                d.id === departureId
-            );
-
-
-        if(!departure)
-            return;
-
-
-        const category =
-            form.querySelector(
-                ".selected-category"
-            ).value;
-
+          row.dataset.departureId;
 
         const status =
-            form.querySelector(
-                ".selected-status"
-            ).value
-            ||
-            "unavailable";
+          row.querySelector(".status-input").value;
 
+        const selectedCategory =
+          row.querySelector(".category-card.selected");
 
-        if(!departure.availability) {
+        const category =
+          selectedCategory
+            ? selectedCategory.dataset.category
+            : "";
 
-            departure.availability =
-                [];
-        }
+        /*
+          VALIDATION IMPORTANTE :
+          Si le pilote est disponible, une catégorie
+          doit obligatoirement être choisie.
+        */
 
-
-        const existing =
-            departure.availability.find(
-                p =>
-                p.name.toLowerCase()
-                ===
-                name.toLowerCase()
-            );
-
-
-        if(existing) {
-
-            existing.status =
-                status;
-
-            existing.category =
-                status === "unavailable"
-                ?
-                ""
-                :
-                category;
-
-        }
-        else {
-
-            departure.availability.push({
-
-                name:
-                    name,
-
-                category:
-                    status === "unavailable"
-                    ?
-                    ""
-                    :
-                    category,
-
-                status:
-                    status
-
-            });
-
-        }
-
-    });
-
-
-    saveEvents();
-
-
-    alert(
-        "Tes disponibilités ont été enregistrées !"
-    );
-
-
-    showEvent(
-        currentEventId
-    );
-}
-
-
-/* =========================================================
-   COMPTEUR LIVE
-========================================================= */
-
-setInterval(
-    () => {
-
-        renderEvents();
-
-
-        if(
-            currentEventId
-            &&
-            !document
-                .getElementById(
-                    "eventPage"
-                )
-                .classList
-                .contains("hidden")
+        if (
+          status !== "unavailable" &&
+          !category
         ) {
-
-            renderEvent(
-                currentEventId
+          const departure =
+            event.departures.find(
+              dep => dep.id === departureId
             );
 
+          alert(
+            "⚠️ Veuillez sélectionner une catégorie pour le départ du " +
+            formatDate(departure.date, departure.time) +
+            " à " +
+            departure.time +
+            "."
+          );
+
+          return;
         }
 
-    },
-    1000
-);
+        pilotData.push({
+          departureId,
+          status,
+          category
+        });
+      }
 
+      /*
+        Si on modifie un pilote existant,
+        on supprime ses anciennes disponibilités.
+      */
 
-/* =========================================================
-   EVENEMENT DEMO
-========================================================= */
+      event.departures.forEach(departure => {
+        departure.availability =
+          departure.availability.filter(
+            pilot =>
+              pilot.name.toLowerCase() !==
+              name.toLowerCase()
+          );
+      });
 
-if(events.length === 0) {
+      /*
+        On ajoute les nouvelles disponibilités.
+      */
 
-    const demoEvent = {
+      pilotData.forEach(data => {
+        const departure =
+          event.departures.find(
+            dep => dep.id === data.departureId
+          );
 
-        id:
-            generateId(),
+        if (!departure) return;
 
-        name:
-            "Spa-Francorchamps",
+        departure.availability.push({
+          name,
+          category: data.category,
+          status: data.status
+        });
+      });
 
+      saveEvents();
+
+      editingPilotName = null;
+
+      alert("✅ Disponibilités enregistrées !");
+
+      renderEvent();
+    }
+
+    function editPilot(name) {
+      editingPilotName = name;
+
+      renderEvent();
+
+      setTimeout(() => {
+        const input =
+          document.querySelector(".pilot-name-input");
+
+        if (input) {
+          input.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+        }
+      }, 100);
+    }
+
+    function cancelEdit() {
+      editingPilotName = null;
+      renderEvent();
+    }
+
+    /* ==========================================================
+       OUTILS AFFICHAGE
+    ========================================================== */
+
+    function getCategoryClass(category) {
+      return "cat-" + category;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    /* ==========================================================
+       RAFRAICHISSEMENT COUNTDOWN
+    ========================================================== */
+
+    setInterval(() => {
+
+      if (currentEventId) {
+        renderEvent();
+      } else {
+        renderHome();
+      }
+
+    }, 1000);
+
+    /* ==========================================================
+       EVENEMENT DEMO
+       Créé uniquement si aucune donnée n'existe.
+    ========================================================== */
+
+    if (events.length === 0) {
+
+      const demo = {
+        id: generateId(),
+        name: "Spa-Francorchamps",
         departures: [
-
-            {
-                id:
-                    generateId(),
-
-                date:
-                    "2026-09-04",
-
-                time:
-                    "20:00",
-
-                availability:
-                    []
-            },
-
-            {
-                id:
-                    generateId(),
-
-                date:
-                    "2026-09-05",
-
-                time:
-                    "14:00",
-
-                availability:
-                    []
-            },
-
-            {
-                id:
-                    generateId(),
-
-                date:
-                    "2026-09-05",
-
-                time:
-                    "20:00",
-
-                availability:
-                    []
-            },
-
-            {
-                id:
-                    generateId(),
-
-                date:
-                    "2026-09-06",
-
-                time:
-                    "15:00",
-
-                availability:
-                    []
-            }
-
+          {
+            id: generateId(),
+            date: "2026-09-04",
+            time: "20:00",
+            availability: []
+          },
+          {
+            id: generateId(),
+            date: "2026-09-05",
+            time: "14:00",
+            availability: []
+          },
+          {
+            id: generateId(),
+            date: "2026-09-05",
+            time: "20:00",
+            availability: []
+          },
+          {
+            id: generateId(),
+            date: "2026-09-06",
+            time: "15:00",
+            availability: []
+          }
         ]
+      };
 
-    };
+      events.push(demo);
+      saveEvents();
+    }
 
+    /* ==========================================================
+       INITIALISATION
+    ========================================================== */
 
-    events.push(
-        demoEvent
-    );
+    renderHome();
 
-
-    saveEvents();
-}
-
-
-/* =========================================================
-   DEMARRAGE
-========================================================= */
-
-showHome();
-
-</script>
+  </script>
 
 </body>
 </html>

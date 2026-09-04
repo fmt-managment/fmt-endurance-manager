@@ -442,29 +442,6 @@
 
 
     /* =====================================================
-       RECAP SECTION
-    ===================================================== */
-
-    .recap-section {
-      margin: 10px 0 18px;
-      padding: 10px 14px;
-      background: var(--panel2);
-      border-radius: 4px;
-      border-left: 3px solid var(--blue);
-      font-size: 11px;
-    }
-
-    .recap-section strong {
-      color: var(--muted);
-    }
-
-    .recap-section span {
-      color: var(--text);
-      margin-left: 8px;
-    }
-
-
-    /* =====================================================
        DEPARTURES
     ===================================================== */
 
@@ -487,13 +464,6 @@
         1px solid var(--border);
 
       border-radius: 7px;
-
-      transition: opacity 0.3s, filter 0.3s;
-    }
-
-    .departure.past {
-      opacity: 0.7;
-      filter: grayscale(0.3);
     }
 
     .departure-header {
@@ -580,12 +550,6 @@
 
       text-transform:
         uppercase;
-    }
-
-    .section-label .count {
-      color: var(--green);
-      font-size: 10px;
-      margin-left: 5px;
     }
 
     .pilot-list {
@@ -1159,17 +1123,11 @@
 
       white-space:
         nowrap;
-
-      transition: background 0.3s, color 0.3s;
     }
 
     .save-button:hover {
       filter:
         brightness(1.1);
-    }
-
-    .save-button.saved {
-      background: var(--blue);
     }
 
 
@@ -1431,35 +1389,23 @@
 
       .pilot-row {
         grid-template-columns:
-          minmax(70px, 1fr)
-          40px
-          55px
+          minmax(80px, 1fr)
+          45px
+          63px
           28px;
 
         gap:
-          4px;
-
-        padding:
-          4px 5px;
-      }
-
-      .pilot-name {
-        font-size:
-          11px;
+          5px;
       }
 
       .availability-bar {
         width:
-          55px;
+          63px;
       }
 
       .category-badge {
         min-width:
-          40px;
-        font-size:
-          7px;
-        padding:
-          2px 4px;
+          43px;
       }
 
       .form-grid {
@@ -1467,24 +1413,10 @@
           1fr;
       }
 
-      .availability-buttons {
-        flex-wrap: wrap;
-        height: auto;
-        gap: 4px;
-      }
-
-      .availability-button {
-        flex: 0 0 calc(33.33% - 3px);
-        height: 30px;
-        font-size: 7px;
-      }
-
+      .availability-buttons,
       .category-buttons {
-        height: 30px;
-      }
-
-      .category-button {
-        font-size: 7px;
+        height:
+          38px;
       }
 
       .save-button {
@@ -1513,25 +1445,6 @@
       .pilot-name-save {
         width:
           100%;
-      }
-
-      .event-card {
-        padding: 14px 12px;
-      }
-
-      .event-name {
-        font-size: 16px;
-      }
-
-      .recap-section {
-        font-size: 10px;
-        padding: 8px 10px;
-      }
-
-      .recap-section span {
-        display: block;
-        margin-left: 0;
-        margin-top: 4px;
       }
     }
 
@@ -2060,17 +1973,6 @@
         null;
 
 
-      // Supprimer automatiquement les événements terminés
-      const now = Date.now();
-      events = events.filter(event => {
-        // Garder l'événement s'il a au moins un départ futur
-        return event.departures.some(departure => {
-          return getDepartureTimestamp(departure) > now;
-        });
-      });
-      saveEvents();
-
-
       let html = `
 
         <div class="page-title">
@@ -2405,25 +2307,9 @@
 
         </div>
 
-      `;
 
-
-      // Récapitulatif des disponibilités du pilote
-      if (pilotName) {
-        const summary = getPilotSummary(pilotName, event);
-        if (summary) {
-          html += `
-            <div class="recap-section">
-              <strong>📋 RÉCAPITULATIF :</strong>
-              <span>${summary}</span>
-            </div>
-          `;
-        }
-      }
-
-
-      html += `
         <div class="departures">
+
       `;
 
 
@@ -2461,29 +2347,6 @@
 
 
     /* =====================================================
-       GET PILOT SUMMARY
-    ===================================================== */
-
-    function getPilotSummary(pilotName, event) {
-      if (!event || !pilotName) return null;
-
-      const summary = [];
-      event.departures.forEach(dep => {
-        const pilot = dep.availability.find(p =>
-          p.name.toLowerCase() === pilotName.toLowerCase()
-        );
-        if (pilot) {
-          const label = getStatusLabel(pilot.status);
-          const dateStr = formatDate(dep.date, dep.time);
-          summary.push(`${dateStr} ${dep.time}: ${label}`);
-        }
-      });
-
-      return summary.length ? summary.join(" | ") : null;
-    }
-
-
-    /* =====================================================
        DEPARTURE
     ===================================================== */
 
@@ -2499,8 +2362,6 @@
           departure
         );
 
-      const isPast = timestamp < Date.now();
-
 
       const availablePilots =
         departure.availability
@@ -2513,7 +2374,7 @@
 
       let html = `
 
-        <div class="departure ${isPast ? 'past' : ''}">
+        <div class="departure">
 
 
           <div class="departure-header">
@@ -2564,7 +2425,6 @@
             <div class="section-label">
 
               PILOTES DISPONIBLES
-              <span class="count">(${availablePilots.length})</span>
 
             </div>
 
@@ -2821,7 +2681,7 @@
             class="edit-button"
             onclick="
               editPilot(
-                '${escapeHtml(
+                '${escapeJs(
                   pilot.name
                 )}'
               )
@@ -3248,7 +3108,6 @@
 
             <button
               class="save-button"
-              id="save-btn-${departure.id}"
               onclick="
                 saveAvailability(
                   '${departure.id}'
@@ -3840,22 +3699,6 @@
 
 
       saveEvents();
-
-
-      /*
-       * Feedback visuel
-       */
-
-      const btn = document.getElementById(`save-btn-${departureId}`);
-      if (btn) {
-        const originalText = btn.textContent;
-        btn.textContent = "✓ ENREGISTRÉ";
-        btn.classList.add("saved");
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.classList.remove("saved");
-        }, 1500);
-      }
 
 
       /*

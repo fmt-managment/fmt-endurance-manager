@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>FMT Endurance</title>
 
   <style>
+
     :root {
       --bg: #090a0b;
       --panel: #111315;
       --panel2: #17191c;
       --panel3: #1d2023;
       --border: #292d31;
+
       --text: #f2f2f2;
       --muted: #92979c;
 
@@ -29,17 +32,28 @@
 
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at top right, rgba(49,184,107,.07), transparent 30%),
-        var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
       min-height: 100vh;
+
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(49,184,107,.07),
+          transparent 30%
+        ),
+        var(--bg);
+
+      color: var(--text);
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
     }
 
-    /* =========================
+
+    /* =====================================================
        TOP STRIPES
-    ========================= */
+    ===================================================== */
 
     .top-stripes {
       display: flex;
@@ -51,38 +65,60 @@
       flex: 1;
     }
 
-    .stripe-blue { background: var(--blue); }
-    .stripe-green { background: var(--green); }
-    .stripe-yellow { background: var(--yellow); }
-    .stripe-red { background: var(--red); }
+    .stripe-blue {
+      background: var(--blue);
+    }
 
-    /* =========================
+    .stripe-green {
+      background: var(--green);
+    }
+
+    .stripe-yellow {
+      background: var(--yellow);
+    }
+
+    .stripe-red {
+      background: var(--red);
+    }
+
+
+    /* =====================================================
        HEADER
-    ========================= */
+    ===================================================== */
 
     header {
-      border-bottom: 1px solid var(--border);
-      background: rgba(9,10,11,.95);
       position: sticky;
       top: 0;
       z-index: 20;
+
+      background: rgba(9,10,11,.95);
+
+      border-bottom:
+        1px solid var(--border);
+
       backdrop-filter: blur(8px);
     }
 
     .header-inner {
       max-width: 1050px;
       margin: auto;
-      padding: 17px 20px;
+
+      padding:
+        17px 20px;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       gap: 20px;
     }
 
     .logo {
       font-size: 21px;
       font-weight: 950;
+
       letter-spacing: 2px;
+
       line-height: 1;
     }
 
@@ -91,11 +127,14 @@
     }
 
     .subtitle {
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: 2px;
       margin-top: 5px;
+
+      color: var(--muted);
+
+      font-size: 10px;
       font-weight: 700;
+
+      letter-spacing: 2px;
     }
 
     button {
@@ -105,27 +144,36 @@
     }
 
     .header-button {
-      background: var(--green);
-      color: #07100a;
-      padding: 10px 15px;
+      padding:
+        10px 15px;
+
+      background:
+        var(--green);
+
+      color:
+        #07100a;
+
+      border-radius: 4px;
+
       font-size: 11px;
       font-weight: 900;
-      letter-spacing: .5px;
-      border-radius: 4px;
     }
 
     .header-button:hover {
       filter: brightness(1.1);
     }
 
-    /* =========================
+
+    /* =====================================================
        MAIN
-    ========================= */
+    ===================================================== */
 
     main {
       max-width: 1050px;
       margin: auto;
-      padding: 28px 20px 60px;
+
+      padding:
+        28px 20px 60px;
     }
 
     .page-title {
@@ -134,19 +182,24 @@
 
     .page-title h1 {
       margin: 0;
+
       font-size: 28px;
       letter-spacing: -1px;
     }
 
     .page-title p {
-      margin: 7px 0 0;
+      margin:
+        7px 0 0;
+
       color: var(--muted);
+
       font-size: 13px;
     }
 
-    /* =========================
-       EVENT LIST
-    ========================= */
+
+    /* =====================================================
+       EVENTS
+    ===================================================== */
 
     .events {
       display: grid;
@@ -154,15 +207,25 @@
     }
 
     .event-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--green);
-      border-radius: 6px;
-      padding: 17px 18px;
-      cursor: pointer;
-      transition: .15s;
       position: relative;
       overflow: hidden;
+
+      padding:
+        17px 18px;
+
+      background: var(--panel);
+
+      border:
+        1px solid var(--border);
+
+      border-left:
+        4px solid var(--green);
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      transition: .15s;
     }
 
     .event-card:hover {
@@ -170,20 +233,12 @@
       transform: translateX(2px);
     }
 
-    .event-card::after {
-      content: "";
-      position: absolute;
-      right: -30px;
-      top: -30px;
-      width: 100px;
-      height: 100px;
-      border: 1px solid rgba(255,255,255,.04);
-      transform: rotate(45deg);
-    }
-
     .event-top {
       display: flex;
-      justify-content: space-between;
+
+      justify-content:
+        space-between;
+
       gap: 15px;
     }
 
@@ -194,662 +249,1249 @@
 
     .event-location {
       margin-top: 4px;
+
       color: var(--muted);
+
       font-size: 12px;
     }
 
     .event-date {
       text-align: right;
-      font-size: 11px;
+
       color: var(--muted);
+
+      font-size: 11px;
     }
 
     .event-date strong {
       display: block;
+
       color: var(--text);
+
       font-size: 13px;
     }
 
     .event-countdown {
       margin-top: 14px;
+
       padding-top: 11px;
-      border-top: 1px solid var(--border);
-      font-size: 11px;
+
+      border-top:
+        1px solid var(--border);
+
       color: var(--green);
+
+      font-size: 11px;
       font-weight: 800;
     }
 
-    /* =========================
-       EVENT PAGE
-    ========================= */
+
+    /* =====================================================
+       BACK BUTTON
+    ===================================================== */
 
     .back-button {
-      background: transparent;
-      color: var(--muted);
       padding: 0;
       margin-bottom: 20px;
+
+      background: transparent;
+
+      color: var(--muted);
+
       font-size: 12px;
       font-weight: 700;
     }
 
     .back-button:hover {
-      color: var(--text);
+      color: white;
     }
 
+
+    /* =====================================================
+       EVENT HEADER
+    ===================================================== */
+
     .event-header {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 20px;
-      margin-bottom: 18px;
       position: relative;
       overflow: hidden;
+
+      margin-bottom: 18px;
+      padding: 20px;
+
+      background: var(--panel);
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 7px;
     }
 
     .event-header::before {
       content: "";
+
       position: absolute;
+
       left: 0;
       top: 0;
       bottom: 0;
+
       width: 4px;
-      background: linear-gradient(
-        to bottom,
-        var(--blue) 0 25%,
-        var(--green) 25% 50%,
-        var(--yellow) 50% 75%,
-        var(--red) 75% 100%
-      );
+
+      background:
+        linear-gradient(
+          to bottom,
+          var(--blue) 0 25%,
+          var(--green) 25% 50%,
+          var(--yellow) 50% 75%,
+          var(--red) 75% 100%
+        );
     }
 
     .event-header h1 {
-      margin: 0 0 6px;
+      margin:
+        0 0 6px;
+
       font-size: 27px;
     }
 
     .event-header p {
       margin: 0;
+
       color: var(--muted);
+
       font-size: 13px;
     }
 
-    /* =========================
+
+    /* =====================================================
+       PILOT NAME GLOBAL
+    ===================================================== */
+
+    .pilot-name-panel {
+      margin-bottom: 18px;
+
+      padding: 15px 16px;
+
+      background:
+        var(--panel);
+
+      border:
+        1px solid var(--border);
+
+      border-left:
+        4px solid var(--green);
+
+      border-radius: 6px;
+    }
+
+    .pilot-name-header {
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      align-items: center;
+
+      gap: 10px;
+
+      margin-bottom: 8px;
+    }
+
+    .pilot-name-header strong {
+      font-size: 11px;
+
+      letter-spacing: 1px;
+
+      text-transform:
+        uppercase;
+    }
+
+    .pilot-name-info {
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+    .pilot-name-row {
+      display: flex;
+
+      gap: 8px;
+    }
+
+    .pilot-name-row input {
+      flex: 1;
+    }
+
+    .pilot-name-save {
+      height: 34px;
+
+      padding:
+        0 14px;
+
+      background:
+        var(--green);
+
+      color:
+        #07100a;
+
+      border-radius: 4px;
+
+      font-size: 10px;
+      font-weight: 950;
+    }
+
+
+    /* =====================================================
        DEPARTURES
-    ========================= */
+    ===================================================== */
 
     .departures {
       display: flex;
-      flex-direction: column;
+
+      flex-direction:
+        column;
+
       gap: 14px;
     }
 
     .departure {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 7px;
       overflow: hidden;
+
+      background:
+        var(--panel);
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 7px;
     }
 
     .departure-header {
-      padding: 14px 16px;
-      background: var(--panel2);
-      border-bottom: 1px solid var(--border);
       display: flex;
-      justify-content: space-between;
+
+      justify-content:
+        space-between;
+
       align-items: center;
+
       gap: 15px;
+
+      padding:
+        14px 16px;
+
+      background:
+        var(--panel2);
+
+      border-bottom:
+        1px solid var(--border);
     }
 
     .departure-date {
-      font-weight: 900;
       font-size: 13px;
-      text-transform: uppercase;
+
+      font-weight: 900;
+
+      text-transform:
+        uppercase;
     }
 
     .departure-time {
-      color: var(--green);
       margin-left: 7px;
+
+      color:
+        var(--green);
     }
 
     .departure-countdown {
+      color:
+        var(--muted);
+
       font-size: 11px;
-      color: var(--muted);
+
       text-align: right;
-      white-space: nowrap;
+
+      white-space:
+        nowrap;
     }
 
     .departure-countdown.upcoming {
-      color: var(--green);
+      color:
+        var(--green);
+
       font-weight: 800;
     }
 
     .departure-countdown.finished {
-      color: var(--muted);
+      color:
+        var(--muted);
     }
 
-    /* =========================
+
+    /* =====================================================
        PILOT LIST
-    ========================= */
+    ===================================================== */
 
     .pilot-section {
-      padding: 12px 14px 4px;
+      padding:
+        12px 14px 4px;
     }
 
     .section-label {
-      color: var(--muted);
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
       margin-bottom: 8px;
-      text-transform: uppercase;
+
+      color:
+        var(--muted);
+
+      font-size: 9px;
+
+      font-weight: 900;
+
+      letter-spacing: 1.5px;
+
+      text-transform:
+        uppercase;
     }
 
     .pilot-list {
       display: flex;
-      flex-direction: column;
+
+      flex-direction:
+        column;
+
       gap: 4px;
     }
 
     .pilot-row {
       display: grid;
-      grid-template-columns: minmax(120px, 1fr) auto 78px 30px;
-      align-items: center;
+
+      grid-template-columns:
+        minmax(100px, 1fr)
+        48px
+        78px
+        30px;
+
+      align-items:
+        center;
+
       gap: 8px;
-      min-height: 34px;
-      padding: 5px 7px;
-      background: var(--panel2);
-      border: 1px solid rgba(255,255,255,.035);
+
+      min-height:
+        34px;
+
+      padding:
+        5px 7px;
+
+      background:
+        var(--panel2);
+
+      border:
+        1px solid rgba(255,255,255,.035);
+
       border-radius: 4px;
     }
 
     .pilot-left {
-      display: flex;
-      align-items: center;
-      gap: 7px;
       min-width: 0;
+
+      display: flex;
+
+      align-items:
+        center;
+
+      gap: 7px;
     }
 
     .pilot-name {
-      font-size: 12px;
-      font-weight: 800;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+
+      text-overflow:
+        ellipsis;
+
+      white-space:
+        nowrap;
+
+      font-size: 12px;
+
+      font-weight: 800;
     }
 
-    /* =========================
-       CATEGORY
-    ========================= */
+
+    /* =====================================================
+       CATEGORY BADGES
+    ===================================================== */
 
     .category-badge {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 48px;
-      padding: 3px 6px;
-      border-radius: 3px;
-      color: #101010;
-      font-size: 8px;
-      font-weight: 950;
-      letter-spacing: .3px;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      min-width:
+        48px;
+
+      padding:
+        3px 6px;
+
+      border-radius:
+        3px;
+
+      color:
+        #101010;
+
+      font-size:
+        8px;
+
+      font-weight:
+        950;
     }
 
     .cat-Hypercar {
-      background: var(--blue);
+      background:
+        var(--blue);
     }
 
     .cat-LMP2 {
-      background: var(--green);
+      background:
+        var(--green);
     }
 
     .cat-LMP3 {
-      background: var(--yellow);
+      background:
+        var(--yellow);
     }
 
     .cat-GT3 {
-      background: var(--red);
-      color: white;
+      background:
+        var(--red);
+
+      color:
+        white;
     }
 
-    /* =========================
+
+    /* =====================================================
        AVAILABILITY BAR
-    ========================= */
+    ===================================================== */
 
     .availability-bar {
-      width: 76px;
-      height: 9px;
       display: flex;
-      gap: 2px;
-      border-radius: 2px;
-      overflow: hidden;
+
+      width:
+        76px;
+
+      height:
+        9px;
+
+      gap:
+        2px;
+
+      overflow:
+        hidden;
+
+      border-radius:
+        2px;
     }
 
     .availability-segment {
       flex: 1;
-      background: #292d31;
+
+      background:
+        #292d31;
     }
 
     .availability-segment.beginning.active {
-      background: var(--green);
+      background:
+        var(--green);
     }
 
     .availability-segment.middle.active {
-      background: var(--yellow);
+      background:
+        var(--yellow);
     }
 
     .availability-segment.end.active {
-      background: var(--red);
+      background:
+        var(--red);
     }
 
     .edit-button {
-      width: 28px;
-      height: 25px;
-      border-radius: 3px;
-      background: #25282b;
-      color: var(--muted);
-      font-size: 11px;
+      width:
+        28px;
+
+      height:
+        25px;
+
+      border-radius:
+        3px;
+
+      background:
+        #25282b;
+
+      color:
+        var(--muted);
+
+      font-size:
+        11px;
     }
 
     .edit-button:hover {
-      background: #303438;
-      color: white;
+      background:
+        #303438;
+
+      color:
+        white;
     }
 
     .empty {
-      padding: 9px 5px 11px;
-      color: #676d72;
-      font-size: 11px;
-      font-style: italic;
+      padding:
+        9px 5px 11px;
+
+      color:
+        #676d72;
+
+      font-size:
+        11px;
+
+      font-style:
+        italic;
     }
 
-    /* =========================
+
+    /* =====================================================
        FORM
-    ========================= */
+    ===================================================== */
 
     .form-section {
-      border-top: 1px solid var(--border);
-      margin-top: 9px;
-      padding: 13px 14px 15px;
+      margin-top:
+        9px;
+
+      padding:
+        13px 14px 15px;
+
+      border-top:
+        1px solid var(--border);
     }
 
     .form-title {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 11px;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      margin-bottom:
+        11px;
     }
 
     .form-title strong {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      font-size:
+        11px;
+
+      letter-spacing:
+        1px;
+
+      text-transform:
+        uppercase;
     }
 
     .editing-label {
       display: none;
-      color: var(--green);
-      font-size: 9px;
-      font-weight: 900;
+
+      color:
+        var(--green);
+
+      font-size:
+        9px;
+
+      font-weight:
+        900;
     }
 
-    .form-section.editing .editing-label {
-      display: block;
+    .form-section.editing
+    .editing-label {
+      display:
+        block;
     }
 
     .form-grid {
       display: grid;
-      grid-template-columns: 1fr 1.4fr 1.2fr auto;
-      gap: 8px;
-      align-items: end;
+
+      grid-template-columns:
+        1.5fr
+        1fr
+        1.2fr
+        auto;
+
+      gap:
+        8px;
+
+      align-items:
+        end;
     }
 
     .field {
       display: flex;
-      flex-direction: column;
-      gap: 5px;
+
+      flex-direction:
+        column;
+
+      gap:
+        5px;
     }
 
     .field label {
-      color: var(--muted);
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .6px;
+      color:
+        var(--muted);
+
+      font-size:
+        9px;
+
+      font-weight:
+        800;
+
+      letter-spacing:
+        .6px;
+
+      text-transform:
+        uppercase;
     }
 
     input {
-      width: 100%;
-      height: 34px;
-      padding: 0 10px;
-      background: #0d0f10;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: white;
-      outline: none;
-      font-family: inherit;
-      font-size: 12px;
+      width:
+        100%;
+
+      height:
+        34px;
+
+      padding:
+        0 10px;
+
+      background:
+        #0d0f10;
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        4px;
+
+      outline:
+        none;
+
+      color:
+        white;
+
+      font-family:
+        inherit;
+
+      font-size:
+        12px;
     }
 
     input:focus {
-      border-color: var(--green);
+      border-color:
+        var(--green);
     }
 
-    /* =========================
+
+    /* =====================================================
        AVAILABILITY BUTTONS
-    ========================= */
+    ===================================================== */
 
     .availability-buttons {
       display: flex;
-      gap: 3px;
-      height: 34px;
+
+      gap:
+        3px;
+
+      height:
+        34px;
     }
 
     .availability-button {
-      flex: 1;
-      border: 1px solid var(--border);
-      background: #0d0f10;
-      color: #777d82;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 900;
-      transition: .12s;
+      flex:
+        1;
+
+      border:
+        1px solid var(--border);
+
+      background:
+        #0d0f10;
+
+      color:
+        #777d82;
+
+      border-radius:
+        3px;
+
+      font-size:
+        8px;
+
+      font-weight:
+        900;
+
+      transition:
+        .12s;
     }
 
     .availability-button:hover {
-      background: #202428;
-      color: white;
+      background:
+        #202428;
+
+      color:
+        white;
     }
 
     .availability-button.active.beginning {
-      background: var(--green);
-      border-color: var(--green);
-      color: #07100a;
+      background:
+        var(--green);
+
+      border-color:
+        var(--green);
+
+      color:
+        #07100a;
     }
 
     .availability-button.active.middle {
-      background: var(--yellow);
-      border-color: var(--yellow);
-      color: #171200;
+      background:
+        var(--yellow);
+
+      border-color:
+        var(--yellow);
+
+      color:
+        #171200;
     }
 
     .availability-button.active.end {
-      background: var(--red);
-      border-color: var(--red);
-      color: white;
+      background:
+        var(--red);
+
+      border-color:
+        var(--red);
+
+      color:
+        white;
     }
 
     .availability-button.active.whole {
-      background: linear-gradient(
-        90deg,
-        var(--green) 0 33%,
-        var(--yellow) 33% 66%,
-        var(--red) 66% 100%
-      );
-      color: #111;
-      border-color: transparent;
+      background:
+        linear-gradient(
+          90deg,
+          var(--green) 0 33%,
+          var(--yellow) 33% 66%,
+          var(--red) 66% 100%
+        );
+
+      border-color:
+        transparent;
+
+      color:
+        #111;
     }
 
     .availability-button.active.unavailable {
-      background: #303337;
-      border-color: #45494d;
-      color: white;
+      background:
+        #3a3d41;
+
+      border-color:
+        #555a5f;
+
+      color:
+        white;
     }
 
-    /* =========================
+
+    /* =====================================================
        CATEGORY BUTTONS
-    ========================= */
+    ===================================================== */
 
     .category-buttons {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 3px;
-      height: 34px;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap:
+        3px;
+
+      height:
+        34px;
     }
 
     .category-button {
-      background: #0d0f10;
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      color: #777d82;
-      font-size: 8px;
-      font-weight: 950;
+      background:
+        #0d0f10;
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        3px;
+
+      color:
+        #777d82;
+
+      font-size:
+        8px;
+
+      font-weight:
+        950;
     }
 
     .category-button:hover {
-      color: white;
+      color:
+        white;
     }
 
     .category-button.active.hyper {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: #071017;
+      background:
+        var(--blue);
+
+      border-color:
+        var(--blue);
+
+      color:
+        #071017;
     }
 
     .category-button.active.lmp2 {
-      background: var(--green);
-      border-color: var(--green);
-      color: #07100a;
+      background:
+        var(--green);
+
+      border-color:
+        var(--green);
+
+      color:
+        #07100a;
     }
 
     .category-button.active.lmp3 {
-      background: var(--yellow);
-      border-color: var(--yellow);
-      color: #151200;
+      background:
+        var(--yellow);
+
+      border-color:
+        var(--yellow);
+
+      color:
+        #151200;
     }
 
     .category-button.active.gt3 {
-      background: var(--red);
-      border-color: var(--red);
-      color: white;
+      background:
+        var(--red);
+
+      border-color:
+        var(--red);
+
+      color:
+        white;
     }
 
+
+    /* =====================================================
+       SAVE BUTTON
+    ===================================================== */
+
     .save-button {
-      height: 34px;
-      padding: 0 14px;
-      background: var(--green);
-      color: #07100a;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 950;
-      white-space: nowrap;
+      height:
+        34px;
+
+      padding:
+        0 14px;
+
+      background:
+        var(--green);
+
+      color:
+        #07100a;
+
+      border-radius:
+        3px;
+
+      font-size:
+        9px;
+
+      font-weight:
+        950;
+
+      white-space:
+        nowrap;
     }
 
     .save-button:hover {
-      filter: brightness(1.1);
+      filter:
+        brightness(1.1);
     }
 
-    /* =========================
+
+    /* =====================================================
        LEGEND
-    ========================= */
+    ===================================================== */
 
     .legend {
       display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 10px;
-      padding: 0 14px 12px;
-      color: var(--muted);
-      font-size: 9px;
+
+      align-items:
+        center;
+
+      justify-content:
+        flex-end;
+
+      gap:
+        10px;
+
+      padding:
+        0 14px 12px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        9px;
     }
 
     .legend-item {
       display: flex;
-      align-items: center;
-      gap: 4px;
+
+      align-items:
+        center;
+
+      gap:
+        4px;
     }
 
     .legend-color {
-      width: 12px;
-      height: 6px;
-      border-radius: 1px;
+      width:
+        12px;
+
+      height:
+        6px;
+
+      border-radius:
+        1px;
     }
 
-    .legend-green { background: var(--green); }
-    .legend-yellow { background: var(--yellow); }
-    .legend-red { background: var(--red); }
+    .legend-green {
+      background:
+        var(--green);
+    }
+
+    .legend-yellow {
+      background:
+        var(--yellow);
+    }
+
+    .legend-red {
+      background:
+        var(--red);
+    }
 
     .legend-whole {
-      width: 18px;
-      height: 6px;
-      background: linear-gradient(
-        90deg,
-        var(--green) 0 33%,
-        var(--yellow) 33% 66%,
-        var(--red) 66% 100%
-      );
+      width:
+        18px;
+
+      height:
+        6px;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--green) 0 33%,
+          var(--yellow) 33% 66%,
+          var(--red) 66% 100%
+        );
     }
 
-    /* =========================
+
+    /* =====================================================
        CREATE EVENT
-    ========================= */
+    ===================================================== */
 
     .create-panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 22px;
-      max-width: 700px;
-      margin: auto;
+      max-width:
+        700px;
+
+      margin:
+        auto;
+
+      padding:
+        22px;
+
+      background:
+        var(--panel);
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        7px;
     }
 
     .create-panel h2 {
-      margin: 0 0 18px;
-      font-size: 20px;
+      margin:
+        0 0 18px;
+
+      font-size:
+        20px;
     }
 
     .create-grid {
-      display: grid;
-      gap: 12px;
+      display:
+        grid;
+
+      gap:
+        12px;
     }
 
     .create-departure {
-      display: grid;
-      grid-template-columns: 1fr 150px auto;
-      gap: 7px;
-      align-items: end;
-      padding: 10px;
-      background: var(--panel2);
-      border: 1px solid var(--border);
-      border-radius: 5px;
+      display:
+        grid;
+
+      grid-template-columns:
+        1fr 150px auto;
+
+      gap:
+        7px;
+
+      align-items:
+        end;
+
+      padding:
+        10px;
+
+      background:
+        var(--panel2);
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        5px;
     }
 
     .small-button {
-      height: 34px;
-      padding: 0 10px;
-      border-radius: 3px;
-      background: #292d31;
-      color: white;
-      font-size: 10px;
-      font-weight: 800;
+      height:
+        34px;
+
+      padding:
+        0 10px;
+
+      border-radius:
+        3px;
+
+      background:
+        #292d31;
+
+      color:
+        white;
+
+      font-size:
+        10px;
+
+      font-weight:
+        800;
     }
 
     .small-button:hover {
-      background: #353a3e;
+      background:
+        #353a3e;
     }
 
     .create-submit {
-      width: 100%;
-      height: 40px;
-      margin-top: 10px;
-      background: var(--green);
-      color: #07100a;
-      font-weight: 950;
-      border-radius: 4px;
+      width:
+        100%;
+
+      height:
+        40px;
+
+      margin-top:
+        10px;
+
+      background:
+        var(--green);
+
+      color:
+        #07100a;
+
+      font-weight:
+        950;
+
+      border-radius:
+        4px;
     }
 
-    /* =========================
+
+    /* =====================================================
        NO EVENTS
-    ========================= */
+    ===================================================== */
 
     .no-events {
-      background: var(--panel);
-      border: 1px dashed var(--border);
-      padding: 35px;
-      text-align: center;
-      border-radius: 6px;
-      color: var(--muted);
-      font-size: 13px;
+      padding:
+        35px;
+
+      background:
+        var(--panel);
+
+      border:
+        1px dashed var(--border);
+
+      border-radius:
+        6px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        13px;
+
+      text-align:
+        center;
     }
 
-    /* =========================
+
+    /* =====================================================
        MOBILE
-    ========================= */
+    ===================================================== */
 
     @media (max-width: 760px) {
 
       .header-inner {
-        padding: 14px;
+        padding:
+          14px;
       }
 
       main {
-        padding: 20px 12px 40px;
+        padding:
+          20px 12px 40px;
       }
 
       .page-title h1 {
-        font-size: 24px;
+        font-size:
+          24px;
       }
 
       .departure-header {
-        align-items: flex-start;
+        align-items:
+          flex-start;
       }
 
       .departure-countdown {
-        font-size: 9px;
+        font-size:
+          9px;
       }
 
       .pilot-row {
-        grid-template-columns: minmax(90px, 1fr) 48px 65px 28px;
-        gap: 5px;
+        grid-template-columns:
+          minmax(80px, 1fr)
+          45px
+          63px
+          28px;
+
+        gap:
+          5px;
       }
 
       .availability-bar {
-        width: 63px;
+        width:
+          63px;
       }
 
       .category-badge {
-        min-width: 43px;
+        min-width:
+          43px;
       }
 
       .form-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+          1fr;
       }
 
       .availability-buttons,
       .category-buttons {
-        height: 38px;
+        height:
+          38px;
       }
 
       .save-button {
-        width: 100%;
+        width:
+          100%;
       }
 
       .create-departure {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+          1fr;
       }
 
       .legend {
-        justify-content: flex-start;
-        flex-wrap: wrap;
+        justify-content:
+          flex-start;
+
+        flex-wrap:
+          wrap;
+      }
+
+      .pilot-name-row {
+        flex-direction:
+          column;
+      }
+
+      .pilot-name-save {
+        width:
+          100%;
       }
     }
+
   </style>
 </head>
 
+
 <body>
 
+
+  <!-- =====================================================
+       TOP STRIPES
+  ====================================================== -->
+
   <div class="top-stripes">
+
     <span class="stripe-blue"></span>
+
     <span class="stripe-green"></span>
+
     <span class="stripe-yellow"></span>
+
     <span class="stripe-red"></span>
+
   </div>
 
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
   <header>
+
     <div class="header-inner">
+
       <div>
-        <div class="logo">FMT <span>ENDURANCE</span></div>
-        <div class="subtitle">FRENCH MCFLY TEAM</div>
+
+        <div class="logo">
+          FMT <span>ENDURANCE</span>
+        </div>
+
+        <div class="subtitle">
+          FRENCH MCFLY TEAM
+        </div>
+
       </div>
+
 
       <button
         class="header-button"
@@ -857,91 +1499,253 @@
       >
         + NOUVEL ÉVÉNEMENT
       </button>
+
     </div>
+
   </header>
+
 
   <main id="app"></main>
 
+
   <script>
 
-    /* =========================================================
-       DATA
-    ========================================================= */
 
-    let events = JSON.parse(
-      localStorage.getItem("fmt_endurance_events") || "[]"
-    );
+    /* =====================================================
+       DATA
+    ===================================================== */
+
+    let events =
+      JSON.parse(
+        localStorage.getItem(
+          "fmt_endurance_events"
+        ) || "[]"
+      );
+
 
     let currentEventId = null;
 
     let editingPilot = null;
 
+    let departureFieldCount = 0;
 
-    /* =========================================================
-       SAVE DATA
-    ========================================================= */
+
+    /*
+     * Form state for every departure.
+     */
+
+    const formState = {};
+
+
+    /* =====================================================
+       SAVE
+    ===================================================== */
 
     function saveEvents() {
+
       localStorage.setItem(
         "fmt_endurance_events",
         JSON.stringify(events)
       );
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
+       GLOBAL PILOT NAME
+    ===================================================== */
+
+    function getPilotName() {
+
+      return localStorage.getItem(
+        "fmt_pilot_name"
+      ) || "";
+
+    }
+
+
+    function setPilotName() {
+
+      const input =
+        document.getElementById(
+          "global-pilot-name"
+        );
+
+      if (!input) return;
+
+
+      const name =
+        input.value.trim();
+
+
+      if (!name) {
+
+        alert(
+          "Entre ton pseudo."
+        );
+
+        return;
+      }
+
+
+      localStorage.setItem(
+        "fmt_pilot_name",
+        name
+      );
+
+
+      /*
+       * Refresh event so all forms
+       * use the new name.
+       */
+
+      renderEvent();
+
+    }
+
+
+    /* =====================================================
        HELPERS
-    ========================================================= */
+    ===================================================== */
 
     function escapeHtml(value) {
+
       return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
     }
 
 
     function escapeJs(value) {
+
       return String(value)
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'");
+        .replace(
+          /\\/g,
+          "\\\\"
+        )
+        .replace(
+          /'/g,
+          "\\'"
+        );
+
     }
 
 
     function generateId() {
+
       return Math.random()
         .toString(36)
-        .substring(2, 9);
+        .substring(
+          2,
+          9
+        );
+
     }
 
 
-    function getCategoryClass(category) {
+    function getCategoryClass(
+      category
+    ) {
 
-      if (category === "Hypercar") return "cat-Hypercar";
-      if (category === "LMP2") return "cat-LMP2";
-      if (category === "LMP3") return "cat-LMP3";
-      if (category === "GT3") return "cat-GT3";
+      if (
+        category ===
+        "Hypercar"
+      ) {
+        return "cat-Hypercar";
+      }
+
+      if (
+        category ===
+        "LMP2"
+      ) {
+        return "cat-LMP2";
+      }
+
+      if (
+        category ===
+        "LMP3"
+      ) {
+        return "cat-LMP3";
+      }
+
+      if (
+        category ===
+        "GT3"
+      ) {
+        return "cat-GT3";
+      }
 
       return "";
+
     }
 
 
-    function getCategoryButtonClass(category) {
+    function getCategoryButtonClass(
+      category
+    ) {
 
-      if (category === "Hypercar") return "hyper";
-      if (category === "LMP2") return "lmp2";
-      if (category === "LMP3") return "lmp3";
-      if (category === "GT3") return "gt3";
+      if (
+        category ===
+        "Hypercar"
+      ) {
+        return "hyper";
+      }
+
+      if (
+        category ===
+        "LMP2"
+      ) {
+        return "lmp2";
+      }
+
+      if (
+        category ===
+        "LMP3"
+      ) {
+        return "lmp3";
+      }
+
+      if (
+        category ===
+        "GT3"
+      ) {
+        return "gt3";
+      }
 
       return "";
+
     }
 
 
-    function formatDate(date, time) {
+    function formatDate(
+      date,
+      time
+    ) {
 
-      const d = new Date(`${date}T${time}`);
+      const d =
+        new Date(
+          `${date}T${time}`
+        );
+
 
       return d.toLocaleDateString(
         "fr-FR",
@@ -951,12 +1755,19 @@
           month: "short"
         }
       );
+
     }
 
 
-    function formatLongDate(date) {
+    function formatLongDate(
+      date
+    ) {
 
-      const d = new Date(`${date}T00:00`);
+      const d =
+        new Date(
+          `${date}T00:00`
+        );
+
 
       return d.toLocaleDateString(
         "fr-FR",
@@ -967,10 +1778,13 @@
           year: "numeric"
         }
       );
+
     }
 
 
-    function getDepartureTimestamp(departure) {
+    function getDepartureTimestamp(
+      departure
+    ) {
 
       return new Date(
         `${departure.date}T${departure.time}`
@@ -979,229 +1793,437 @@
     }
 
 
-    /* =========================================================
+    /* =====================================================
        COUNTDOWN
-    ========================================================= */
+    ===================================================== */
 
-    function formatCountdown(target) {
+    function formatCountdown(
+      target
+    ) {
 
-      const now = Date.now();
+      const now =
+        Date.now();
 
-      let diff = target - now;
 
-      if (diff <= 0) {
+      const diff =
+        target - now;
+
+
+      if (
+        diff <= 0
+      ) {
         return null;
       }
 
-      const totalSeconds = Math.floor(diff / 1000);
 
-      const days = Math.floor(totalSeconds / 86400);
+      const totalSeconds =
+        Math.floor(
+          diff / 1000
+        );
 
-      const hours = Math.floor(
-        (totalSeconds % 86400) / 3600
-      );
 
-      const minutes = Math.floor(
-        (totalSeconds % 3600) / 60
-      );
+      const days =
+        Math.floor(
+          totalSeconds / 86400
+        );
 
-      const seconds = totalSeconds % 60;
 
-      if (days > 0) {
+      const hours =
+        Math.floor(
+          (totalSeconds % 86400) /
+          3600
+        );
+
+
+      const minutes =
+        Math.floor(
+          (totalSeconds % 3600) /
+          60
+        );
+
+
+      const seconds =
+        totalSeconds % 60;
+
+
+      if (
+        days > 0
+      ) {
+
         return `${days}j ${hours}h ${minutes}m`;
+
       }
 
-      if (hours > 0) {
+
+      if (
+        hours > 0
+      ) {
+
         return `${hours}h ${minutes}m ${seconds}s`;
+
       }
+
 
       return `${minutes}m ${seconds}s`;
+
     }
 
 
     function updateCountdowns() {
 
-      document
-        .querySelectorAll("[data-countdown]")
-        .forEach(element => {
-
-          const target = Number(
-            element.dataset.countdown
-          );
-
-          const countdown = formatCountdown(target);
-
-          if (!countdown) {
-
-            element.textContent = "🏁 Départ passé";
-            element.classList.remove("upcoming");
-            element.classList.add("finished");
-
-          } else {
-
-            element.textContent = `⏱ ${countdown}`;
-            element.classList.add("upcoming");
-            element.classList.remove("finished");
-          }
-        });
-
 
       document
-        .querySelectorAll("[data-event-countdown]")
-        .forEach(element => {
+        .querySelectorAll(
+          "[data-countdown]"
+        )
+        .forEach(
+          element => {
 
-          const target = Number(
-            element.dataset.eventCountdown
-          );
+            const target =
+              Number(
+                element.dataset.countdown
+              );
 
-          const countdown = formatCountdown(target);
 
-          if (!countdown) {
-            element.textContent = "🏁 Événement terminé";
-          } else {
-            element.textContent =
-              `⏱ Prochain départ dans ${countdown}`;
+            const countdown =
+              formatCountdown(
+                target
+              );
+
+
+            if (!countdown) {
+
+              element.textContent =
+                "🏁 Départ passé";
+
+              element.classList.remove(
+                "upcoming"
+              );
+
+              element.classList.add(
+                "finished"
+              );
+
+            } else {
+
+              element.textContent =
+                `⏱ ${countdown}`;
+
+              element.classList.add(
+                "upcoming"
+              );
+
+              element.classList.remove(
+                "finished"
+              );
+
+            }
+
           }
-        });
+        );
+
+
+      document
+        .querySelectorAll(
+          "[data-event-countdown]"
+        )
+        .forEach(
+          element => {
+
+            const target =
+              Number(
+                element.dataset.eventCountdown
+              );
+
+
+            const countdown =
+              formatCountdown(
+                target
+              );
+
+
+            if (!countdown) {
+
+              element.textContent =
+                "🏁 Événement terminé";
+
+            } else {
+
+              element.textContent =
+                `⏱ Prochain départ dans ${countdown}`;
+
+            }
+
+          }
+        );
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        HOME
-    ========================================================= */
+    ===================================================== */
 
     function renderHome() {
 
-      currentEventId = null;
-      editingPilot = null;
+      currentEventId =
+        null;
+
+      editingPilot =
+        null;
+
 
       let html = `
+
         <div class="page-title">
-          <h1>ÉVÉNEMENTS</h1>
-          <p>Gestion des courses d'endurance FMT</p>
+
+          <h1>
+            ÉVÉNEMENTS
+          </h1>
+
+          <p>
+            Gestion des courses d'endurance FMT
+          </p>
+
         </div>
+
       `;
 
 
-      if (events.length === 0) {
+      if (
+        events.length === 0
+      ) {
 
         html += `
+
           <div class="no-events">
-            Aucun événement créé.<br><br>
-            Clique sur <strong>+ NOUVEL ÉVÉNEMENT</strong> pour commencer.
+
+            Aucun événement créé.
+
+            <br><br>
+
+            Clique sur
+            <strong>
+              + NOUVEL ÉVÉNEMENT
+            </strong>
+            pour commencer.
+
           </div>
+
         `;
 
       } else {
 
-        html += `<div class="events">`;
 
-        events.forEach(event => {
-
-          const upcoming = event.departures
-            .map(d => ({
-              departure: d,
-              timestamp: getDepartureTimestamp(d)
-            }))
-            .filter(x => x.timestamp > Date.now())
-            .sort((a,b) => a.timestamp - b.timestamp)[0];
+        html += `
+          <div class="events">
+        `;
 
 
-          html += `
-            <div
-              class="event-card"
-              onclick="openEvent('${event.id}')"
-            >
+        events.forEach(
+          event => {
 
-              <div class="event-top">
 
-                <div>
-                  <div class="event-name">
-                    ${escapeHtml(event.name)}
-                  </div>
+            const upcoming =
+              event.departures
+                .map(
+                  departure => ({
 
-                  ${
-                    event.location
-                    ? `
-                      <div class="event-location">
-                        📍 ${escapeHtml(event.location)}
-                      </div>
-                    `
-                    : ""
-                  }
-                </div>
+                    departure,
 
-                ${
-                  upcoming
-                  ? `
-                    <div class="event-date">
-                      <strong>
-                        ${formatDate(
-                          upcoming.departure.date,
-                          upcoming.departure.time
-                        )}
-                      </strong>
-                      ${upcoming.departure.time}
-                    </div>
-                  `
-                  : ""
-                }
+                    timestamp:
+                      getDepartureTimestamp(
+                        departure
+                      )
 
-              </div>
+                  })
+                )
+                .filter(
+                  item =>
+                    item.timestamp >
+                    Date.now()
+                )
+                .sort(
+                  (a,b) =>
+                    a.timestamp -
+                    b.timestamp
+                )[0];
+
+
+            html += `
 
               <div
-                class="event-countdown"
-                data-event-countdown="${
-                  upcoming
-                    ? upcoming.timestamp
-                    : 0
-                }"
+                class="event-card"
+                onclick="
+                  openEvent(
+                    '${event.id}'
+                  )
+                "
               >
-                ${
-                  upcoming
-                  ? `⏱ Prochain départ dans ${formatCountdown(upcoming.timestamp)}`
-                  : "🏁 Événement terminé"
-                }
+
+                <div class="event-top">
+
+                  <div>
+
+                    <div class="event-name">
+
+                      ${escapeHtml(
+                        event.name
+                      )}
+
+                    </div>
+
+
+                    ${
+                      event.location
+                      ?
+                      `
+                        <div class="event-location">
+
+                          📍
+                          ${escapeHtml(
+                            event.location
+                          )}
+
+                        </div>
+                      `
+                      :
+                      ""
+                    }
+
+                  </div>
+
+
+                  ${
+                    upcoming
+                    ?
+                    `
+                      <div class="event-date">
+
+                        <strong>
+
+                          ${formatDate(
+                            upcoming.departure.date,
+                            upcoming.departure.time
+                          )}
+
+                        </strong>
+
+                        ${
+                          upcoming.departure.time
+                        }
+
+                      </div>
+                    `
+                    :
+                    ""
+                  }
+
+                </div>
+
+
+                <div
+                  class="event-countdown"
+                  data-event-countdown="${
+                    upcoming
+                    ?
+                    upcoming.timestamp
+                    :
+                    0
+                  }"
+                >
+
+                  ${
+                    upcoming
+                    ?
+                    `⏱ Prochain départ dans ${formatCountdown(
+                      upcoming.timestamp
+                    )}`
+                    :
+                    "🏁 Événement terminé"
+                  }
+
+                </div>
+
               </div>
 
-            </div>
-          `;
-        });
+            `;
 
-        html += `</div>`;
+          }
+        );
+
+
+        html += `
+          </div>
+        `;
+
       }
 
-      document.getElementById("app").innerHTML = html;
+
+      document.getElementById(
+        "app"
+      ).innerHTML =
+        html;
+
+
+      updateCountdowns();
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        OPEN EVENT
-    ========================================================= */
+    ===================================================== */
 
-    function openEvent(id) {
+    function openEvent(
+      id
+    ) {
 
-      currentEventId = id;
-      editingPilot = null;
+      currentEventId =
+        id;
+
+      editingPilot =
+        null;
+
+
+      Object.keys(
+        formState
+      ).forEach(
+        key =>
+          delete formState[key]
+      );
+
 
       renderEvent();
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        RENDER EVENT
-    ========================================================= */
+    ===================================================== */
 
     function renderEvent() {
 
-      const event = events.find(
-        e => e.id === currentEventId
-      );
+
+      const event =
+        events.find(
+          e =>
+            e.id ===
+            currentEventId
+        );
+
 
       if (!event) {
+
         renderHome();
+
         return;
       }
+
+
+      const pilotName =
+        getPilotName();
 
 
       let html = `
@@ -1213,36 +2235,96 @@
           ← RETOUR AUX ÉVÉNEMENTS
         </button>
 
+
         <div class="event-header">
 
           <h1>
-            ${escapeHtml(event.name)}
+
+            ${escapeHtml(
+              event.name
+            )}
+
           </h1>
+
 
           ${
             event.location
-            ? `
+            ?
+            `
               <p>
-                📍 ${escapeHtml(event.location)}
+
+                📍
+                ${escapeHtml(
+                  event.location
+                )}
+
               </p>
             `
-            : ""
+            :
+            ""
           }
 
         </div>
 
+
+        <!-- GLOBAL PILOT NAME -->
+
+        <div class="pilot-name-panel">
+
+          <div class="pilot-name-header">
+
+            <strong>
+              👤 MON PSEUDO
+            </strong>
+
+            <span class="pilot-name-info">
+              Saisi une seule fois pour tout l'événement
+            </span>
+
+          </div>
+
+
+          <div class="pilot-name-row">
+
+            <input
+              id="global-pilot-name"
+              type="text"
+              value="${escapeHtml(
+                pilotName
+              )}"
+              placeholder="Ex : McFly"
+            >
+
+
+            <button
+              class="pilot-name-save"
+              onclick="setPilotName()"
+            >
+              ENREGISTRER
+            </button>
+
+          </div>
+
+        </div>
+
+
         <div class="departures">
+
       `;
 
 
       event.departures.forEach(
-        (departure, departureIndex) => {
+        (
+          departure,
+          index
+        ) => {
 
-          html += renderDeparture(
-            event,
-            departure,
-            departureIndex
-          );
+          html +=
+            renderDeparture(
+              event,
+              departure,
+              index
+            );
 
         }
       );
@@ -1253,15 +2335,20 @@
       `;
 
 
-      document.getElementById("app").innerHTML = html;
+      document.getElementById(
+        "app"
+      ).innerHTML =
+        html;
+
 
       updateCountdowns();
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        DEPARTURE
-    ========================================================= */
+    ===================================================== */
 
     function renderDeparture(
       event,
@@ -1269,19 +2356,26 @@
       departureIndex
     ) {
 
+
       const timestamp =
-        getDepartureTimestamp(departure);
+        getDepartureTimestamp(
+          departure
+        );
 
 
       const availablePilots =
-        departure.availability.filter(
-          pilot => pilot.status !== "unavailable"
-        );
+        departure.availability
+          .filter(
+            pilot =>
+              pilot.status !==
+              "unavailable"
+          );
 
 
       let html = `
 
         <div class="departure">
+
 
           <div class="departure-header">
 
@@ -1294,22 +2388,33 @@
               )}
 
               <span class="departure-time">
+
                 ${escapeHtml(
                   departure.time
                 )}
+
               </span>
 
             </div>
+
 
             <div
               class="departure-countdown"
               data-countdown="${timestamp}"
             >
+
               ${
-                formatCountdown(timestamp)
-                ? `⏱ ${formatCountdown(timestamp)}`
-                : "🏁 Départ passé"
+                formatCountdown(
+                  timestamp
+                )
+                ?
+                `⏱ ${formatCountdown(
+                  timestamp
+                )}`
+                :
+                "🏁 Départ passé"
               }
+
             </div>
 
           </div>
@@ -1318,38 +2423,59 @@
           <div class="pilot-section">
 
             <div class="section-label">
+
               PILOTES DISPONIBLES
+
             </div>
 
       `;
 
 
-      if (availablePilots.length === 0) {
+      if (
+        availablePilots.length === 0
+      ) {
 
         html += `
+
           <div class="empty">
+
             Aucun pilote disponible pour ce départ.
+
           </div>
+
         `;
 
       } else {
 
-        html += `<div class="pilot-list">`;
 
-        availablePilots.forEach(pilot => {
+        html += `
+          <div class="pilot-list">
+        `;
 
-          html += renderPilotRow(
-            pilot
-          );
 
-        });
+        availablePilots.forEach(
+          pilot => {
 
-        html += `</div>`;
+            html +=
+              renderPilotRow(
+                pilot
+              );
+
+          }
+        );
+
+
+        html += `
+          </div>
+        `;
+
       }
 
 
       html += `
+
           </div>
+
 
           ${renderForm(
             event,
@@ -1357,106 +2483,195 @@
             departureIndex
           )}
 
+
           <div class="legend">
 
             <div class="legend-item">
-              <span class="legend-color legend-green"></span>
+
+              <span
+                class="legend-color legend-green"
+              ></span>
+
               Début
+
             </div>
 
+
             <div class="legend-item">
-              <span class="legend-color legend-yellow"></span>
+
+              <span
+                class="legend-color legend-yellow"
+              ></span>
+
               Milieu
+
             </div>
 
+
             <div class="legend-item">
-              <span class="legend-color legend-red"></span>
+
+              <span
+                class="legend-color legend-red"
+              ></span>
+
               Fin
+
             </div>
 
+
             <div class="legend-item">
-              <span class="legend-whole"></span>
+
+              <span
+                class="legend-whole"
+              ></span>
+
               Toute la course
+
             </div>
 
           </div>
 
+
         </div>
+
       `;
 
 
       return html;
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        PILOT ROW
-    ========================================================= */
+    ===================================================== */
 
-    function renderPilotRow(pilot) {
+    function renderPilotRow(
+      pilot
+    ) {
 
-      const status = pilot.status || "";
+
+      const status =
+        pilot.status ||
+        "";
+
 
       const beginning =
-        status.includes("beginning") ||
-        status === "whole";
+        status.includes(
+          "beginning"
+        ) ||
+        status ===
+          "whole";
+
 
       const middle =
-        status.includes("middle") ||
-        status === "whole";
+        status.includes(
+          "middle"
+        ) ||
+        status ===
+          "whole";
+
 
       const end =
-        status.includes("end") ||
-        status === "whole";
+        status.includes(
+          "end"
+        ) ||
+        status ===
+          "whole";
 
 
       return `
 
         <div class="pilot-row">
 
+
           <div class="pilot-left">
 
             <div class="pilot-name">
-              ${escapeHtml(pilot.name)}
+
+              ${escapeHtml(
+                pilot.name
+              )}
+
             </div>
 
           </div>
 
 
-          <span class="category-badge ${
-            getCategoryClass(pilot.category)
-          }">
+          <span
+            class="category-badge ${
+              getCategoryClass(
+                pilot.category
+              )
+            }"
+          >
 
-            ${escapeHtml(
-              pilot.category === "Hypercar"
-                ? "HYPER"
-                : pilot.category || "—"
-            )}
+            ${
+              pilot.category ===
+              "Hypercar"
+              ?
+              "HYPER"
+              :
+              escapeHtml(
+                pilot.category ||
+                "—"
+              )
+            }
 
           </span>
 
 
           <div
             class="availability-bar"
-            title="${getStatusLabel(status)}"
+            title="${escapeHtml(
+              getStatusLabel(
+                status
+              )
+            )}"
           >
 
             <span
-              class="availability-segment beginning ${
-                beginning ? "active" : ""
-              }"
+              class="
+                availability-segment
+                beginning
+                ${
+                  beginning
+                  ?
+                  "active"
+                  :
+                  ""
+                }
+              "
             ></span>
 
-            <span
-              class="availability-segment middle ${
-                middle ? "active" : ""
-              }"
-            ></span>
 
             <span
-              class="availability-segment end ${
-                end ? "active" : ""
-              }"
+              class="
+                availability-segment
+                middle
+                ${
+                  middle
+                  ?
+                  "active"
+                  :
+                  ""
+                }
+              "
+            ></span>
+
+
+            <span
+              class="
+                availability-segment
+                end
+                ${
+                  end
+                  ?
+                  "active"
+                  :
+                  ""
+                }
+              "
             ></span>
 
           </div>
@@ -1464,7 +2679,13 @@
 
           <button
             class="edit-button"
-            onclick="editPilot('${escapeJs(pilot.name)}')"
+            onclick="
+              editPilot(
+                '${escapeJs(
+                  pilot.name
+                )}'
+              )
+            "
             title="Modifier"
           >
             ✎
@@ -1473,40 +2694,91 @@
         </div>
 
       `;
+
     }
 
 
-    /* =========================================================
-       STATUS
-    ========================================================= */
+    /* =====================================================
+       STATUS LABEL
+    ===================================================== */
 
-    function getStatusLabel(status) {
+    function getStatusLabel(
+      status
+    ) {
 
-      if (status === "whole") {
+
+      if (
+        status ===
+        "whole"
+      ) {
+
         return "Toute la course";
+
       }
+
+
+      if (
+        status ===
+        "unavailable"
+      ) {
+
+        return "Indisponible";
+
+      }
+
 
       const parts = [];
 
-      if (status.includes("beginning")) {
-        parts.push("Début");
+
+      if (
+        status.includes(
+          "beginning"
+        )
+      ) {
+
+        parts.push(
+          "Début"
+        );
+
       }
 
-      if (status.includes("middle")) {
-        parts.push("Milieu");
+
+      if (
+        status.includes(
+          "middle"
+        )
+      ) {
+
+        parts.push(
+          "Milieu"
+        );
+
       }
 
-      if (status.includes("end")) {
-        parts.push("Fin");
+
+      if (
+        status.includes(
+          "end"
+        )
+      ) {
+
+        parts.push(
+          "Fin"
+        );
+
       }
 
-      return parts.join(" + ");
+
+      return parts.join(
+        " + "
+      );
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        FORM
-    ========================================================= */
+    ===================================================== */
 
     function renderForm(
       event,
@@ -1514,70 +2786,105 @@
       departureIndex
     ) {
 
-      const existing =
+
+      const globalName =
+        getPilotName();
+
+
+      let existing = null;
+
+
+      if (
         editingPilot
-        ? departure.availability.find(
-            p =>
-              p.name.toLowerCase() ===
+      ) {
+
+        existing =
+          departure.availability.find(
+            pilot =>
+              pilot.name.toLowerCase() ===
               editingPilot.toLowerCase()
-          )
-        : null;
+          );
+
+      }
 
 
-      const nameValue =
-        existing
-        ? existing.name
-        : "";
+      const state =
+        formState[
+          departure.id
+        ] || {};
 
 
       const status =
-        existing
-        ? existing.status
-        : "";
+        state.status ??
+        existing?.status ??
+        "";
 
 
       const category =
-        existing
-        ? existing.category
-        : "";
-
-
-      const isWhole =
-        status === "whole";
-
-
-      const isUnavailable =
-        status === "unavailable";
+        state.category ??
+        existing?.category ??
+        "";
 
 
       const beginning =
-        status.includes("beginning");
+        status.includes(
+          "beginning"
+        );
 
 
       const middle =
-        status.includes("middle");
+        status.includes(
+          "middle"
+        );
 
 
       const end =
-        status.includes("end");
+        status.includes(
+          "end"
+        );
+
+
+      const whole =
+        status ===
+        "whole";
+
+
+      const unavailable =
+        status ===
+        "unavailable";
 
 
       return `
 
-        <div class="form-section ${
-          existing ? "editing" : ""
-        }">
+        <div
+          class="form-section ${
+            existing
+            ?
+            "editing"
+            :
+            ""
+          }"
+        >
+
 
           <div class="form-title">
 
             <strong>
-              ${existing
-                ? "✎ Modifier ma disponibilité"
-                : "+ Enregistrer ma disponibilité"
+
+              ${
+                existing
+                ?
+                "✎ MODIFIER MA DISPONIBILITÉ"
+                :
+                "+ ENREGISTRER MA DISPONIBILITÉ"
               }
+
             </strong>
 
-            <span class="editing-label">
+
+            <span
+              class="editing-label"
+            >
               MODIFICATION
             </span>
 
@@ -1586,107 +2893,184 @@
 
           <div class="form-grid">
 
+
+            <!-- PSEUDO -->
+
             <div class="field">
 
-              <label>Nom / Pseudo</label>
+              <label>
+                Pilote
+              </label>
 
               <input
                 id="name-${departure.id}"
                 type="text"
-                value="${escapeHtml(nameValue)}"
-                placeholder="Ex : McFly"
+                value="${escapeHtml(
+                  existing
+                  ?
+                  existing.name
+                  :
+                  globalName
+                )}"
+                readonly
               >
 
             </div>
 
 
+            <!-- AVAILABILITY -->
+
             <div class="field">
 
-              <label>Disponibilité</label>
+              <label>
+                Disponibilité
+              </label>
+
 
               <div
                 class="availability-buttons"
                 id="availability-${departure.id}"
               >
 
+
                 <button
                   type="button"
-                  class="availability-button beginning ${
-                    beginning ? "active" : ""
-                  }"
-                  onclick="toggleAvailability(
-                    '${departure.id}',
-                    'beginning'
-                  )"
+                  class="
+                    availability-button
+                    beginning
+                    ${
+                      beginning
+                      ?
+                      "active"
+                      :
+                      ""
+                    }
+                  "
+                  onclick="
+                    toggleAvailability(
+                      '${departure.id}',
+                      'beginning'
+                    )
+                  "
                 >
                   DÉBUT
                 </button>
 
+
                 <button
                   type="button"
-                  class="availability-button middle ${
-                    middle ? "active" : ""
-                  }"
-                  onclick="toggleAvailability(
-                    '${departure.id}',
-                    'middle'
-                  )"
+                  class="
+                    availability-button
+                    middle
+                    ${
+                      middle
+                      ?
+                      "active"
+                      :
+                      ""
+                    }
+                  "
+                  onclick="
+                    toggleAvailability(
+                      '${departure.id}',
+                      'middle'
+                    )
+                  "
                 >
                   MILIEU
                 </button>
 
+
                 <button
                   type="button"
-                  class="availability-button end ${
-                    end ? "active" : ""
-                  }"
-                  onclick="toggleAvailability(
-                    '${departure.id}',
-                    'end'
-                  )"
+                  class="
+                    availability-button
+                    end
+                    ${
+                      end
+                      ?
+                      "active"
+                      :
+                      ""
+                    }
+                  "
+                  onclick="
+                    toggleAvailability(
+                      '${departure.id}',
+                      'end'
+                    )
+                  "
                 >
                   FIN
                 </button>
 
+
                 <button
                   type="button"
-                  class="availability-button whole ${
-                    isWhole ? "active" : ""
-                  }"
-                  onclick="setAvailability(
-                    '${departure.id}',
-                    'whole'
-                  )"
+                  class="
+                    availability-button
+                    whole
+                    ${
+                      whole
+                      ?
+                      "active"
+                      :
+                      ""
+                    }
+                  "
+                  onclick="
+                    setAvailability(
+                      '${departure.id}',
+                      'whole'
+                    )
+                  "
                 >
                   TOUT
                 </button>
 
+
                 <button
                   type="button"
-                  class="availability-button unavailable ${
-                    isUnavailable ? "active" : ""
-                  }"
-                  onclick="setAvailability(
-                    '${departure.id}',
-                    'unavailable'
-                  )"
+                  class="
+                    availability-button
+                    unavailable
+                    ${
+                      unavailable
+                      ?
+                      "active"
+                      :
+                      ""
+                    }
+                  "
+                  onclick="
+                    setAvailability(
+                      '${departure.id}',
+                      'unavailable'
+                    )
+                  "
                 >
                   ABSENT
                 </button>
+
 
               </div>
 
             </div>
 
 
+            <!-- CATEGORY -->
+
             <div class="field">
 
-              <label>Catégorie</label>
+              <label>
+                Catégorie
+              </label>
+
 
               <div
                 class="category-buttons"
-                id="category-${departure.id}"
               >
+
 
                 ${renderCategoryButton(
                   departure.id,
@@ -1694,17 +3078,20 @@
                   category
                 )}
 
+
                 ${renderCategoryButton(
                   departure.id,
                   "LMP2",
                   category
                 )}
 
+
                 ${renderCategoryButton(
                   departure.id,
                   "LMP3",
                   category
                 )}
+
 
                 ${renderCategoryButton(
                   departure.id,
@@ -1717,26 +3104,41 @@
             </div>
 
 
+            <!-- SAVE -->
+
             <button
               class="save-button"
-              onclick="saveAvailability(
-                '${departure.id}'
-              )"
+              onclick="
+                saveAvailability(
+                  '${departure.id}'
+                )
+              "
             >
+
               ${
                 existing
-                ? "MODIFIER"
-                : "ENREGISTRER"
+                ?
+                "MODIFIER"
+                :
+                "ENREGISTRER"
               }
+
             </button>
 
+
           </div>
+
 
         </div>
 
       `;
+
     }
 
+
+    /* =====================================================
+       CATEGORY BUTTON
+    ===================================================== */
 
     function renderCategoryButton(
       departureId,
@@ -1744,96 +3146,160 @@
       selected
     ) {
 
+
       return `
 
         <button
           type="button"
-          class="category-button ${
-            getCategoryButtonClass(category)
-          } ${
-            selected === category
-              ? "active"
-              : ""
-          }"
-          onclick="setCategory(
-            '${departureId}',
-            '${category}'
-          )"
+          class="
+            category-button
+            ${
+              getCategoryButtonClass(
+                category
+              )
+            }
+            ${
+              selected ===
+              category
+              ?
+              "active"
+              :
+              ""
+            }
+          "
+          onclick="
+            setCategory(
+              '${departureId}',
+              '${category}'
+            )
+          "
         >
+
           ${
-            category === "Hypercar"
-              ? "HYPER"
-              : category
+            category ===
+            "Hypercar"
+            ?
+            "HYPER"
+            :
+            category
           }
+
         </button>
 
       `;
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        FORM STATE
-    ========================================================= */
+    ===================================================== */
 
-    const formState = {};
+    function ensureFormState(
+      departureId
+    ) {
 
+      if (
+        !formState[
+          departureId
+        ]
+      ) {
 
-    function ensureFormState(departureId) {
+        formState[
+          departureId
+        ] = {
 
-      if (!formState[departureId]) {
+          status:
+            "",
 
-        formState[departureId] = {
-          status: "",
-          category: ""
+          category:
+            ""
+
         };
 
       }
 
-      return formState[departureId];
+
+      return formState[
+        departureId
+      ];
+
     }
 
+
+    /* =====================================================
+       TOGGLE AVAILABILITY
+    ===================================================== */
 
     function toggleAvailability(
       departureId,
       type
     ) {
 
-      const state =
-        ensureFormState(departureId);
 
+      const state =
+        ensureFormState(
+          departureId
+        );
+
+
+      /*
+       * Clicking a segment while
+       * Whole / Absent is selected
+       * starts a fresh selection.
+       */
 
       if (
-        state.status === "whole" ||
-        state.status === "unavailable"
+        state.status ===
+          "whole" ||
+        state.status ===
+          "unavailable"
       ) {
-        state.status = "";
+
+        state.status =
+          "";
+
       }
 
 
       let parts =
         state.status
-          ? state.status.split(",")
-          : [];
+          ?
+          state.status.split(",")
+          :
+          [];
 
 
-      if (parts.includes(type)) {
+      if (
+        parts.includes(
+          type
+        )
+      ) {
 
         parts =
           parts.filter(
-            p => p !== type
+            part =>
+              part !==
+              type
           );
 
       } else {
 
-        parts.push(type);
+        parts.push(
+          type
+        );
 
       }
 
 
       const order = [
+
         "beginning",
+
         "middle",
+
         "end"
+
       ];
 
 
@@ -1844,9 +3310,16 @@
       );
 
 
-      if (parts.length === 3) {
+      /*
+       * All 3 = Whole race
+       */
 
-        state.status = "whole";
+      if (
+        parts.length === 3
+      ) {
+
+        state.status =
+          "whole";
 
       } else {
 
@@ -1856,67 +3329,108 @@
       }
 
 
+      /*
+       * Immediately refresh
+       * ONLY this departure.
+       */
+
       refreshDepartureForm(
         departureId
       );
+
     }
 
+
+    /* =====================================================
+       SET AVAILABILITY
+    ===================================================== */
 
     function setAvailability(
       departureId,
       status
     ) {
 
-      const state =
-        ensureFormState(departureId);
 
-      state.status = status;
+      const state =
+        ensureFormState(
+          departureId
+        );
+
+
+      state.status =
+        status;
+
 
       refreshDepartureForm(
         departureId
       );
+
     }
 
+
+    /* =====================================================
+       SET CATEGORY
+    ===================================================== */
 
     function setCategory(
       departureId,
       category
     ) {
 
-      const state =
-        ensureFormState(departureId);
 
-      state.category = category;
+      const state =
+        ensureFormState(
+          departureId
+        );
+
+
+      state.category =
+        category;
+
 
       refreshDepartureForm(
         departureId
       );
+
     }
 
 
-    /* =========================================================
-       REFRESH FORM ONLY
-    ========================================================= */
+    /* =====================================================
+       REFRESH ONE FORM
+    ===================================================== */
 
     function refreshDepartureForm(
       departureId
     ) {
 
+
       const event =
         events.find(
-          e => e.id === currentEventId
+          e =>
+            e.id ===
+            currentEventId
         );
 
-      if (!event) return;
+
+      if (!event) {
+        return;
+      }
 
 
       const departureIndex =
         event.departures.findIndex(
-          d => d.id === departureId
+          departure =>
+            departure.id ===
+            departureId
         );
 
-      if (departureIndex === -1) {
+
+      if (
+        departureIndex === -1
+      ) {
+
         return;
+
       }
 
 
@@ -1935,41 +3449,28 @@
       if (!form) {
 
         renderEvent();
+
         return;
+
       }
 
 
-      const oldName =
+      /*
+       * Keep current input value.
+       */
+
+      const input =
         document.getElementById(
           `name-${departureId}`
-        )?.value || "";
+        );
 
 
-      const tempState =
-        ensureFormState(departureId);
-
-
-      const existing =
-        editingPilot
-        ? departure.availability.find(
-            p =>
-              p.name.toLowerCase() ===
-              editingPilot.toLowerCase()
-          )
-        : null;
-
-
-      const state = {
-        status:
-          tempState.status ||
-          existing?.status ||
-          "",
-
-        category:
-          tempState.category ||
-          existing?.category ||
-          ""
-      };
+      const name =
+        input
+        ?
+        input.value
+        :
+        getPilotName();
 
 
       form.outerHTML =
@@ -1985,49 +3486,65 @@
           `name-${departureId}`
         );
 
+
       if (newInput) {
+
         newInput.value =
-          existing
-          ? existing.name
-          : oldName;
+          name;
+
       }
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        SAVE AVAILABILITY
-    ========================================================= */
+    ===================================================== */
 
     function saveAvailability(
       departureId
     ) {
 
+
       const event =
         events.find(
-          e => e.id === currentEventId
+          e =>
+            e.id ===
+            currentEventId
         );
 
-      if (!event) return;
+
+      if (!event) {
+        return;
+      }
 
 
       const departure =
         event.departures.find(
-          d => d.id === departureId
-        );
-
-      if (!departure) return;
-
-
-      const input =
-        document.getElementById(
-          `name-${departureId}`
+          d =>
+            d.id ===
+            departureId
         );
 
 
-      const name =
-        input
-          ? input.value.trim()
-          : "";
+      if (!departure) {
+        return;
+      }
+
+
+      const globalName =
+        getPilotName();
+
+
+      if (!globalName) {
+
+        alert(
+          "Entre ton pseudo en haut de la page avant de renseigner tes disponibilités."
+        );
+
+        return;
+
+      }
 
 
       const state =
@@ -2037,59 +3554,52 @@
 
 
       let status =
-        state.status || "";
+        state.status ||
+        "";
 
 
       let category =
-        state.category || "";
+        state.category ||
+        "";
 
 
-      /* If editing, load existing values
-         when state hasn't been changed */
+      /*
+       * When editing, use the existing
+       * values if nothing was changed.
+       */
 
       if (
-        editingPilot &&
-        !status
+        editingPilot
       ) {
+
 
         const existing =
           departure.availability.find(
-            p =>
-              p.name.toLowerCase() ===
+            pilot =>
+              pilot.name.toLowerCase() ===
               editingPilot.toLowerCase()
           );
 
-        if (existing) {
-          status = existing.status;
-        }
-      }
-
-
-      if (
-        editingPilot &&
-        !category
-      ) {
-
-        const existing =
-          departure.availability.find(
-            p =>
-              p.name.toLowerCase() ===
-              editingPilot.toLowerCase()
-          );
 
         if (existing) {
-          category = existing.category;
+
+          if (!status) {
+
+            status =
+              existing.status;
+
+          }
+
+
+          if (!category) {
+
+            category =
+              existing.category;
+
+          }
+
         }
-      }
 
-
-      if (!name) {
-
-        alert(
-          "Entre ton nom ou ton pseudo."
-        );
-
-        return;
       }
 
 
@@ -2100,11 +3610,13 @@
         );
 
         return;
+
       }
 
 
       if (
-        status !== "unavailable" &&
+        status !==
+          "unavailable" &&
         !category
       ) {
 
@@ -2113,79 +3625,73 @@
         );
 
         return;
+
       }
 
 
-      /* =========================
-         FIND EXISTING PILOT
-      ========================= */
+      /*
+       * Find the pilot.
+       */
 
       const existingIndex =
         departure.availability.findIndex(
-          p =>
-            p.name.toLowerCase() ===
-            name.toLowerCase()
+          pilot =>
+            pilot.name.toLowerCase() ===
+            globalName.toLowerCase()
         );
 
 
-      /* =========================
-         EDIT EXISTING PILOT
-      ========================= */
+      /*
+       * UPDATE
+       */
 
       if (
-        editingPilot &&
         existingIndex !== -1
       ) {
+
 
         departure.availability[
           existingIndex
         ] = {
+
           ...departure.availability[
             existingIndex
           ],
-          name,
-          category,
-          status
+
+          name:
+            globalName,
+
+          category:
+            category,
+
+          status:
+            status
+
         };
 
       }
 
-      /* =========================
-         UPDATE SAME NAME
-      ========================= */
 
-      else if (
-        existingIndex !== -1
-      ) {
-
-        departure.availability[
-          existingIndex
-        ] = {
-          ...departure.availability[
-            existingIndex
-          ],
-          name,
-          category,
-          status
-        };
-
-      }
-
-      /* =========================
-         NEW PILOT
-      ========================= */
+      /*
+       * NEW
+       */
 
       else {
 
+
         departure.availability.push({
 
-          id: generateId(),
+          id:
+            generateId(),
 
-          name,
+          name:
+            globalName,
 
-          category,
+          category:
+            category,
 
-          status
+          status:
+            status
 
         });
 
@@ -2195,40 +3701,88 @@
       saveEvents();
 
 
-      editingPilot = null;
+      /*
+       * Clear this form state.
+       */
 
       delete formState[
         departureId
       ];
 
 
+      editingPilot =
+        null;
+
+
       renderEvent();
-    }
-
-
-    /* =========================================================
-       EDIT PILOT
-    ========================================================= */
-
-    function editPilot(name) {
-
-      editingPilot = name;
-
-      const event =
-        events.find(
-          e => e.id === currentEventId
-        );
-
-      if (!event) return;
 
 
       /*
-       * Find the departure containing
-       * the pilot and initialize its form.
+       * Scroll back close to
+       * the saved departure.
+       */
+
+      setTimeout(
+        () => {
+
+          const element =
+            document.querySelector(
+              `[data-departure-id="${departureId}"]`
+            );
+
+
+          if (element) {
+
+            element.scrollIntoView({
+              behavior:
+                "smooth",
+              block:
+                "center"
+            });
+
+          }
+
+        },
+        50
+      );
+
+    }
+
+
+    /* =====================================================
+       EDIT PILOT
+    ===================================================== */
+
+    function editPilot(
+      name
+    ) {
+
+
+      editingPilot =
+        name;
+
+
+      const event =
+        events.find(
+          e =>
+            e.id ===
+            currentEventId
+        );
+
+
+      if (!event) {
+        return;
+      }
+
+
+      /*
+       * Load this pilot's choices
+       * for every departure.
        */
 
       event.departures.forEach(
         departure => {
+
 
           const pilot =
             departure.availability.find(
@@ -2237,58 +3791,83 @@
                 name.toLowerCase()
             );
 
+
           if (pilot) {
+
 
             formState[
               departure.id
             ] = {
 
-              status: pilot.status,
+              status:
+                pilot.status,
 
-              category: pilot.category
+              category:
+                pilot.category
 
             };
 
           }
+
         }
+      );
+
+
+      /*
+       * Save the pseudo as global
+       * pseudo too.
+       */
+
+      localStorage.setItem(
+        "fmt_pilot_name",
+        name
       );
 
 
       renderEvent();
 
 
-      /*
-       * Scroll to the first form
-       */
+      setTimeout(
+        () => {
 
-      setTimeout(() => {
 
-        const form =
-          document.querySelector(
-            ".form-section.editing"
-          );
+          const form =
+            document.querySelector(
+              ".form-section.editing"
+            );
 
-        if (form) {
 
-          form.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-          });
+          if (form) {
 
-        }
+            form.scrollIntoView({
+              behavior:
+                "smooth",
 
-      }, 50);
+              block:
+                "center"
+            });
+
+          }
+
+        },
+        50
+      );
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        CREATE EVENT
-    ========================================================= */
+    ===================================================== */
 
     function showCreateEvent() {
 
-      currentEventId = null;
-      editingPilot = null;
+
+      currentEventId =
+        null;
+
+      editingPilot =
+        null;
 
 
       document.getElementById(
@@ -2302,17 +3881,22 @@
           ← RETOUR
         </button>
 
+
         <div class="create-panel">
 
           <h2>
             NOUVEL ÉVÉNEMENT
           </h2>
 
+
           <div class="create-grid">
+
 
             <div class="field">
 
-              <label>Nom de l'événement</label>
+              <label>
+                Nom de l'événement
+              </label>
 
               <input
                 id="event-name"
@@ -2325,7 +3909,9 @@
 
             <div class="field">
 
-              <label>Circuit / lieu</label>
+              <label>
+                Circuit / lieu
+              </label>
 
               <input
                 id="event-location"
@@ -2338,16 +3924,22 @@
 
             <div class="field">
 
-              <label>Départs</label>
+              <label>
+                Départs
+              </label>
 
-              <div id="departure-fields"></div>
+              <div
+                id="departure-fields"
+              ></div>
 
             </div>
 
 
             <button
               class="small-button"
-              onclick="addDepartureField()"
+              onclick="
+                addDepartureField()
+              "
             >
               + AJOUTER UN DÉPART
             </button>
@@ -2355,35 +3947,49 @@
 
             <button
               class="create-submit"
-              onclick="createEvent()"
+              onclick="
+                createEvent()
+              "
             >
               CRÉER L'ÉVÉNEMENT
             </button>
 
+
           </div>
 
         </div>
+
       `;
 
 
+      departureFieldCount =
+        0;
+
+
       addDepartureField();
+
     }
 
 
-    let departureFieldCount = 0;
-
+    /* =====================================================
+       ADD DEPARTURE FIELD
+    ===================================================== */
 
     function addDepartureField(
       date = "",
       time = ""
     ) {
 
+
       const container =
         document.getElementById(
           "departure-fields"
         );
 
-      if (!container) return;
+
+      if (!container) {
+        return;
+      }
 
 
       const id =
@@ -2391,7 +3997,10 @@
 
 
       const div =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       div.className =
         "create-departure";
@@ -2401,7 +4010,9 @@
 
         <div class="field">
 
-          <label>Date</label>
+          <label>
+            Date
+          </label>
 
           <input
             type="date"
@@ -2414,7 +4025,9 @@
 
         <div class="field">
 
-          <label>Heure</label>
+          <label>
+            Heure
+          </label>
 
           <input
             type="time"
@@ -2428,7 +4041,9 @@
         <button
           class="small-button"
           type="button"
-          onclick="this.parentElement.remove()"
+          onclick="
+            this.parentElement.remove()
+          "
         >
           ✕
         </button>
@@ -2436,15 +4051,19 @@
       `;
 
 
-      container.appendChild(div);
+      container.appendChild(
+        div
+      );
+
     }
 
 
-    /* =========================================================
+    /* =====================================================
        CREATE EVENT
-    ========================================================= */
+    ===================================================== */
 
     function createEvent() {
+
 
       const name =
         document.getElementById(
@@ -2465,6 +4084,7 @@
         );
 
         return;
+
       }
 
 
@@ -2477,150 +4097,222 @@
       const departures = [];
 
 
-      rows.forEach(row => {
-
-        const date =
-          row.querySelector(
-            ".new-departure-date"
-          ).value;
+      rows.forEach(
+        row => {
 
 
-        const time =
-          row.querySelector(
-            ".new-departure-time"
-          ).value;
+          const date =
+            row.querySelector(
+              ".new-departure-date"
+            ).value;
 
 
-        if (date && time) {
+          const time =
+            row.querySelector(
+              ".new-departure-time"
+            ).value;
 
-          departures.push({
 
-            id: generateId(),
+          if (
+            date &&
+            time
+          ) {
 
-            date,
 
-            time,
+            departures.push({
 
-            availability: []
+              id:
+                generateId(),
 
-          });
+              date:
+                date,
+
+              time:
+                time,
+
+              availability:
+                []
+
+            });
+
+          }
 
         }
+      );
 
-      });
 
-
-      if (departures.length === 0) {
+      if (
+        departures.length === 0
+      ) {
 
         alert(
           "Ajoute au moins un départ."
         );
 
         return;
+
       }
 
 
       departures.sort(
         (a,b) =>
-          getDepartureTimestamp(a) -
-          getDepartureTimestamp(b)
+          getDepartureTimestamp(
+            a
+          ) -
+          getDepartureTimestamp(
+            b
+          )
       );
 
 
       const event = {
 
-        id: generateId(),
+        id:
+          generateId(),
 
-        name,
+        name:
+          name,
 
-        location,
+        location:
+          location,
 
-        departures
+        departures:
+          departures
 
       };
 
 
-      events.push(event);
+      events.push(
+        event
+      );
+
 
       saveEvents();
 
 
-      openEvent(event.id);
+      openEvent(
+        event.id
+      );
+
     }
 
 
-    /* =========================================================
-       INITIAL LOAD
-    ========================================================= */
+    /* =====================================================
+       INITIAL DATA
+    ===================================================== */
 
-    if (events.length === 0) {
+    if (
+      events.length === 0
+    ) {
 
-      /*
-       * Demo event shown on first launch.
-       * It can be deleted manually from localStorage
-       * if you don't want it.
-       */
 
       events.push({
 
-        id: generateId(),
+        id:
+          generateId(),
 
-        name: "Spa 6H",
+        name:
+          "Spa 6H",
 
-        location: "Spa-Francorchamps",
+        location:
+          "Spa-Francorchamps",
 
         departures: [
 
           {
-            id: generateId(),
-            date: "2026-09-04",
-            time: "20:00",
-            availability: []
+
+            id:
+              generateId(),
+
+            date:
+              "2026-09-04",
+
+            time:
+              "20:00",
+
+            availability:
+              []
+
           },
 
-          {
-            id: generateId(),
-            date: "2026-09-05",
-            time: "14:00",
-            availability: []
-          },
 
           {
-            id: generateId(),
-            date: "2026-09-05",
-            time: "20:00",
-            availability: []
+
+            id:
+              generateId(),
+
+            date:
+              "2026-09-05",
+
+            time:
+              "14:00",
+
+            availability:
+              []
+
           },
 
+
           {
-            id: generateId(),
-            date: "2026-09-06",
-            time: "15:00",
-            availability: []
+
+            id:
+              generateId(),
+
+            date:
+              "2026-09-05",
+
+            time:
+              "20:00",
+
+            availability:
+              []
+
+          },
+
+
+          {
+
+            id:
+              generateId(),
+
+            date:
+              "2026-09-06",
+
+            time:
+              "15:00",
+
+            availability:
+              []
+
           }
 
         ]
 
       });
 
+
       saveEvents();
+
     }
 
+
+    /* =====================================================
+       START
+    ===================================================== */
 
     renderHome();
 
 
-    /* =========================================================
-       COUNTDOWN LOOP
-       IMPORTANT:
-       We update only countdown text.
-       We DO NOT rerender the page every second.
-       ========================================================= */
+    /*
+     * Countdown updates only.
+     * The page itself is NOT rerendered every second.
+     */
 
     setInterval(
       updateCountdowns,
       1000
     );
+
 
   </script>
 

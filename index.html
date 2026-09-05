@@ -1,4320 +1,2440 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>FMT Endurance</title>
-
-  <style>
-
-    :root {
-      --bg: #090a0b;
-      --panel: #111315;
-      --panel2: #17191c;
-      --panel3: #1d2023;
-      --border: #292d31;
-
-      --text: #f2f2f2;
-      --muted: #92979c;
-
-      --blue: #2589d8;
-      --green: #31b86b;
-      --yellow: #e4c341;
-      --red: #e34c4c;
-
-      --accent: #7ee38f;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-
-      background:
-        radial-gradient(
-          circle at top right,
-          rgba(49,184,107,.07),
-          transparent 30%
-        ),
-        var(--bg);
-
-      color: var(--text);
-
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-    }
-
-
-    /* =====================================================
-       TOP STRIPES
-    ===================================================== */
-
-    .top-stripes {
-      display: flex;
-      height: 5px;
-      width: 100%;
-    }
-
-    .top-stripes span {
-      flex: 1;
-    }
-
-    .stripe-blue {
-      background: var(--blue);
-    }
-
-    .stripe-green {
-      background: var(--green);
-    }
-
-    .stripe-yellow {
-      background: var(--yellow);
-    }
-
-    .stripe-red {
-      background: var(--red);
-    }
-
-
-    /* =====================================================
-       HEADER
-    ===================================================== */
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-
-      background: rgba(9,10,11,.95);
-
-      border-bottom:
-        1px solid var(--border);
-
-      backdrop-filter: blur(8px);
-    }
-
-    .header-inner {
-      max-width: 1050px;
-      margin: auto;
-
-      padding:
-        17px 20px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 20px;
-    }
-
-    .logo {
-      font-size: 21px;
-      font-weight: 950;
-
-      letter-spacing: 2px;
-
-      line-height: 1;
-    }
-
-    .logo span {
-      color: var(--green);
-    }
-
-    .subtitle {
-      margin-top: 5px;
-
-      color: var(--muted);
-
-      font-size: 10px;
-      font-weight: 700;
-
-      letter-spacing: 2px;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .header-button {
-      padding:
-        10px 15px;
-
-      background:
-        var(--green);
-
-      color:
-        #07100a;
-
-      border-radius: 4px;
-
-      font-size: 11px;
-      font-weight: 900;
-    }
-
-    .header-button:hover {
-      filter: brightness(1.1);
-    }
-
-
-    /* =====================================================
-       MAIN
-    ===================================================== */
-
-    main {
-      max-width: 1050px;
-      margin: auto;
-
-      padding:
-        28px 20px 60px;
-    }
-
-    .page-title {
-      margin-bottom: 22px;
-    }
-
-    .page-title h1 {
-      margin: 0;
-
-      font-size: 28px;
-      letter-spacing: -1px;
-    }
-
-    .page-title p {
-      margin:
-        7px 0 0;
-
-      color: var(--muted);
-
-      font-size: 13px;
-    }
-
-
-    /* =====================================================
-       EVENTS
-    ===================================================== */
-
-    .events {
-      display: grid;
-      gap: 12px;
-    }
-
-    .event-card {
-      position: relative;
-      overflow: hidden;
-
-      padding:
-        17px 18px;
-
-      background: var(--panel);
-
-      border:
-        1px solid var(--border);
-
-      border-left:
-        4px solid var(--green);
-
-      border-radius: 6px;
-
-      cursor: pointer;
-
-      transition: .15s;
-    }
-
-    .event-card:hover {
-      background: var(--panel2);
-      transform: translateX(2px);
-    }
-
-    .event-top {
-      display: flex;
-
-      justify-content:
-        space-between;
-
-      gap: 15px;
-    }
-
-    .event-name {
-      font-size: 18px;
-      font-weight: 900;
-    }
-
-    .event-location {
-      margin-top: 4px;
-
-      color: var(--muted);
-
-      font-size: 12px;
-    }
-
-    .event-date {
-      text-align: right;
-
-      color: var(--muted);
-
-      font-size: 11px;
-    }
-
-    .event-date strong {
-      display: block;
-
-      color: var(--text);
-
-      font-size: 13px;
-    }
-
-    .event-countdown {
-      margin-top: 14px;
-
-      padding-top: 11px;
-
-      border-top:
-        1px solid var(--border);
-
-      color: var(--green);
-
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-
-    /* =====================================================
-       BACK BUTTON
-    ===================================================== */
-
-    .back-button {
-      padding: 0;
-      margin-bottom: 20px;
-
-      background: transparent;
-
-      color: var(--muted);
-
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .back-button:hover {
-      color: white;
-    }
-
-
-    /* =====================================================
-       EVENT HEADER
-    ===================================================== */
-
-    .event-header {
-      position: relative;
-      overflow: hidden;
-
-      margin-bottom: 18px;
-      padding: 20px;
-
-      background: var(--panel);
-
-      border:
-        1px solid var(--border);
-
-      border-radius: 7px;
-    }
-
-    .event-header::before {
-      content: "";
-
-      position: absolute;
-
-      left: 0;
-      top: 0;
-      bottom: 0;
-
-      width: 4px;
-
-      background:
-        linear-gradient(
-          to bottom,
-          var(--blue) 0 25%,
-          var(--green) 25% 50%,
-          var(--yellow) 50% 75%,
-          var(--red) 75% 100%
-        );
-    }
-
-    .event-header h1 {
-      margin:
-        0 0 6px;
-
-      font-size: 27px;
-    }
-
-    .event-header p {
-      margin: 0;
-
-      color: var(--muted);
-
-      font-size: 13px;
-    }
-
-
-    /* =====================================================
-       PILOT NAME GLOBAL
-    ===================================================== */
-
-    .pilot-name-panel {
-      margin-bottom: 18px;
-
-      padding: 15px 16px;
-
-      background:
-        var(--panel);
-
-      border:
-        1px solid var(--border);
-
-      border-left:
-        4px solid var(--green);
-
-      border-radius: 6px;
-    }
-
-    .pilot-name-header {
-      display: flex;
-
-      justify-content:
-        space-between;
-
-      align-items: center;
-
-      gap: 10px;
-
-      margin-bottom: 8px;
-    }
-
-    .pilot-name-header strong {
-      font-size: 11px;
-
-      letter-spacing: 1px;
-
-      text-transform:
-        uppercase;
-    }
-
-    .pilot-name-info {
-      color: var(--muted);
-
-      font-size: 10px;
-    }
-
-    .pilot-name-row {
-      display: flex;
-
-      gap: 8px;
-    }
-
-    .pilot-name-row input {
-      flex: 1;
-    }
-
-    .pilot-name-save {
-      height: 34px;
-
-      padding:
-        0 14px;
-
-      background:
-        var(--green);
-
-      color:
-        #07100a;
-
-      border-radius: 4px;
-
-      font-size: 10px;
-      font-weight: 950;
-    }
-
-
-    /* =====================================================
-       DEPARTURES
-    ===================================================== */
-
-    .departures {
-      display: flex;
-
-      flex-direction:
-        column;
-
-      gap: 14px;
-    }
-
-    .departure {
-      overflow: hidden;
-
-      background:
-        var(--panel);
-
-      border:
-        1px solid var(--border);
-
-      border-radius: 7px;
-    }
-
-    .departure-header {
-      display: flex;
-
-      justify-content:
-        space-between;
-
-      align-items: center;
-
-      gap: 15px;
-
-      padding:
-        14px 16px;
-
-      background:
-        var(--panel2);
-
-      border-bottom:
-        1px solid var(--border);
-    }
-
-    .departure-date {
-      font-size: 13px;
-
-      font-weight: 900;
-
-      text-transform:
-        uppercase;
-    }
-
-    .departure-time {
-      margin-left: 7px;
-
-      color:
-        var(--green);
-    }
-
-    .departure-countdown {
-      color:
-        var(--muted);
-
-      font-size: 11px;
-
-      text-align: right;
-
-      white-space:
-        nowrap;
-    }
-
-    .departure-countdown.upcoming {
-      color:
-        var(--green);
-
-      font-weight: 800;
-    }
-
-    .departure-countdown.finished {
-      color:
-        var(--muted);
-    }
-
-
-    /* =====================================================
-       PILOT LIST
-    ===================================================== */
-
-    .pilot-section {
-      padding:
-        12px 14px 4px;
-    }
-
-    .section-label {
-      margin-bottom: 8px;
-
-      color:
-        var(--muted);
-
-      font-size: 9px;
-
-      font-weight: 900;
-
-      letter-spacing: 1.5px;
-
-      text-transform:
-        uppercase;
-    }
-
-    .pilot-list {
-      display: flex;
-
-      flex-direction:
-        column;
-
-      gap: 4px;
-    }
-
-    .pilot-row {
-      display: grid;
-
-      grid-template-columns:
-        minmax(100px, 1fr)
-        48px
-        78px
-        30px;
-
-      align-items:
-        center;
-
-      gap: 8px;
-
-      min-height:
-        34px;
-
-      padding:
-        5px 7px;
-
-      background:
-        var(--panel2);
-
-      border:
-        1px solid rgba(255,255,255,.035);
-
-      border-radius: 4px;
-    }
-
-    .pilot-left {
-      min-width: 0;
-
-      display: flex;
-
-      align-items:
-        center;
-
-      gap: 7px;
-    }
-
-    .pilot-name {
-      overflow: hidden;
-
-      text-overflow:
-        ellipsis;
-
-      white-space:
-        nowrap;
-
-      font-size: 12px;
-
-      font-weight: 800;
-    }
-
-
-    /* =====================================================
-       CATEGORY BADGES
-    ===================================================== */
-
-    .category-badge {
-      display: inline-flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        center;
-
-      min-width:
-        48px;
-
-      padding:
-        3px 6px;
-
-      border-radius:
-        3px;
-
-      color:
-        #101010;
-
-      font-size:
-        8px;
-
-      font-weight:
-        950;
-    }
-
-    .cat-Hypercar {
-      background:
-        var(--blue);
-    }
-
-    .cat-LMP2 {
-      background:
-        var(--green);
-    }
-
-    .cat-LMP3 {
-      background:
-        var(--yellow);
-    }
-
-    .cat-GT3 {
-      background:
-        var(--red);
-
-      color:
-        white;
-    }
-
-
-    /* =====================================================
-       AVAILABILITY BAR
-    ===================================================== */
-
-    .availability-bar {
-      display: flex;
-
-      width:
-        76px;
-
-      height:
-        9px;
-
-      gap:
-        2px;
-
-      overflow:
-        hidden;
-
-      border-radius:
-        2px;
-    }
-
-    .availability-segment {
-      flex: 1;
-
-      background:
-        #292d31;
-    }
-
-    .availability-segment.beginning.active {
-      background:
-        var(--green);
-    }
-
-    .availability-segment.middle.active {
-      background:
-        var(--yellow);
-    }
-
-    .availability-segment.end.active {
-      background:
-        var(--red);
-    }
-
-    .edit-button {
-      width:
-        28px;
-
-      height:
-        25px;
-
-      border-radius:
-        3px;
-
-      background:
-        #25282b;
-
-      color:
-        var(--muted);
-
-      font-size:
-        11px;
-    }
-
-    .edit-button:hover {
-      background:
-        #303438;
-
-      color:
-        white;
-    }
-
-    .empty {
-      padding:
-        9px 5px 11px;
-
-      color:
-        #676d72;
-
-      font-size:
-        11px;
-
-      font-style:
-        italic;
-    }
-
-
-    /* =====================================================
-       FORM
-    ===================================================== */
-
-    .form-section {
-      margin-top:
-        9px;
-
-      padding:
-        13px 14px 15px;
-
-      border-top:
-        1px solid var(--border);
-    }
-
-    .form-title {
-      display: flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        space-between;
-
-      margin-bottom:
-        11px;
-    }
-
-    .form-title strong {
-      font-size:
-        11px;
-
-      letter-spacing:
-        1px;
-
-      text-transform:
-        uppercase;
-    }
-
-    .editing-label {
-      display: none;
-
-      color:
-        var(--green);
-
-      font-size:
-        9px;
-
-      font-weight:
-        900;
-    }
-
-    .form-section.editing
-    .editing-label {
-      display:
-        block;
-    }
-
-    .form-grid {
-      display: grid;
-
-      grid-template-columns:
-        1.5fr
-        1fr
-        1.2fr
-        auto;
-
-      gap:
-        8px;
-
-      align-items:
-        end;
-    }
-
-    .field {
-      display: flex;
-
-      flex-direction:
-        column;
-
-      gap:
-        5px;
-    }
-
-    .field label {
-      color:
-        var(--muted);
-
-      font-size:
-        9px;
-
-      font-weight:
-        800;
-
-      letter-spacing:
-        .6px;
-
-      text-transform:
-        uppercase;
-    }
-
-    input {
-      width:
-        100%;
-
-      height:
-        34px;
-
-      padding:
-        0 10px;
-
-      background:
-        #0d0f10;
-
-      border:
-        1px solid var(--border);
-
-      border-radius:
-        4px;
-
-      outline:
-        none;
-
-      color:
-        white;
-
-      font-family:
-        inherit;
-
-      font-size:
-        12px;
-    }
-
-    input:focus {
-      border-color:
-        var(--green);
-    }
-
-
-    /* =====================================================
-       AVAILABILITY BUTTONS
-    ===================================================== */
-
-    .availability-buttons {
-      display: flex;
-
-      gap:
-        3px;
-
-      height:
-        34px;
-    }
-
-    .availability-button {
-      flex:
-        1;
-
-      border:
-        1px solid var(--border);
-
-      background:
-        #0d0f10;
-
-      color:
-        #777d82;
-
-      border-radius:
-        3px;
-
-      font-size:
-        8px;
-
-      font-weight:
-        900;
-
-      transition:
-        .12s;
-    }
-
-    .availability-button:hover {
-      background:
-        #202428;
-
-      color:
-        white;
-    }
-
-    .availability-button.active.beginning {
-      background:
-        var(--green);
-
-      border-color:
-        var(--green);
-
-      color:
-        #07100a;
-    }
-
-    .availability-button.active.middle {
-      background:
-        var(--yellow);
-
-      border-color:
-        var(--yellow);
-
-      color:
-        #171200;
-    }
-
-    .availability-button.active.end {
-      background:
-        var(--red);
-
-      border-color:
-        var(--red);
-
-      color:
-        white;
-    }
-
-    .availability-button.active.whole {
-      background:
-        linear-gradient(
-          90deg,
-          var(--green) 0 33%,
-          var(--yellow) 33% 66%,
-          var(--red) 66% 100%
-        );
-
-      border-color:
-        transparent;
-
-      color:
-        #111;
-    }
-
-    .availability-button.active.unavailable {
-      background:
-        #3a3d41;
-
-      border-color:
-        #555a5f;
-
-      color:
-        white;
-    }
-
-
-    /* =====================================================
-       CATEGORY BUTTONS
-    ===================================================== */
-
-    .category-buttons {
-      display: grid;
-
-      grid-template-columns:
-        repeat(4, 1fr);
-
-      gap:
-        3px;
-
-      height:
-        34px;
-    }
-
-    .category-button {
-      background:
-        #0d0f10;
-
-      border:
-        1px solid var(--border);
-
-      border-radius:
-        3px;
-
-      color:
-        #777d82;
-
-      font-size:
-        8px;
-
-      font-weight:
-        950;
-    }
-
-    .category-button:hover {
-      color:
-        white;
-    }
-
-    .category-button.active.hyper {
-      background:
-        var(--blue);
-
-      border-color:
-        var(--blue);
-
-      color:
-        #071017;
-    }
-
-    .category-button.active.lmp2 {
-      background:
-        var(--green);
-
-      border-color:
-        var(--green);
-
-      color:
-        #07100a;
-    }
-
-    .category-button.active.lmp3 {
-      background:
-        var(--yellow);
-
-      border-color:
-        var(--yellow);
-
-      color:
-        #151200;
-    }
-
-    .category-button.active.gt3 {
-      background:
-        var(--red);
-
-      border-color:
-        var(--red);
-
-      color:
-        white;
-    }
-
-
-    /* =====================================================
-       SAVE BUTTON
-    ===================================================== */
-
-    .save-button {
-      height:
-        34px;
-
-      padding:
-        0 14px;
-
-      background:
-        var(--green);
-
-      color:
-        #07100a;
-
-      border-radius:
-        3px;
-
-      font-size:
-        9px;
-
-      font-weight:
-        950;
-
-      white-space:
-        nowrap;
-    }
-
-    .save-button:hover {
-      filter:
-        brightness(1.1);
-    }
-
-
-    /* =====================================================
-       LEGEND
-    ===================================================== */
-
-    .legend {
-      display: flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        flex-end;
-
-      gap:
-        10px;
-
-      padding:
-        0 14px 12px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        9px;
-    }
-
-    .legend-item {
-      display: flex;
-
-      align-items:
-        center;
-
-      gap:
-        4px;
-    }
-
-    .legend-color {
-      width:
-        12px;
-
-      height:
-        6px;
-
-      border-radius:
-        1px;
-    }
-
-    .legend-green {
-      background:
-        var(--green);
-    }
-
-    .legend-yellow {
-      background:
-        var(--yellow);
-    }
-
-    .legend-red {
-      background:
-        var(--red);
-    }
-
-    .legend-whole {
-      width:
-        18px;
-
-      height:
-        6px;
-
-      background:
-        linear-gradient(
-          90deg,
-          var(--green) 0 33%,
-          var(--yellow) 33% 66%,
-          var(--red) 66% 100%
-        );
-    }
-
-
-    /* =====================================================
-       CREATE EVENT
-    ===================================================== */
-
-    .create-panel {
-      max-width:
-        700px;
-
-      margin:
-        auto;
-
-      padding:
-        22px;
-
-      background:
-        var(--panel);
-
-      border:
-        1px solid var(--border);
-
-      border-radius:
-        7px;
-    }
-
-    .create-panel h2 {
-      margin:
-        0 0 18px;
-
-      font-size:
-        20px;
-    }
-
-    .create-grid {
-      display:
-        grid;
-
-      gap:
-        12px;
-    }
-
-    .create-departure {
-      display:
-        grid;
-
-      grid-template-columns:
-        1fr 150px auto;
-
-      gap:
-        7px;
-
-      align-items:
-        end;
-
-      padding:
-        10px;
-
-      background:
-        var(--panel2);
-
-      border:
-        1px solid var(--border);
-
-      border-radius:
-        5px;
-    }
-
-    .small-button {
-      height:
-        34px;
-
-      padding:
-        0 10px;
-
-      border-radius:
-        3px;
-
-      background:
-        #292d31;
-
-      color:
-        white;
-
-      font-size:
-        10px;
-
-      font-weight:
-        800;
-    }
-
-    .small-button:hover {
-      background:
-        #353a3e;
-    }
-
-    .create-submit {
-      width:
-        100%;
-
-      height:
-        40px;
-
-      margin-top:
-        10px;
-
-      background:
-        var(--green);
-
-      color:
-        #07100a;
-
-      font-weight:
-        950;
-
-      border-radius:
-        4px;
-    }
-
-
-    /* =====================================================
-       NO EVENTS
-    ===================================================== */
-
-    .no-events {
-      padding:
-        35px;
-
-      background:
-        var(--panel);
-
-      border:
-        1px dashed var(--border);
-
-      border-radius:
-        6px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        13px;
-
-      text-align:
-        center;
-    }
-
-
-    /* =====================================================
-       MOBILE
-    ===================================================== */
-
-    @media (max-width: 760px) {
-
-      .header-inner {
-        padding:
-          14px;
-      }
-
-      main {
-        padding:
-          20px 12px 40px;
-      }
-
-      .page-title h1 {
-        font-size:
-          24px;
-      }
-
-      .departure-header {
-        align-items:
-          flex-start;
-      }
-
-      .departure-countdown {
-        font-size:
-          9px;
-      }
-
-      .pilot-row {
-        grid-template-columns:
-          minmax(80px, 1fr)
-          45px
-          63px
-          28px;
-
-        gap:
-          5px;
-      }
-
-      .availability-bar {
-        width:
-          63px;
-      }
-
-      .category-badge {
-        min-width:
-          43px;
-      }
-
-      .form-grid {
-        grid-template-columns:
-          1fr;
-      }
-
-      .availability-buttons,
-      .category-buttons {
-        height:
-          38px;
-      }
-
-      .save-button {
-        width:
-          100%;
-      }
-
-      .create-departure {
-        grid-template-columns:
-          1fr;
-      }
-
-      .legend {
-        justify-content:
-          flex-start;
-
-        flex-wrap:
-          wrap;
-      }
-
-      .pilot-name-row {
-        flex-direction:
-          column;
-      }
-
-      .pilot-name-save {
-        width:
-          100%;
-      }
-    }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FMT ENDURANCE</title>
+
+<style>
+:root {
+  --bg: #090a0b;
+  --panel: #111315;
+  --panel2: #17191c;
+  --panel3: #1d2023;
+  --border: #292d31;
+
+  --text: #f2f2f2;
+  --muted: #92979c;
+
+  --blue: #2589d8;
+  --green: #31b86b;
+  --yellow: #e4c341;
+  --red: #e34c4c;
+
+  --accent: #7ee38f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.top-stripes {
+  height: 5px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.top-stripes div:nth-child(1) {
+  background: var(--blue);
+}
+
+.top-stripes div:nth-child(2) {
+  background: var(--green);
+}
+
+.top-stripes div:nth-child(3) {
+  background: var(--yellow);
+}
+
+.top-stripes div:nth-child(4) {
+  background: var(--red);
+}
+
+header {
+  background: #0d0f10;
+  border-bottom: 1px solid var(--border);
+  padding: 18px 20px;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.logo span {
+  color: var(--green);
+}
+
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 25px 18px 50px;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+
+.page-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 25px;
+}
+
+.primary-button {
+  border: 0;
+  background: var(--green);
+  color: #07100a;
+  font-weight: 900;
+  padding: 11px 16px;
+  border-radius: 4px;
+}
+
+.primary-button:hover {
+  filter: brightness(1.08);
+}
+
+.secondary-button {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--text);
+  font-weight: 800;
+  padding: 10px 15px;
+  border-radius: 4px;
+}
+
+.secondary-button:hover {
+  background: var(--panel3);
+}
+
+.back-button {
+  margin-bottom: 20px;
+}
+
+.event-list {
+  display: grid;
+  gap: 12px;
+}
+
+.event-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 17px 18px 17px 23px;
+  cursor: pointer;
+  transition: .15s;
+}
+
+.event-card:hover {
+  background: var(--panel2);
+  border-color: #3a4045;
+  transform: translateX(2px);
+}
+
+.event-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--green);
+}
+
+.event-name {
+  font-size: 17px;
+  font-weight: 900;
+  margin-bottom: 7px;
+}
+
+.event-info {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.event-countdown {
+  margin-top: 10px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.event-countdown.finished {
+  color: var(--muted);
+}
+
+.empty {
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  padding: 30px;
+  text-align: center;
+  color: var(--muted);
+  border-radius: 6px;
+}
+
+.form-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: .5px;
+}
+
+input {
+  width: 100%;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 11px;
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--green);
+}
+
+.departure-fields {
+  display: grid;
+  gap: 10px;
+}
+
+.departure-field {
+  display: grid;
+  grid-template-columns: 1fr 140px 40px;
+  gap: 8px;
+  align-items: center;
+}
+
+.remove-departure {
+  height: 38px;
+  border: 1px solid var(--border);
+  background: #211719;
+  color: var(--red);
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+.event-header {
+  margin-bottom: 22px;
+}
+
+.event-title {
+  font-size: 27px;
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+
+.event-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pilot-name-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 15px;
+  margin-bottom: 18px;
+}
+
+.pilot-name-panel input {
+  max-width: 450px;
+}
+
+.departures {
+  display: grid;
+  gap: 14px;
+}
+
+.departure {
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  transition: .2s;
+}
+
+.departure.finished {
+  opacity: .65;
+  border-color: #222528;
+}
+
+.departure.finished:hover {
+  opacity: .82;
+}
+
+.departure-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 16px;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+}
+
+.departure.finished .departure-header {
+  background: #101214;
+  border-bottom: 0;
+}
+
+.departure-date {
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.departure-time {
+  margin-left: 7px;
+  color: var(--green);
+}
+
+.departure.finished .departure-time {
+  color: var(--muted);
+}
+
+.departure-countdown {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.departure-countdown.upcoming {
+  color: var(--green);
+  font-weight: 800;
+}
+
+.departure-countdown.finished {
+  color: var(--muted);
+}
+
+.finished-label {
+  margin-left: auto;
+  margin-right: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.departure-toggle {
+  border: 1px solid var(--border);
+  background: #1c1f22;
+  color: var(--muted);
+  padding: 6px 9px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.departure-toggle:hover {
+  background: #25292c;
+  color: var(--text);
+}
+
+.pilot-section {
+  padding: 12px;
+}
+
+.pilot-section-title {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 7px;
+}
+
+.pilot-list {
+  display: grid;
+  gap: 4px;
+}
+
+.pilot-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 48px 78px 30px;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 5px 7px;
+  background: var(--panel2);
+  border: 1px solid rgba(255,255,255,.035);
+  border-radius: 4px;
+}
+
+.pilot-name {
+  font-size: 12px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-badge {
+  text-align: center;
+  padding: 4px 3px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 900;
+  color: #fff;
+}
+
+.cat-Hypercar {
+  background: var(--blue);
+}
+
+.cat-LMP2 {
+  background: var(--green);
+}
+
+.cat-LMP3 {
+  background: var(--yellow);
+  color: #151200;
+}
+
+.cat-GT3 {
+  background: var(--red);
+  color: white;
+}
+
+.availability-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  height: 17px;
+}
+
+.availability-segment {
+  background: #292d31;
+  border-radius: 2px;
+}
+
+.availability-segment.beginning.active {
+  background: var(--green);
+}
+
+.availability-segment.middle.active {
+  background: var(--yellow);
+}
+
+.availability-segment.end.active {
+  background: var(--red);
+}
+
+.availability-whole {
+  grid-column: 1 / 4;
+  background: var(--green);
+  border-radius: 2px;
+}
+
+.availability-unavailable {
+  grid-column: 1 / 4;
+  background: #35383b;
+  border-radius: 2px;
+}
+
+.edit-button {
+  width: 28px;
+  height: 25px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #25282b;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.edit-button:hover {
+  color: var(--text);
+  background: #303438;
+}
+
+.no-pilots {
+  color: #666b70;
+  font-size: 11px;
+  padding: 8px 2px;
+}
+
+.finished-history {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.form-section {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  background: #0f1112;
+}
+
+.form-section.editing {
+  border-top-color: var(--green);
+}
+
+.form-title {
+  font-size: 11px;
+  font-weight: 900;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.availability-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.availability-button {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--muted);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.availability-button:hover {
+  background: var(--panel3);
+  color: var(--text);
+}
+
+.availability-button.active.beginning {
+  background: var(--green);
+  border-color: var(--green);
+  color: #07100a;
+}
+
+.availability-button.active.middle {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: #151200;
+}
+
+.availability-button.active.end {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+
+.availability-button.active.whole {
+  background: var(--green);
+  border-color: var(--green);
+  color: #07100a;
+}
+
+.availability-button.active.unavailable {
+  background: #3b3e41;
+  border-color: #555a5e;
+  color: white;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.category-button {
+  min-height: 58px;
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--muted);
+  border-radius: 4px;
+  font-weight: 900;
+  font-size: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-button img {
+  max-width: 70px;
+  max-height: 34px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 2px;
+}
+
+.category-button.active.hyper {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #071017;
+}
+
+.category-button.active.lmp2 {
+  background: var(--green);
+  border-color: var(--green);
+  color: #07100a;
+}
+
+.category-button.active.lmp3 {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: #151200;
+}
+
+.category-button.active.gt3 {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+
+.save-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-button {
+  border: 0;
+  background: var(--accent);
+  color: #07100a;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 9px 14px;
+  border-radius: 4px;
+}
+
+.legend {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.legend span {
+  margin-right: 10px;
+}
+
+@media (max-width: 650px) {
+
+  main {
+    padding: 18px 10px 40px;
+  }
+
+  .departure-header {
+    align-items: flex-start;
+  }
+
+  .departure-countdown {
+    font-size: 9px;
+  }
+
+  .departure-field {
+    grid-template-columns: 1fr 105px 38px;
+  }
+
+  .pilot-row {
+    grid-template-columns: minmax(80px, 1fr) 48px 70px 28px;
+  }
+
+  .categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .availability-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .finished-label {
+    display: none;
+  }
+}
+</style>
 </head>
-
 
 <body>
 
+<div class="top-stripes">
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
 
-  <!-- =====================================================
-       TOP STRIPES
-  ====================================================== -->
-
-  <div class="top-stripes">
-
-    <span class="stripe-blue"></span>
-
-    <span class="stripe-green"></span>
-
-    <span class="stripe-yellow"></span>
-
-    <span class="stripe-red"></span>
-
+<header>
+  <div class="header-inner">
+    <div class="logo">FMT <span>ENDURANCE</span></div>
+    <button class="primary-button" onclick="showCreateEvent()">+ ÉVÉNEMENT</button>
   </div>
+</header>
+
+<main id="app"></main>
+
+<script>
+
+/* =========================================================
+   DONNÉES
+========================================================= */
+
+let events = JSON.parse(
+  localStorage.getItem("fmt_endurance_events") || "[]"
+);
+
+let currentEventId = null;
+let editingPilot = null;
+let departureFieldCount = 0;
+
+const formState = {};
+
+/*
+  Permet de retenir quels départs terminés sont ouverts.
+  Les départs terminés sont automatiquement fermés par défaut.
+*/
+const collapsedDepartures = {};
 
 
-  <!-- =====================================================
-       HEADER
-  ====================================================== -->
+/* =========================================================
+   SAUVEGARDE
+========================================================= */
 
-  <header>
+function saveEvents() {
+  localStorage.setItem(
+    "fmt_endurance_events",
+    JSON.stringify(events)
+  );
+}
 
-    <div class="header-inner">
 
-      <div>
+/* =========================================================
+   PILOTE
+========================================================= */
 
-        <div class="logo">
-          FMT <span>ENDURANCE</span>
+function getPilotName() {
+  return localStorage.getItem("fmt_pilot_name") || "";
+}
+
+function setPilotName(name) {
+  localStorage.setItem("fmt_pilot_name", name.trim());
+}
+
+
+/* =========================================================
+   UTILITAIRES
+========================================================= */
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function escapeJs(value) {
+  return String(value || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'");
+}
+
+function generateId() {
+  return Math.random().toString(36).substring(2, 8);
+}
+
+function getCategoryClass(category) {
+  return "cat-" + category;
+}
+
+function getCategoryButtonClass(category) {
+  if (category === "Hypercar") return "hyper";
+  if (category === "LMP2") return "lmp2";
+  if (category === "LMP3") return "lmp3";
+  if (category === "GT3") return "gt3";
+
+  return "";
+}
+
+function formatDate(date) {
+  return new Date(date).toLocaleDateString("fr-FR");
+}
+
+function formatLongDate(date) {
+  return new Date(date).toLocaleDateString(
+    "fr-FR",
+    {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    }
+  );
+}
+
+function getDepartureTimestamp(departure) {
+  return new Date(
+    departure.date + "T" + departure.time
+  ).getTime();
+}
+
+function formatCountdown(target) {
+
+  const diff = target - Date.now();
+
+  if (diff <= 0) {
+    return null;
+  }
+
+  const totalSeconds = Math.floor(diff / 1000);
+
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) {
+    return `${days}j ${hours}h ${minutes}m`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+
+  return `${seconds}s`;
+}
+
+
+/* =========================================================
+   COMPTEURS
+========================================================= */
+
+function updateCountdowns() {
+
+  let refreshEvent = false;
+
+  document.querySelectorAll("[data-countdown]").forEach(element => {
+
+    const target = Number(element.dataset.countdown);
+    const countdown = formatCountdown(target);
+
+    const wasFinished =
+      element.classList.contains("finished");
+
+    if (!countdown) {
+
+      element.textContent = "🏁 Départ passé";
+
+      element.classList.remove("upcoming");
+      element.classList.add("finished");
+
+      if (!wasFinished && currentEventId) {
+        refreshEvent = true;
+      }
+
+    } else {
+
+      element.textContent = "⏱ " + countdown;
+
+      element.classList.remove("finished");
+      element.classList.add("upcoming");
+    }
+
+  });
+
+
+  document.querySelectorAll("[data-event-countdown]").forEach(element => {
+
+    const target = Number(element.dataset.eventCountdown);
+    const countdown = formatCountdown(target);
+
+    if (!countdown) {
+
+      element.textContent = "🏁 Événement terminé";
+      element.classList.add("finished");
+
+    } else {
+
+      element.textContent =
+        "⏱ Prochain départ dans " + countdown;
+
+      element.classList.remove("finished");
+    }
+
+  });
+
+
+  /*
+    Lorsqu'un départ vient juste de passer,
+    on reconstruit l'événement pour le réduire automatiquement.
+  */
+  if (refreshEvent && currentEventId) {
+    renderEvent();
+  }
+}
+
+
+/* =========================================================
+   ACCUEIL
+========================================================= */
+
+function renderHome() {
+
+  currentEventId = null;
+  editingPilot = null;
+
+  let html = `
+    <div class="page-title">ÉVÉNEMENTS</div>
+    <div class="page-subtitle">
+      Gestion des courses d'endurance FMT
+    </div>
+  `;
+
+  if (!events.length) {
+
+    html += `
+      <div class="empty">
+        Aucun événement créé.
+      </div>
+    `;
+
+  } else {
+
+    html += `<div class="event-list">`;
+
+    events.forEach(event => {
+
+      const futureDepartures = event.departures
+        .filter(d => getDepartureTimestamp(d) > Date.now())
+        .sort(
+          (a, b) =>
+            getDepartureTimestamp(a) -
+            getDepartureTimestamp(b)
+        );
+
+      const nextDeparture = futureDepartures[0];
+
+      html += `
+        <div
+          class="event-card"
+          onclick="openEvent('${escapeJs(event.id)}')"
+        >
+
+          <div class="event-name">
+            ${escapeHtml(event.name)}
+          </div>
+
+          <div class="event-info">
+            ${event.departures.length}
+            départ${event.departures.length > 1 ? "s" : ""}
+          </div>
+
+          <div
+            class="event-countdown ${!nextDeparture ? "finished" : ""}"
+            data-event-countdown="${
+              nextDeparture
+                ? getDepartureTimestamp(nextDeparture)
+                : 0
+            }"
+          >
+            ${
+              nextDeparture
+                ? "⏱ Prochain départ dans " +
+                  (formatCountdown(
+                    getDepartureTimestamp(nextDeparture)
+                  ) || "...")
+                : "🏁 Événement terminé"
+            }
+          </div>
+
+        </div>
+      `;
+
+    });
+
+    html += `</div>`;
+  }
+
+  document.getElementById("app").innerHTML = html;
+}
+
+
+/* =========================================================
+   OUVRIR UN ÉVÉNEMENT
+========================================================= */
+
+function openEvent(id) {
+
+  currentEventId = id;
+  editingPilot = null;
+
+  Object.keys(formState).forEach(
+    key => delete formState[key]
+  );
+
+  renderEvent();
+}
+
+
+/* =========================================================
+   AFFICHER UN ÉVÉNEMENT
+========================================================= */
+
+function renderEvent() {
+
+  const event = events.find(
+    e => e.id === currentEventId
+  );
+
+  if (!event) {
+    renderHome();
+    return;
+  }
+
+  let html = `
+
+    <button
+      class="secondary-button back-button"
+      onclick="renderHome()"
+    >
+      ← Retour aux événements
+    </button>
+
+    <div class="event-header">
+
+      <div class="event-title">
+        ${escapeHtml(event.name)}
+      </div>
+
+      <div class="event-subtitle">
+        ${event.departures.length}
+        départ${event.departures.length > 1 ? "s" : ""}
+      </div>
+
+    </div>
+
+    <div class="pilot-name-panel">
+
+      <label class="form-label">
+        Ton pseudo pilote
+      </label>
+
+      <input
+        id="globalPilotName"
+        type="text"
+        maxlength="30"
+        placeholder="Ex : McFly"
+        value="${escapeHtml(getPilotName())}"
+        oninput="setPilotName(this.value)"
+      >
+
+    </div>
+
+    <div class="departures">
+  `;
+
+  event.departures.forEach(
+    (departure, index) => {
+
+      html += renderDeparture(
+        event,
+        departure,
+        index
+      );
+
+    }
+  );
+
+  html += `</div>`;
+
+  document.getElementById("app").innerHTML = html;
+
+  updateCountdowns();
+}
+
+
+/* =========================================================
+   DÉPART
+========================================================= */
+
+function renderDeparture(
+  event,
+  departure,
+  departureIndex
+) {
+
+  const timestamp =
+    getDepartureTimestamp(departure);
+
+  const finished =
+    timestamp <= Date.now();
+
+  /*
+    Un départ terminé est automatiquement fermé
+    s'il n'a jamais été ouvert auparavant.
+  */
+  if (
+    finished &&
+    collapsedDepartures[departure.id] === undefined
+  ) {
+    collapsedDepartures[departure.id] = true;
+  }
+
+  const collapsed =
+    finished &&
+    collapsedDepartures[departure.id];
+
+  const availablePilots =
+    departure.availability.filter(
+      pilot => pilot.status !== "unavailable"
+    );
+
+  let html = `
+
+    <div class="departure ${finished ? "finished" : ""}">
+
+      <div class="departure-header">
+
+        <div class="departure-date">
+
+          ${escapeHtml(
+            formatLongDate(departure.date)
+          )}
+
+          <span class="departure-time">
+            ${escapeHtml(departure.time)}
+          </span>
+
         </div>
 
-        <div class="subtitle">
-          FRENCH MCFLY TEAM
-        </div>
+        ${
+          finished
+            ? `
+              <div class="finished-label">
+                TERMINÉ
+              </div>
+
+              <button
+                class="departure-toggle"
+                onclick="toggleDeparture('${escapeJs(
+                  departure.id
+                )}')"
+              >
+                ${collapsed ? "AFFICHER" : "MASQUER"}
+              </button>
+            `
+            : `
+              <div
+                class="departure-countdown upcoming"
+                data-countdown="${timestamp}"
+              >
+                ⏱ ${
+                  formatCountdown(timestamp) ||
+                  "Départ passé"
+                }
+              </div>
+            `
+        }
+
+      </div>
+  `;
+
+
+  /*
+    Départ terminé et réduit :
+    on n'affiche que l'en-tête.
+  */
+
+  if (finished && collapsed) {
+
+    html += `</div>`;
+
+    return html;
+  }
+
+
+  /*
+    Liste des pilotes
+  */
+
+  html += `
+
+    <div class="pilot-section">
+
+      <div class="pilot-section-title">
+        ${finished ? "HISTORIQUE DES PILOTES" : "PILOTES INSCRITS"}
+      </div>
+
+      <div class="pilot-list">
+  `;
+
+  if (!availablePilots.length) {
+
+    html += `
+      <div class="no-pilots">
+        Aucun pilote inscrit.
+      </div>
+    `;
+
+  } else {
+
+    availablePilots.forEach(pilot => {
+
+      html += renderPilotRow(
+        pilot,
+        finished
+      );
+
+    });
+
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+
+  /*
+    Si le départ est terminé,
+    surtout pas de formulaire.
+  */
+
+  if (finished) {
+
+    html += `
+      <div class="finished-history">
+        🏁 Départ terminé — inscriptions verrouillées
+      </div>
+    `;
+
+  } else {
+
+    html += renderForm(
+      event,
+      departure,
+      departureIndex
+    );
+
+    html += `
+      <div class="legend">
+        <span>🟢 Début</span>
+        <span>🟡 Milieu</span>
+        <span>🔴 Fin</span>
+        <span>🟢 Toute la course</span>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+
+  return html;
+}
+
+
+/* =========================================================
+   LIGNE PILOTE
+========================================================= */
+
+function renderPilotRow(
+  pilot,
+  finished = false
+) {
+
+  let availabilityHtml = "";
+
+  if (pilot.status === "whole") {
+
+    availabilityHtml = `
+      <div class="availability-bar">
+        <div class="availability-whole"></div>
+      </div>
+    `;
+
+  } else if (
+    pilot.status === "unavailable"
+  ) {
+
+    availabilityHtml = `
+      <div class="availability-bar">
+        <div class="availability-unavailable"></div>
+      </div>
+    `;
+
+  } else {
+
+    const parts =
+      pilot.status.split(",");
+
+    availabilityHtml = `
+      <div class="availability-bar">
+
+        <div class="availability-segment beginning ${
+          parts.includes("beginning")
+            ? "active"
+            : ""
+        }"></div>
+
+        <div class="availability-segment middle ${
+          parts.includes("middle")
+            ? "active"
+            : ""
+        }"></div>
+
+        <div class="availability-segment end ${
+          parts.includes("end")
+            ? "active"
+            : ""
+        }"></div>
+
+      </div>
+    `;
+  }
+
+
+  /*
+    Sur un départ terminé,
+    aucun bouton de modification.
+  */
+
+  const actionHtml = finished
+    ? `<span></span>`
+    : `
+      <button
+        class="edit-button"
+        onclick="editPilot('${escapeJs(pilot.name)}')"
+        title="Modifier"
+      >
+        ✎
+      </button>
+    `;
+
+  return `
+
+    <div class="pilot-row">
+
+      <div class="pilot-name">
+        ${escapeHtml(pilot.name)}
+      </div>
+
+      <div class="category-badge ${
+        getCategoryClass(pilot.category)
+      }">
+        ${escapeHtml(pilot.category)}
+      </div>
+
+      ${availabilityHtml}
+
+      ${actionHtml}
+
+    </div>
+  `;
+}
+
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+function getStatusLabel(status) {
+
+  if (!status) return "";
+
+  if (status === "whole") {
+    return "Toute la course";
+  }
+
+  if (status === "unavailable") {
+    return "Indisponible";
+  }
+
+  return status;
+}
+
+
+function renderForm(
+  event,
+  departure,
+  departureIndex
+) {
+
+  ensureFormState(departure.id);
+
+  const state =
+    formState[departure.id];
+
+  const editing =
+    editingPilot !== null;
+
+  return `
+
+    <div class="form-section ${
+      editing ? "editing" : ""
+    }">
+
+      <div class="form-title">
+        ${
+          editing
+            ? "Modifier mon inscription"
+            : "Ma disponibilité"
+        }
+      </div>
+
+      <div class="availability-buttons">
+
+        <button
+          class="availability-button beginning ${
+            state.beginning
+              ? "active"
+              : ""
+          }"
+          onclick="toggleAvailability(
+            '${escapeJs(departure.id)}',
+            'beginning'
+          )"
+        >
+          DÉBUT
+        </button>
+
+        <button
+          class="availability-button middle ${
+            state.middle
+              ? "active"
+              : ""
+          }"
+          onclick="toggleAvailability(
+            '${escapeJs(departure.id)}',
+            'middle'
+          )"
+        >
+          MILIEU
+        </button>
+
+        <button
+          class="availability-button end ${
+            state.end
+              ? "active"
+              : ""
+          }"
+          onclick="toggleAvailability(
+            '${escapeJs(departure.id)}',
+            'end'
+          )"
+        >
+          FIN
+        </button>
+
+        <button
+          class="availability-button whole ${
+            state.whole
+              ? "active"
+              : ""
+          }"
+          onclick="setAvailability(
+            '${escapeJs(departure.id)}',
+            'whole'
+          )"
+        >
+          TOUTE LA COURSE
+        </button>
+
+        <button
+          class="availability-button unavailable ${
+            state.unavailable
+              ? "active"
+              : ""
+          }"
+          onclick="setAvailability(
+            '${escapeJs(departure.id)}',
+            'unavailable'
+          )"
+        >
+          INDISPONIBLE
+        </button>
 
       </div>
 
 
-      <button
-        class="header-button"
-        onclick="showCreateEvent()"
-      >
-        + NOUVEL ÉVÉNEMENT
-      </button>
+      <div class="form-title">
+        Catégorie
+      </div>
+
+      <div class="categories">
+
+        ${renderCategoryButton(
+          departure.id,
+          "Hypercar",
+          state.category === "Hypercar"
+        )}
+
+        ${renderCategoryButton(
+          departure.id,
+          "LMP2",
+          state.category === "LMP2"
+        )}
+
+        ${renderCategoryButton(
+          departure.id,
+          "LMP3",
+          state.category === "LMP3"
+        )}
+
+        ${renderCategoryButton(
+          departure.id,
+          "GT3",
+          state.category === "GT3"
+        )}
+
+      </div>
+
+
+      <div class="save-row">
+
+        <button
+          class="save-button"
+          onclick="saveAvailability(
+            '${escapeJs(departure.id)}'
+          )"
+        >
+          ${editing ? "MODIFIER" : "S'INSCRIRE"}
+        </button>
+
+      </div>
 
     </div>
-
-  </header>
-
-
-  <main id="app"></main>
-
-
-  <script>
-
-
-    /* =====================================================
-       DATA
-    ===================================================== */
-
-    let events =
-      JSON.parse(
-        localStorage.getItem(
-          "fmt_endurance_events"
-        ) || "[]"
-      );
-
-
-    let currentEventId = null;
-
-    let editingPilot = null;
-
-    let departureFieldCount = 0;
-
-
-    /*
-     * Form state for every departure.
-     */
-
-    const formState = {};
-
-
-    /* =====================================================
-       SAVE
-    ===================================================== */
-
-    function saveEvents() {
-
-      localStorage.setItem(
-        "fmt_endurance_events",
-        JSON.stringify(events)
-      );
-
-    }
-
-
-    /* =====================================================
-       GLOBAL PILOT NAME
-    ===================================================== */
-
-    function getPilotName() {
-
-      return localStorage.getItem(
-        "fmt_pilot_name"
-      ) || "";
-
-    }
-
-
-    function setPilotName() {
-
-      const input =
-        document.getElementById(
-          "global-pilot-name"
-        );
-
-      if (!input) return;
-
-
-      const name =
-        input.value.trim();
-
-
-      if (!name) {
-
-        alert(
-          "Entre ton pseudo."
-        );
-
-        return;
-      }
-
-
-      localStorage.setItem(
-        "fmt_pilot_name",
-        name
-      );
-
-
-      /*
-       * Refresh event so all forms
-       * use the new name.
-       */
-
-      renderEvent();
-
-    }
-
-
-    /* =====================================================
-       HELPERS
-    ===================================================== */
-
-    function escapeHtml(value) {
-
-      return String(value)
-        .replace(
-          /&/g,
-          "&amp;"
-        )
-        .replace(
-          /</g,
-          "&lt;"
-        )
-        .replace(
-          />/g,
-          "&gt;"
-        )
-        .replace(
-          /"/g,
-          "&quot;"
-        )
-        .replace(
-          /'/g,
-          "&#039;"
-        );
-
-    }
-
-
-    function escapeJs(value) {
-
-      return String(value)
-        .replace(
-          /\\/g,
-          "\\\\"
-        )
-        .replace(
-          /'/g,
-          "\\'"
-        );
-
-    }
-
-
-    function generateId() {
-
-      return Math.random()
-        .toString(36)
-        .substring(
-          2,
-          9
-        );
-
-    }
-
-
-    function getCategoryClass(
-      category
-    ) {
-
-      if (
-        category ===
-        "Hypercar"
-      ) {
-        return "cat-Hypercar";
-      }
-
-      if (
-        category ===
-        "LMP2"
-      ) {
-        return "cat-LMP2";
-      }
-
-      if (
-        category ===
-        "LMP3"
-      ) {
-        return "cat-LMP3";
-      }
-
-      if (
-        category ===
-        "GT3"
-      ) {
-        return "cat-GT3";
-      }
-
-      return "";
-
-    }
-
-
-    function getCategoryButtonClass(
-      category
-    ) {
-
-      if (
-        category ===
-        "Hypercar"
-      ) {
-        return "hyper";
-      }
-
-      if (
-        category ===
-        "LMP2"
-      ) {
-        return "lmp2";
-      }
-
-      if (
-        category ===
-        "LMP3"
-      ) {
-        return "lmp3";
-      }
-
-      if (
-        category ===
-        "GT3"
-      ) {
-        return "gt3";
-      }
-
-      return "";
-
-    }
-
-
-    function formatDate(
-      date,
-      time
-    ) {
-
-      const d =
-        new Date(
-          `${date}T${time}`
-        );
-
-
-      return d.toLocaleDateString(
-        "fr-FR",
-        {
-          weekday: "short",
-          day: "2-digit",
-          month: "short"
-        }
-      );
-
-    }
-
-
-    function formatLongDate(
-      date
-    ) {
-
-      const d =
-        new Date(
-          `${date}T00:00`
-        );
-
-
-      return d.toLocaleDateString(
-        "fr-FR",
-        {
-          weekday: "long",
-          day: "2-digit",
-          month: "long",
-          year: "numeric"
-        }
-      );
-
-    }
-
-
-    function getDepartureTimestamp(
-      departure
-    ) {
-
-      return new Date(
-        `${departure.date}T${departure.time}`
-      ).getTime();
-
-    }
-
-
-    /* =====================================================
-       COUNTDOWN
-    ===================================================== */
-
-    function formatCountdown(
-      target
-    ) {
-
-      const now =
-        Date.now();
-
-
-      const diff =
-        target - now;
-
-
-      if (
-        diff <= 0
-      ) {
-        return null;
-      }
-
-
-      const totalSeconds =
-        Math.floor(
-          diff / 1000
-        );
-
-
-      const days =
-        Math.floor(
-          totalSeconds / 86400
-        );
-
-
-      const hours =
-        Math.floor(
-          (totalSeconds % 86400) /
-          3600
-        );
-
-
-      const minutes =
-        Math.floor(
-          (totalSeconds % 3600) /
-          60
-        );
-
-
-      const seconds =
-        totalSeconds % 60;
-
-
-      if (
-        days > 0
-      ) {
-
-        return `${days}j ${hours}h ${minutes}m`;
-
-      }
-
-
-      if (
-        hours > 0
-      ) {
-
-        return `${hours}h ${minutes}m ${seconds}s`;
-
-      }
-
-
-      return `${minutes}m ${seconds}s`;
-
-    }
-
-
-    function updateCountdowns() {
-
-
-      document
-        .querySelectorAll(
-          "[data-countdown]"
-        )
-        .forEach(
-          element => {
-
-            const target =
-              Number(
-                element.dataset.countdown
-              );
-
-
-            const countdown =
-              formatCountdown(
-                target
-              );
-
-
-            if (!countdown) {
-
-              element.textContent =
-                "🏁 Départ passé";
-
-              element.classList.remove(
-                "upcoming"
-              );
-
-              element.classList.add(
-                "finished"
-              );
-
-            } else {
-
-              element.textContent =
-                `⏱ ${countdown}`;
-
-              element.classList.add(
-                "upcoming"
-              );
-
-              element.classList.remove(
-                "finished"
-              );
-
-            }
-
-          }
-        );
-
-
-      document
-        .querySelectorAll(
-          "[data-event-countdown]"
-        )
-        .forEach(
-          element => {
-
-            const target =
-              Number(
-                element.dataset.eventCountdown
-              );
-
-
-            const countdown =
-              formatCountdown(
-                target
-              );
-
-
-            if (!countdown) {
-
-              element.textContent =
-                "🏁 Événement terminé";
-
-            } else {
-
-              element.textContent =
-                `⏱ Prochain départ dans ${countdown}`;
-
-            }
-
-          }
-        );
-
-    }
-
-
-    /* =====================================================
-       HOME
-    ===================================================== */
-
-    function renderHome() {
-
-      currentEventId =
-        null;
-
-      editingPilot =
-        null;
-
-
-      let html = `
-
-        <div class="page-title">
-
-          <h1>
-            ÉVÉNEMENTS
-          </h1>
-
-          <p>
-            Gestion des courses d'endurance FMT
-          </p>
-
-        </div>
-
-      `;
-
-
-      if (
-        events.length === 0
-      ) {
-
-        html += `
-
-          <div class="no-events">
-
-            Aucun événement créé.
-
-            <br><br>
-
-            Clique sur
-            <strong>
-              + NOUVEL ÉVÉNEMENT
-            </strong>
-            pour commencer.
-
-          </div>
-
-        `;
-
-      } else {
-
-
-        html += `
-          <div class="events">
-        `;
-
-
-        events.forEach(
-          event => {
-
-
-            const upcoming =
-              event.departures
-                .map(
-                  departure => ({
-
-                    departure,
-
-                    timestamp:
-                      getDepartureTimestamp(
-                        departure
-                      )
-
-                  })
-                )
-                .filter(
-                  item =>
-                    item.timestamp >
-                    Date.now()
-                )
-                .sort(
-                  (a,b) =>
-                    a.timestamp -
-                    b.timestamp
-                )[0];
-
-
-            html += `
-
-              <div
-                class="event-card"
-                onclick="
-                  openEvent(
-                    '${event.id}'
-                  )
-                "
-              >
-
-                <div class="event-top">
-
-                  <div>
-
-                    <div class="event-name">
-
-                      ${escapeHtml(
-                        event.name
-                      )}
-
-                    </div>
-
-
-                    ${
-                      event.location
-                      ?
-                      `
-                        <div class="event-location">
-
-                          📍
-                          ${escapeHtml(
-                            event.location
-                          )}
-
-                        </div>
-                      `
-                      :
-                      ""
-                    }
-
-                  </div>
-
-
-                  ${
-                    upcoming
-                    ?
-                    `
-                      <div class="event-date">
-
-                        <strong>
-
-                          ${formatDate(
-                            upcoming.departure.date,
-                            upcoming.departure.time
-                          )}
-
-                        </strong>
-
-                        ${
-                          upcoming.departure.time
-                        }
-
-                      </div>
-                    `
-                    :
-                    ""
-                  }
-
-                </div>
-
-
-                <div
-                  class="event-countdown"
-                  data-event-countdown="${
-                    upcoming
-                    ?
-                    upcoming.timestamp
-                    :
-                    0
-                  }"
-                >
-
-                  ${
-                    upcoming
-                    ?
-                    `⏱ Prochain départ dans ${formatCountdown(
-                      upcoming.timestamp
-                    )}`
-                    :
-                    "🏁 Événement terminé"
-                  }
-
-                </div>
-
-              </div>
-
-            `;
-
-          }
-        );
-
-
-        html += `
-          </div>
-        `;
-
-      }
-
-
-      document.getElementById(
-        "app"
-      ).innerHTML =
-        html;
-
-
-      updateCountdowns();
-
-    }
-
-
-    /* =====================================================
-       OPEN EVENT
-    ===================================================== */
-
-    function openEvent(
-      id
-    ) {
-
-      currentEventId =
-        id;
-
-      editingPilot =
-        null;
-
-
-      Object.keys(
-        formState
-      ).forEach(
-        key =>
-          delete formState[key]
-      );
-
-
-      renderEvent();
-
-    }
-
-
-    /* =====================================================
-       RENDER EVENT
-    ===================================================== */
-
-    function renderEvent() {
-
-
-      const event =
-        events.find(
-          e =>
-            e.id ===
-            currentEventId
-        );
-
-
-      if (!event) {
-
-        renderHome();
-
-        return;
-      }
-
-
-      const pilotName =
-        getPilotName();
-
-
-      let html = `
-
-        <button
-          class="back-button"
-          onclick="renderHome()"
-        >
-          ← RETOUR AUX ÉVÉNEMENTS
-        </button>
-
-
-        <div class="event-header">
-
-          <h1>
-
-            ${escapeHtml(
-              event.name
-            )}
-
-          </h1>
-
-
-          ${
-            event.location
-            ?
-            `
-              <p>
-
-                📍
-                ${escapeHtml(
-                  event.location
-                )}
-
-              </p>
-            `
-            :
-            ""
-          }
-
-        </div>
-
-
-        <!-- GLOBAL PILOT NAME -->
-
-        <div class="pilot-name-panel">
-
-          <div class="pilot-name-header">
-
-            <strong>
-              👤 MON PSEUDO
-            </strong>
-
-            <span class="pilot-name-info">
-              Saisi une seule fois pour tout l'événement
-            </span>
-
-          </div>
-
-
-          <div class="pilot-name-row">
-
-            <input
-              id="global-pilot-name"
-              type="text"
-              value="${escapeHtml(
-                pilotName
-              )}"
-              placeholder="Ex : McFly"
+  `;
+}
+
+
+/* =========================================================
+   BOUTONS CATÉGORIES
+========================================================= */
+
+function renderCategoryButton(
+  departureId,
+  category,
+  selected
+) {
+
+  const imageMap = {
+    Hypercar: "images/HC.png",
+    LMP2: "images/LMP2.png",
+    LMP3: "images/P3.png",
+    GT3: "images/GT3.png"
+  };
+
+  return `
+
+    <button
+      class="category-button ${
+        getCategoryButtonClass(category)
+      } ${selected ? "active" : ""}"
+      onclick="setCategory(
+        '${escapeJs(departureId)}',
+        '${escapeJs(category)}'
+      )"
+    >
+
+      ${
+        imageMap[category]
+          ? `
+            <img
+              src="${imageMap[category]}"
+              alt="${escapeHtml(category)}"
+              onerror="this.style.display='none'"
             >
-
-
-            <button
-              class="pilot-name-save"
-              onclick="setPilotName()"
-            >
-              ENREGISTRER
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <div class="departures">
-
-      `;
-
-
-      event.departures.forEach(
-        (
-          departure,
-          index
-        ) => {
-
-          html +=
-            renderDeparture(
-              event,
-              departure,
-              index
-            );
-
-        }
-      );
-
-
-      html += `
-        </div>
-      `;
-
-
-      document.getElementById(
-        "app"
-      ).innerHTML =
-        html;
-
-
-      updateCountdowns();
-
-    }
-
-
-    /* =====================================================
-       DEPARTURE
-    ===================================================== */
-
-    function renderDeparture(
-      event,
-      departure,
-      departureIndex
-    ) {
-
-
-      const timestamp =
-        getDepartureTimestamp(
-          departure
-        );
-
-
-      const availablePilots =
-        departure.availability
-          .filter(
-            pilot =>
-              pilot.status !==
-              "unavailable"
-          );
-
-
-      let html = `
-
-        <div class="departure">
-
-
-          <div class="departure-header">
-
-            <div class="departure-date">
-
-              ${escapeHtml(
-                formatLongDate(
-                  departure.date
-                )
-              )}
-
-              <span class="departure-time">
-
-                ${escapeHtml(
-                  departure.time
-                )}
-
-              </span>
-
-            </div>
-
-
-            <div
-              class="departure-countdown"
-              data-countdown="${timestamp}"
-            >
-
-              ${
-                formatCountdown(
-                  timestamp
-                )
-                ?
-                `⏱ ${formatCountdown(
-                  timestamp
-                )}`
-                :
-                "🏁 Départ passé"
-              }
-
-            </div>
-
-          </div>
-
-
-          <div class="pilot-section">
-
-            <div class="section-label">
-
-              PILOTES DISPONIBLES
-
-            </div>
-
-      `;
-
-
-      if (
-        availablePilots.length === 0
-      ) {
-
-        html += `
-
-          <div class="empty">
-
-            Aucun pilote disponible pour ce départ.
-
-          </div>
-
-        `;
-
-      } else {
-
-
-        html += `
-          <div class="pilot-list">
-        `;
-
-
-        availablePilots.forEach(
-          pilot => {
-
-            html +=
-              renderPilotRow(
-                pilot
-              );
-
-          }
-        );
-
-
-        html += `
-          </div>
-        `;
-
+          `
+          : ""
       }
 
+      ${escapeHtml(category)}
 
-      html += `
+    </button>
+  `;
+}
 
-          </div>
 
+/* =========================================================
+   ÉTAT DU FORMULAIRE
+========================================================= */
 
-          ${renderForm(
-            event,
-            departure,
-            departureIndex
-          )}
+function ensureFormState(departureId) {
 
+  if (!formState[departureId]) {
 
-          <div class="legend">
+    formState[departureId] = {
 
-            <div class="legend-item">
+      beginning: false,
+      middle: false,
+      end: false,
+      whole: false,
+      unavailable: false,
+      category: ""
+    };
+  }
+}
 
-              <span
-                class="legend-color legend-green"
-              ></span>
 
-              Début
+/* =========================================================
+   DISPONIBILITÉ
+========================================================= */
 
-            </div>
+function toggleAvailability(
+  departureId,
+  type
+) {
 
+  const event =
+    events.find(
+      e => e.id === currentEventId
+    );
 
-            <div class="legend-item">
+  const departure =
+    event?.departures.find(
+      d => d.id === departureId
+    );
 
-              <span
-                class="legend-color legend-yellow"
-              ></span>
+  /*
+    Sécurité :
+    impossible de modifier un départ terminé.
+  */
 
-              Milieu
+  if (
+    !departure ||
+    getDepartureTimestamp(departure) <= Date.now()
+  ) {
+    return;
+  }
 
-            </div>
+  ensureFormState(departureId);
 
+  const state =
+    formState[departureId];
 
-            <div class="legend-item">
+  /*
+    Si on clique sur une disponibilité,
+    on désactive whole + unavailable.
+  */
 
-              <span
-                class="legend-color legend-red"
-              ></span>
+  state.whole = false;
+  state.unavailable = false;
 
-              Fin
+  state[type] = !state[type];
 
-            </div>
 
+  /*
+    Si les trois segments sont sélectionnés,
+    on passe automatiquement à toute la course.
+  */
 
-            <div class="legend-item">
+  if (
+    state.beginning &&
+    state.middle &&
+    state.end
+  ) {
 
-              <span
-                class="legend-whole"
-              ></span>
+    state.beginning = false;
+    state.middle = false;
+    state.end = false;
 
-              Toute la course
+    state.whole = true;
+  }
 
-            </div>
+  refreshDepartureForm(departureId);
+}
 
-          </div>
 
+function setAvailability(
+  departureId,
+  type
+) {
 
-        </div>
+  const event =
+    events.find(
+      e => e.id === currentEventId
+    );
 
-      `;
+  const departure =
+    event?.departures.find(
+      d => d.id === departureId
+    );
 
+  if (
+    !departure ||
+    getDepartureTimestamp(departure) <= Date.now()
+  ) {
+    return;
+  }
 
-      return html;
+  ensureFormState(departureId);
 
-    }
+  const state =
+    formState[departureId];
 
+  state.beginning = false;
+  state.middle = false;
+  state.end = false;
+  state.whole = false;
+  state.unavailable = false;
 
-    /* =====================================================
-       PILOT ROW
-    ===================================================== */
+  state[type] = true;
 
-    function renderPilotRow(
-      pilot
-    ) {
+  refreshDepartureForm(departureId);
+}
 
 
-      const status =
-        pilot.status ||
-        "";
+/* =========================================================
+   CATÉGORIE
+========================================================= */
 
+function setCategory(
+  departureId,
+  category
+) {
 
-      const beginning =
-        status.includes(
-          "beginning"
-        ) ||
-        status ===
-          "whole";
+  const event =
+    events.find(
+      e => e.id === currentEventId
+    );
 
+  const departure =
+    event?.departures.find(
+      d => d.id === departureId
+    );
 
-      const middle =
-        status.includes(
-          "middle"
-        ) ||
-        status ===
-          "whole";
+  if (
+    !departure ||
+    getDepartureTimestamp(departure) <= Date.now()
+  ) {
+    return;
+  }
 
+  ensureFormState(departureId);
 
-      const end =
-        status.includes(
-          "end"
-        ) ||
-        status ===
-          "whole";
-
-
-      return `
-
-        <div class="pilot-row">
-
-
-          <div class="pilot-left">
-
-            <div class="pilot-name">
-
-              ${escapeHtml(
-                pilot.name
-              )}
-
-            </div>
-
-          </div>
-
-
-          <span
-            class="category-badge ${
-              getCategoryClass(
-                pilot.category
-              )
-            }"
-          >
-
-            ${
-              pilot.category ===
-              "Hypercar"
-              ?
-              "HYPER"
-              :
-              escapeHtml(
-                pilot.category ||
-                "—"
-              )
-            }
-
-          </span>
-
-
-          <div
-            class="availability-bar"
-            title="${escapeHtml(
-              getStatusLabel(
-                status
-              )
-            )}"
-          >
+  formState[departureId].category =
+    category;
 
-            <span
-              class="
-                availability-segment
-                beginning
-                ${
-                  beginning
-                  ?
-                  "active"
-                  :
-                  ""
-                }
-              "
-            ></span>
+  refreshDepartureForm(departureId);
+}
 
 
-            <span
-              class="
-                availability-segment
-                middle
-                ${
-                  middle
-                  ?
-                  "active"
-                  :
-                  ""
-                }
-              "
-            ></span>
+/* =========================================================
+   RAFRAÎCHIR LE FORMULAIRE
+========================================================= */
 
+function refreshDepartureForm(
+  departureId
+) {
 
-            <span
-              class="
-                availability-segment
-                end
-                ${
-                  end
-                  ?
-                  "active"
-                  :
-                  ""
-                }
-              "
-            ></span>
+  const container =
+    document.querySelector(
+      `.form-section:has(#name-${departureId})`
+    );
 
-          </div>
+  /*
+    Si le navigateur ne trouve pas le conteneur
+    avec :has(), on reconstruit simplement l'événement.
+  */
 
+  if (!container) {
+    renderEvent();
+    return;
+  }
+}
 
-          <button
-            class="edit-button"
-            onclick="
-              editPilot(
-                '${escapeJs(
-                  pilot.name
-                )}'
-              )
-            "
-            title="Modifier"
-          >
-            ✎
-          </button>
 
-        </div>
+/* =========================================================
+   INSCRIPTION
+========================================================= */
 
-      `;
+function saveAvailability(
+  departureId
+) {
 
-    }
+  const event =
+    events.find(
+      e => e.id === currentEventId
+    );
 
+  if (!event) return;
 
-    /* =====================================================
-       STATUS LABEL
-    ===================================================== */
+  const departure =
+    event.departures.find(
+      d => d.id === departureId
+    );
 
-    function getStatusLabel(
-      status
-    ) {
+  if (!departure) return;
 
+  /*
+    Sécurité départ terminé
+  */
 
-      if (
-        status ===
-        "whole"
-      ) {
+  if (
+    getDepartureTimestamp(departure) <= Date.now()
+  ) {
 
-        return "Toute la course";
+    alert(
+      "Ce départ est terminé. Les inscriptions sont verrouillées."
+    );
 
-      }
+    return;
+  }
 
 
-      if (
-        status ===
-        "unavailable"
-      ) {
+  const name =
+    getPilotName().trim();
 
-        return "Indisponible";
+  if (!name) {
 
-      }
+    alert(
+      "Entre d'abord ton pseudo pilote."
+    );
 
+    document
+      .getElementById("globalPilotName")
+      ?.focus();
 
-      const parts = [];
+    return;
+  }
 
 
-      if (
-        status.includes(
-          "beginning"
-        )
-      ) {
+  ensureFormState(departureId);
 
-        parts.push(
-          "Début"
-        );
+  const state =
+    formState[departureId];
 
-      }
+  let status = "";
 
+  if (state.unavailable) {
 
-      if (
-        status.includes(
-          "middle"
-        )
-      ) {
+    status = "unavailable";
 
-        parts.push(
-          "Milieu"
-        );
+  } else if (state.whole) {
 
-      }
+    status = "whole";
 
+  } else {
 
-      if (
-        status.includes(
-          "end"
-        )
-      ) {
+    const parts = [];
 
-        parts.push(
-          "Fin"
-        );
+    if (state.beginning)
+      parts.push("beginning");
 
-      }
+    if (state.middle)
+      parts.push("middle");
 
+    if (state.end)
+      parts.push("end");
 
-      return parts.join(
-        " + "
-      );
+    status = parts.join(",");
+  }
 
-    }
 
+  if (!status) {
 
-    /* =====================================================
-       FORM
-    ===================================================== */
+    alert(
+      "Choisis ta disponibilité."
+    );
 
-    function renderForm(
-      event,
-      departure,
-      departureIndex
-    ) {
+    return;
+  }
 
 
-      const globalName =
-        getPilotName();
+  if (
+    status !== "unavailable" &&
+    !state.category
+  ) {
 
+    alert(
+      "Choisis ta catégorie."
+    );
 
-      let existing = null;
+    return;
+  }
 
 
-      if (
-        editingPilot
-      ) {
-
-        existing =
-          departure.availability.find(
-            pilot =>
-              pilot.name.toLowerCase() ===
-              editingPilot.toLowerCase()
-          );
-
-      }
-
-
-      const state =
-        formState[
-          departure.id
-        ] || {};
-
-
-      const status =
-        state.status ??
-        existing?.status ??
-        "";
-
-
-      const category =
-        state.category ??
-        existing?.category ??
-        "";
-
-
-      const beginning =
-        status.includes(
-          "beginning"
-        );
-
-
-      const middle =
-        status.includes(
-          "middle"
-        );
-
-
-      const end =
-        status.includes(
-          "end"
-        );
-
-
-      const whole =
-        status ===
-        "whole";
-
-
-      const unavailable =
-        status ===
-        "unavailable";
-
-
-      return `
-
-        <div
-          class="form-section ${
-            existing
-            ?
-            "editing"
-            :
-            ""
-          }"
-        >
-
-
-          <div class="form-title">
-
-            <strong>
-
-              ${
-                existing
-                ?
-                "✎ MODIFIER MA DISPONIBILITÉ"
-                :
-                "+ ENREGISTRER MA DISPONIBILITÉ"
-              }
-
-            </strong>
-
-
-            <span
-              class="editing-label"
-            >
-              MODIFICATION
-            </span>
-
-          </div>
-
-
-          <div class="form-grid">
-
-
-            <!-- PSEUDO -->
-
-            <div class="field">
-
-              <label>
-                Pilote
-              </label>
-
-              <input
-                id="name-${departure.id}"
-                type="text"
-                value="${escapeHtml(
-                  existing
-                  ?
-                  existing.name
-                  :
-                  globalName
-                )}"
-                readonly
-              >
-
-            </div>
-
-
-            <!-- AVAILABILITY -->
-
-            <div class="field">
-
-              <label>
-                Disponibilité
-              </label>
-
-
-              <div
-                class="availability-buttons"
-                id="availability-${departure.id}"
-              >
-
-
-                <button
-                  type="button"
-                  class="
-                    availability-button
-                    beginning
-                    ${
-                      beginning
-                      ?
-                      "active"
-                      :
-                      ""
-                    }
-                  "
-                  onclick="
-                    toggleAvailability(
-                      '${departure.id}',
-                      'beginning'
-                    )
-                  "
-                >
-                  DÉBUT
-                </button>
-
-
-                <button
-                  type="button"
-                  class="
-                    availability-button
-                    middle
-                    ${
-                      middle
-                      ?
-                      "active"
-                      :
-                      ""
-                    }
-                  "
-                  onclick="
-                    toggleAvailability(
-                      '${departure.id}',
-                      'middle'
-                    )
-                  "
-                >
-                  MILIEU
-                </button>
-
-
-                <button
-                  type="button"
-                  class="
-                    availability-button
-                    end
-                    ${
-                      end
-                      ?
-                      "active"
-                      :
-                      ""
-                    }
-                  "
-                  onclick="
-                    toggleAvailability(
-                      '${departure.id}',
-                      'end'
-                    )
-                  "
-                >
-                  FIN
-                </button>
-
-
-                <button
-                  type="button"
-                  class="
-                    availability-button
-                    whole
-                    ${
-                      whole
-                      ?
-                      "active"
-                      :
-                      ""
-                    }
-                  "
-                  onclick="
-                    setAvailability(
-                      '${departure.id}',
-                      'whole'
-                    )
-                  "
-                >
-                  TOUT
-                </button>
-
-
-                <button
-                  type="button"
-                  class="
-                    availability-button
-                    unavailable
-                    ${
-                      unavailable
-                      ?
-                      "active"
-                      :
-                      ""
-                    }
-                  "
-                  onclick="
-                    setAvailability(
-                      '${departure.id}',
-                      'unavailable'
-                    )
-                  "
-                >
-                  ABSENT
-                </button>
-
-
-              </div>
-
-            </div>
-
-
-            <!-- CATEGORY -->
-
-            <div class="field">
-
-              <label>
-                Catégorie
-              </label>
-
-
-              <div
-                class="category-buttons"
-              >
-
-
-                ${renderCategoryButton(
-                  departure.id,
-                  "Hypercar",
-                  category
-                )}
-
-
-                ${renderCategoryButton(
-                  departure.id,
-                  "LMP2",
-                  category
-                )}
-
-
-                ${renderCategoryButton(
-                  departure.id,
-                  "LMP3",
-                  category
-                )}
-
-
-                ${renderCategoryButton(
-                  departure.id,
-                  "GT3",
-                  category
-                )}
-
-              </div>
-
-            </div>
-
-
-            <!-- SAVE -->
-
-            <button
-              class="save-button"
-              onclick="
-                saveAvailability(
-                  '${departure.id}'
-                )
-              "
-            >
-
-              ${
-                existing
-                ?
-                "MODIFIER"
-                :
-                "ENREGISTRER"
-              }
-
-            </button>
-
-
-          </div>
-
-
-        </div>
-
-      `;
-
-    }
-
-
-    /* =====================================================
-       CATEGORY BUTTON
-    ===================================================== */
-
-    function renderCategoryButton(
-      departureId,
-      category,
-      selected
-    ) {
-
-
-      return `
-
-        <button
-          type="button"
-          class="
-            category-button
-            ${
-              getCategoryButtonClass(
-                category
-              )
-            }
-            ${
-              selected ===
-              category
-              ?
-              "active"
-              :
-              ""
-            }
-          "
-          onclick="
-            setCategory(
-              '${departureId}',
-              '${category}'
-            )
-          "
-        >
-
-          ${
-            category ===
-            "Hypercar"
-            ?
-            "HYPER"
-            :
-            category
-          }
-
-        </button>
-
-      `;
-
-    }
-
-
-    /* =====================================================
-       FORM STATE
-    ===================================================== */
-
-    function ensureFormState(
-      departureId
-    ) {
-
-      if (
-        !formState[
-          departureId
-        ]
-      ) {
-
-        formState[
-          departureId
-        ] = {
-
-          status:
-            "",
-
-          category:
-            ""
-
-        };
-
-      }
-
-
-      return formState[
-        departureId
-      ];
-
-    }
-
-
-    /* =====================================================
-       TOGGLE AVAILABILITY
-    ===================================================== */
-
-    function toggleAvailability(
-      departureId,
-      type
-    ) {
-
-
-      const state =
-        ensureFormState(
-          departureId
-        );
-
-
-      /*
-       * Clicking a segment while
-       * Whole / Absent is selected
-       * starts a fresh selection.
-       */
-
-      if (
-        state.status ===
-          "whole" ||
-        state.status ===
-          "unavailable"
-      ) {
-
-        state.status =
-          "";
-
-      }
-
-
-      let parts =
-        state.status
-          ?
-          state.status.split(",")
-          :
-          [];
-
-
-      if (
-        parts.includes(
-          type
-        )
-      ) {
-
-        parts =
-          parts.filter(
-            part =>
-              part !==
-              type
-          );
-
-      } else {
-
-        parts.push(
-          type
-        );
-
-      }
-
-
-      const order = [
-
-        "beginning",
-
-        "middle",
-
-        "end"
-
-      ];
-
-
-      parts.sort(
-        (a,b) =>
-          order.indexOf(a) -
-          order.indexOf(b)
-      );
-
-
-      /*
-       * All 3 = Whole race
-       */
-
-      if (
-        parts.length === 3
-      ) {
-
-        state.status =
-          "whole";
-
-      } else {
-
-        state.status =
-          parts.join(",");
-
-      }
-
-
-      /*
-       * Immediately refresh
-       * ONLY this departure.
-       */
-
-      refreshDepartureForm(
-        departureId
-      );
-
-    }
-
-
-    /* =====================================================
-       SET AVAILABILITY
-    ===================================================== */
-
-    function setAvailability(
-      departureId,
-      status
-    ) {
-
-
-      const state =
-        ensureFormState(
-          departureId
-        );
-
-
-      state.status =
-        status;
-
-
-      refreshDepartureForm(
-        departureId
-      );
-
-    }
-
-
-    /* =====================================================
-       SET CATEGORY
-    ===================================================== */
-
-    function setCategory(
-      departureId,
-      category
-    ) {
-
-
-      const state =
-        ensureFormState(
-          departureId
-        );
-
-
-      state.category =
-        category;
-
-
-      refreshDepartureForm(
-        departureId
-      );
-
-    }
-
-
-    /* =====================================================
-       REFRESH ONE FORM
-    ===================================================== */
-
-    function refreshDepartureForm(
-      departureId
-    ) {
-
-
-      const event =
-        events.find(
-          e =>
-            e.id ===
-            currentEventId
-        );
-
-
-      if (!event) {
-        return;
-      }
-
-
-      const departureIndex =
-        event.departures.findIndex(
-          departure =>
-            departure.id ===
-            departureId
-        );
-
-
-      if (
-        departureIndex === -1
-      ) {
-
-        return;
-
-      }
-
-
-      const departure =
-        event.departures[
-          departureIndex
-        ];
-
-
-      const form =
-        document.querySelector(
-          `.form-section:has(#name-${departureId})`
-        );
-
-
-      if (!form) {
-
-        renderEvent();
-
-        return;
-
-      }
-
-
-      /*
-       * Keep current input value.
-       */
-
-      const input =
-        document.getElementById(
-          `name-${departureId}`
-        );
-
-
-      const name =
-        input
-        ?
-        input.value
-        :
-        getPilotName();
-
-
-      form.outerHTML =
-        renderForm(
-          event,
-          departure,
-          departureIndex
-        );
-
-
-      const newInput =
-        document.getElementById(
-          `name-${departureId}`
-        );
-
-
-      if (newInput) {
-
-        newInput.value =
-          name;
-
-      }
-
-    }
-
-
-    /* =====================================================
-       SAVE AVAILABILITY
-    ===================================================== */
-
-    function saveAvailability(
-      departureId
-    ) {
-
-
-      const event =
-        events.find(
-          e =>
-            e.id ===
-            currentEventId
-        );
-
-
-      if (!event) {
-        return;
-      }
-
-
-      const departure =
-        event.departures.find(
-          d =>
-            d.id ===
-            departureId
-        );
-
-
-      if (!departure) {
-        return;
-      }
-
-
-      const globalName =
-        getPilotName();
-
-
-      if (!globalName) {
-
-        alert(
-          "Entre ton pseudo en haut de la page avant de renseigner tes disponibilités."
-        );
-
-        return;
-
-      }
-
-
-      const state =
-        ensureFormState(
-          departureId
-        );
-
-
-      let status =
-        state.status ||
-        "";
-
-
-      let category =
-        state.category ||
-        "";
-
-
-      /*
-       * When editing, use the existing
-       * values if nothing was changed.
-       */
-
-      if (
-        editingPilot
-      ) {
-
-
-        const existing =
-          departure.availability.find(
-            pilot =>
-              pilot.name.toLowerCase() ===
-              editingPilot.toLowerCase()
-          );
-
-
-        if (existing) {
-
-          if (!status) {
-
-            status =
-              existing.status;
-
-          }
-
-
-          if (!category) {
-
-            category =
-              existing.category;
-
-          }
-
-        }
-
-      }
-
-
-      if (!status) {
-
-        alert(
-          "Choisis ta disponibilité."
-        );
-
-        return;
-
-      }
-
-
-      if (
-        status !==
-          "unavailable" &&
-        !category
-      ) {
-
-        alert(
-          "Choisis ta catégorie."
-        );
-
-        return;
-
-      }
-
-
-      /*
-       * Find the pilot.
-       */
-
-      const existingIndex =
-        departure.availability.findIndex(
-          pilot =>
-            pilot.name.toLowerCase() ===
-            globalName.toLowerCase()
-        );
-
-
-      /*
-       * UPDATE
-       */
-
-      if (
-        existingIndex !== -1
-      ) {
-
-
-        departure.availability[
-          existingIndex
-        ] = {
-
-          ...departure.availability[
-            existingIndex
-          ],
-
-          name:
-            globalName,
-
-          category:
-            category,
-
-          status:
-            status
-
-        };
-
-      }
-
-
-      /*
-       * NEW
-       */
-
-      else {
-
-
-        departure.availability.push({
-
-          id:
-            generateId(),
-
-          name:
-            globalName,
-
-          category:
-            category,
-
-          status:
-            status
-
-        });
-
-      }
-
-
-      saveEvents();
-
-
-      /*
-       * Clear this form state.
-       */
-
-      delete formState[
-        departureId
-      ];
-
-
-      editingPilot =
-        null;
-
-
-      renderEvent();
-
-
-      /*
-       * Scroll back close to
-       * the saved departure.
-       */
-
-      setTimeout(
-        () => {
-
-          const element =
-            document.querySelector(
-              `[data-departure-id="${departureId}"]`
-            );
-
-
-          if (element) {
-
-            element.scrollIntoView({
-              behavior:
-                "smooth",
-              block:
-                "center"
-            });
-
-          }
-
-        },
-        50
-      );
-
-    }
-
-
-    /* =====================================================
-       EDIT PILOT
-    ===================================================== */
-
-    function editPilot(
-      name
-    ) {
-
-
-      editingPilot =
-        name;
-
-
-      const event =
-        events.find(
-          e =>
-            e.id ===
-            currentEventId
-        );
-
-
-      if (!event) {
-        return;
-      }
-
-
-      /*
-       * Load this pilot's choices
-       * for every departure.
-       */
-
-      event.departures.forEach(
-        departure => {
-
-
-          const pilot =
-            departure.availability.find(
-              p =>
-                p.name.toLowerCase() ===
-                name.toLowerCase()
-            );
-
-
-          if (pilot) {
-
-
-            formState[
-              departure.id
-            ] = {
-
-              status:
-                pilot.status,
-
-              category:
-                pilot.category
-
-            };
-
-          }
-
-        }
-      );
-
-
-      /*
-       * Save the pseudo as global
-       * pseudo too.
-       */
-
-      localStorage.setItem(
-        "fmt_pilot_name",
-        name
-      );
-
-
-      renderEvent();
-
-
-      setTimeout(
-        () => {
-
-
-          const form =
-            document.querySelector(
-              ".form-section.editing"
-            );
-
-
-          if (form) {
-
-            form.scrollIntoView({
-              behavior:
-                "smooth",
-
-              block:
-                "center"
-            });
-
-          }
-
-        },
-        50
-      );
-
-    }
-
-
-    /* =====================================================
-       CREATE EVENT
-    ===================================================== */
-
-    function showCreateEvent() {
-
-
-      currentEventId =
-        null;
-
-      editingPilot =
-        null;
-
-
-      document.getElementById(
-        "app"
-      ).innerHTML = `
-
-        <button
-          class="back-button"
-          onclick="renderHome()"
-        >
-          ← RETOUR
-        </button>
-
-
-        <div class="create-panel">
-
-          <h2>
-            NOUVEL ÉVÉNEMENT
-          </h2>
-
-
-          <div class="create-grid">
-
-
-            <div class="field">
-
-              <label>
-                Nom de l'événement
-              </label>
-
-              <input
-                id="event-name"
-                type="text"
-                placeholder="Ex : Spa 6H"
-              >
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Circuit / lieu
-              </label>
-
-              <input
-                id="event-location"
-                type="text"
-                placeholder="Ex : Spa-Francorchamps"
-              >
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Départs
-              </label>
-
-              <div
-                id="departure-fields"
-              ></div>
-
-            </div>
-
-
-            <button
-              class="small-button"
-              onclick="
-                addDepartureField()
-              "
-            >
-              + AJOUTER UN DÉPART
-            </button>
-
-
-            <button
-              class="create-submit"
-              onclick="
-                createEvent()
-              "
-            >
-              CRÉER L'ÉVÉNEMENT
-            </button>
-
-
-          </div>
-
-        </div>
-
-      `;
-
-
-      departureFieldCount =
-        0;
-
-
-      addDepartureField();
-
-    }
-
-
-    /* =====================================================
-       ADD DEPARTURE FIELD
-    ===================================================== */
-
-    function addDepartureField(
-      date = "",
-      time = ""
-    ) {
-
-
-      const container =
-        document.getElementById(
-          "departure-fields"
-        );
-
-
-      if (!container) {
-        return;
-      }
-
-
-      const id =
-        `new-departure-${departureFieldCount++}`;
-
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "create-departure";
-
-
-      div.innerHTML = `
-
-        <div class="field">
-
-          <label>
-            Date
-          </label>
-
-          <input
-            type="date"
-            class="new-departure-date"
-            value="${date}"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>
-            Heure
-          </label>
-
-          <input
-            type="time"
-            class="new-departure-time"
-            value="${time}"
-          >
-
-        </div>
-
-
-        <button
-          class="small-button"
-          type="button"
-          onclick="
-            this.parentElement.remove()
-          "
-        >
-          ✕
-        </button>
-
-      `;
-
-
-      container.appendChild(
-        div
-      );
-
-    }
-
-
-    /* =====================================================
-       CREATE EVENT
-    ===================================================== */
-
-    function createEvent() {
-
-
-      const name =
-        document.getElementById(
-          "event-name"
-        ).value.trim();
-
-
-      const location =
-        document.getElementById(
-          "event-location"
-        ).value.trim();
-
-
-      if (!name) {
-
-        alert(
-          "Entre un nom pour l'événement."
-        );
-
-        return;
-
-      }
-
-
-      const rows =
-        document.querySelectorAll(
-          ".create-departure"
-        );
-
-
-      const departures = [];
-
-
-      rows.forEach(
-        row => {
-
-
-          const date =
-            row.querySelector(
-              ".new-departure-date"
-            ).value;
-
-
-          const time =
-            row.querySelector(
-              ".new-departure-time"
-            ).value;
-
-
-          if (
-            date &&
-            time
-          ) {
-
-
-            departures.push({
-
-              id:
-                generateId(),
-
-              date:
-                date,
-
-              time:
-                time,
-
-              availability:
-                []
-
-            });
-
-          }
-
-        }
-      );
-
-
-      if (
-        departures.length === 0
-      ) {
-
-        alert(
-          "Ajoute au moins un départ."
-        );
-
-        return;
-
-      }
-
-
-      departures.sort(
-        (a,b) =>
-          getDepartureTimestamp(
-            a
-          ) -
-          getDepartureTimestamp(
-            b
-          )
-      );
-
-
-      const event = {
-
-        id:
-          generateId(),
-
-        name:
-          name,
-
-        location:
-          location,
-
-        departures:
-          departures
-
-      };
-
-
-      events.push(
-        event
-      );
-
-
-      saveEvents();
-
-
-      openEvent(
-        event.id
-      );
-
-    }
-
-
-    /* =====================================================
-       INITIAL DATA
-    ===================================================== */
-
-    if (
-      events.length === 0
-    ) {
-
-
-      events.push({
-
-        id:
-          generateId(),
-
-        name:
-          "Spa 6H",
-
-        location:
-          "Spa-Francorchamps",
-
-        departures: [
-
-          {
-
-            id:
-              generateId(),
-
-            date:
-              "2026-09-04",
-
-            time:
-              "20:00",
-
-            availability:
-              []
-
-          },
-
-
-          {
-
-            id:
-              generateId(),
-
-            date:
-              "2026-09-05",
-
-            time:
-              "14:00",
-
-            availability:
-              []
-
-          },
-
-
-          {
-
-            id:
-              generateId(),
-
-            date:
-              "2026-09-05",
-
-            time:
-              "20:00",
-
-            availability:
-              []
-
-          },
-
-
-          {
-
-            id:
-              generateId(),
-
-            date:
-              "2026-09-06",
-
-            time:
-              "15:00",
-
-            availability:
-              []
-
-          }
-
-        ]
-
-      });
-
-
-      saveEvents();
-
-    }
-
-
-    /* =====================================================
-       START
-    ===================================================== */
-
-    renderHome();
-
-
-    /*
-     * Countdown updates only.
-     * The page itself is NOT rerendered every second.
-     */
-
-    setInterval(
-      updateCountdowns,
-      1000
+  const existingIndex =
+    departure.availability.findIndex(
+      pilot =>
+        pilot.name.toLowerCase() ===
+        name.toLowerCase()
     );
 
 
-  </script>
+  const pilotData = {
+
+    id:
+      existingIndex >= 0
+        ? departure.availability[existingIndex].id
+        : generateId(),
+
+    name,
+
+    category:
+      status === "unavailable"
+        ? ""
+        : state.category,
+
+    status
+  };
+
+
+  if (existingIndex >= 0) {
+
+    departure.availability[
+      existingIndex
+    ] = pilotData;
+
+  } else {
+
+    departure.availability.push(
+      pilotData
+    );
+  }
+
+
+  setPilotName(name);
+
+  saveEvents();
+
+  delete formState[departureId];
+
+  editingPilot = null;
+
+  renderEvent();
+
+  setTimeout(() => {
+
+    const element =
+      document.querySelector(
+        `[data-departure-id="${departureId}"]`
+      );
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+  }, 50);
+}
+
+
+/* =========================================================
+   MODIFIER UN PILOTE
+========================================================= */
+
+function editPilot(name) {
+
+  const event =
+    events.find(
+      e => e.id === currentEventId
+    );
+
+  if (!event) return;
+
+
+  /*
+    Vérification :
+    si le pilote n'a aucun départ modifiable,
+    on ne fait rien.
+  */
+
+  const editableDeparture =
+    event.departures.some(
+      departure =>
+        getDepartureTimestamp(departure) >
+        Date.now()
+    );
+
+  if (!editableDeparture) {
+    return;
+  }
+
+
+  editingPilot = name;
+
+  setPilotName(name);
+
+
+  /*
+    Charger les données du pilote
+    pour tous les départs encore modifiables.
+  */
+
+  event.departures.forEach(
+    departure => {
+
+      if (
+        getDepartureTimestamp(departure) <=
+        Date.now()
+      ) {
+        return;
+      }
+
+      const pilot =
+        departure.availability.find(
+          p =>
+            p.name.toLowerCase() ===
+            name.toLowerCase()
+        );
+
+      ensureFormState(
+        departure.id
+      );
+
+      const state =
+        formState[departure.id];
+
+      state.beginning = false;
+      state.middle = false;
+      state.end = false;
+      state.whole = false;
+      state.unavailable = false;
+      state.category = "";
+
+
+      if (!pilot) return;
+
+
+      if (
+        pilot.status === "whole"
+      ) {
+
+        state.whole = true;
+
+      } else if (
+        pilot.status === "unavailable"
+      ) {
+
+        state.unavailable = true;
+
+      } else {
+
+        const parts =
+          pilot.status.split(",");
+
+        state.beginning =
+          parts.includes("beginning");
+
+        state.middle =
+          parts.includes("middle");
+
+        state.end =
+          parts.includes("end");
+      }
+
+
+      state.category =
+        pilot.category || "";
+    }
+  );
+
+
+  renderEvent();
+
+
+  setTimeout(() => {
+
+    const form =
+      document.querySelector(
+        ".form-section.editing"
+      );
+
+    if (form) {
+
+      form.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+    }
+
+  }, 50);
+}
+
+
+/* =========================================================
+   DÉPART TERMINÉ : AFFICHER / MASQUER
+========================================================= */
+
+function toggleDeparture(
+  departureId
+) {
+
+  const event =
+    events.find(
+      e => e.id === currentEventId
+    );
+
+  if (!event) return;
+
+  const departure =
+    event.departures.find(
+      d => d.id === departureId
+    );
+
+  if (!departure) return;
+
+
+  /*
+    On ne permet le toggle
+    que pour un départ terminé.
+  */
+
+  if (
+    getDepartureTimestamp(departure) >
+    Date.now()
+  ) {
+    return;
+  }
+
+
+  collapsedDepartures[departureId] =
+    !collapsedDepartures[departureId];
+
+  renderEvent();
+}
+
+
+/* =========================================================
+   CRÉATION ÉVÉNEMENT
+========================================================= */
+
+function showCreateEvent() {
+
+  currentEventId = null;
+  editingPilot = null;
+
+  departureFieldCount = 0;
+
+  document.getElementById("app").innerHTML = `
+
+    <button
+      class="secondary-button back-button"
+      onclick="renderHome()"
+    >
+      ← Retour
+    </button>
+
+    <div class="page-title">
+      NOUVEL ÉVÉNEMENT
+    </div>
+
+    <div class="page-subtitle">
+      Créer une nouvelle course d'endurance
+    </div>
+
+    <div class="form-panel">
+
+      <div class="form-group">
+
+        <label class="form-label">
+          Nom de l'événement
+        </label>
+
+        <input
+          id="eventName"
+          type="text"
+          placeholder="Ex : Spa 6H"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">
+          Départs
+        </label>
+
+        <div
+          id="departureFields"
+          class="departure-fields"
+        ></div>
+
+      </div>
+
+      <button
+        class="secondary-button"
+        onclick="addDepartureField()"
+      >
+        + Ajouter un départ
+      </button>
+
+      <div style="height:15px"></div>
+
+      <button
+        class="primary-button"
+        onclick="createEvent()"
+      >
+        CRÉER L'ÉVÉNEMENT
+      </button>
+
+    </div>
+  `;
+
+  addDepartureField();
+}
+
+
+/* =========================================================
+   AJOUT D'UN DÉPART
+========================================================= */
+
+function addDepartureField(
+  date = "",
+  time = ""
+) {
+
+  departureFieldCount++;
+
+  const id =
+    "departureField" +
+    departureFieldCount;
+
+  const container =
+    document.getElementById(
+      "departureFields"
+    );
+
+  const div =
+    document.createElement("div");
+
+  div.className =
+    "departure-field";
+
+  div.id = id;
+
+  div.innerHTML = `
+
+    <input
+      type="date"
+      class="new-departure-date"
+      value="${date}"
+    >
+
+    <input
+      type="time"
+      class="new-departure-time"
+      value="${time}"
+    >
+
+    <button
+      class="remove-departure"
+      onclick="document.getElementById('${id}').remove()"
+    >
+      ×
+    </button>
+  `;
+
+  container.appendChild(div);
+}
+
+
+/* =========================================================
+   CRÉER ÉVÉNEMENT
+========================================================= */
+
+function createEvent() {
+
+  const name =
+    document
+      .getElementById("eventName")
+      .value
+      .trim();
+
+  if (!name) {
+
+    alert(
+      "Donne un nom à l'événement."
+    );
+
+    return;
+  }
+
+
+  const fields =
+    document.querySelectorAll(
+      ".departure-field"
+    );
+
+  const departures = [];
+
+
+  fields.forEach(field => {
+
+    const date =
+      field.querySelector(
+        ".new-departure-date"
+      ).value;
+
+    const time =
+      field.querySelector(
+        ".new-departure-time"
+      ).value;
+
+    if (date && time) {
+
+      departures.push({
+
+        id: generateId(),
+
+        date,
+
+        time,
+
+        availability: []
+      });
+    }
+
+  });
+
+
+  if (!departures.length) {
+
+    alert(
+      "Ajoute au moins un départ avec une date et une heure."
+    );
+
+    return;
+  }
+
+
+  departures.sort(
+    (a, b) =>
+      getDepartureTimestamp(a) -
+      getDepartureTimestamp(b)
+  );
+
+
+  const newEvent = {
+
+    id: generateId(),
+
+    name,
+
+    departures
+  };
+
+
+  events.push(newEvent);
+
+  saveEvents();
+
+  openEvent(newEvent.id);
+}
+
+
+/* =========================================================
+   ÉVÉNEMENT DE DÉMO
+========================================================= */
+
+if (!events.length) {
+
+  events.push({
+
+    id: "demo-spa-6h",
+
+    name: "Spa 6H",
+
+    departures: [
+
+      {
+        id: "spa-1",
+        date: "2026-09-04",
+        time: "20:00",
+        availability: []
+      },
+
+      {
+        id: "spa-2",
+        date: "2026-09-05",
+        time: "14:00",
+        availability: []
+      },
+
+      {
+        id: "spa-3",
+        date: "2026-09-05",
+        time: "20:00",
+        availability: []
+      },
+
+      {
+        id: "spa-4",
+        date: "2026-09-06",
+        time: "15:00",
+        availability: []
+      }
+
+    ]
+  });
+
+  saveEvents();
+}
+
+
+/* =========================================================
+   DÉMARRAGE
+========================================================= */
+
+renderHome();
+
+setInterval(
+  updateCountdowns,
+  1000
+);
+
+</script>
 
 </body>
 </html>

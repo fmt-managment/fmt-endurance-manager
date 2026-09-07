@@ -1,5 +1,24 @@
 const CATEGORIES = ['Hypercar','LMP2 ELMS','LMP2 WEC','LMP3','GT3','GTE'];
 const EVENT_TYPES = {special:{label:'Special event',css:'special'},lmu:{label:'Championnat LMU',css:'lmu'},private:{label:'Championnat privé',css:'private'}};
+const CIRCUITS = [
+  {id:'bahrain',name:'Bahrain International Circuit'},
+  {id:'barcelona',name:'Circuit de Barcelona-Catalunya'},
+  {id:'cota',name:'Circuit of the Americas'},
+  {id:'daytona',name:'Daytona International Speedway'},
+  {id:'fuji',name:'Fuji Speedway'},
+  {id:'imola',name:'Autodromo Enzo e Dino Ferrari (Imola)'},
+  {id:'interlagos',name:'Interlagos'},
+  {id:'laguna-seca',name:'WeatherTech Raceway Laguna Seca'},
+  {id:'le-mans',name:'Circuit de la Sarthe (Le Mans)'},
+  {id:'lusail',name:'Lusail International Circuit'},
+  {id:'monza',name:'Autodromo Nazionale Monza'},
+  {id:'nurburgring',name:'Nürburgring GP'},
+  {id:'paul-ricard',name:'Circuit Paul Ricard'},
+  {id:'portimao',name:'Algarve International Circuit (Portimão)'},
+  {id:'sebring',name:'Sebring International Raceway'},
+  {id:'silverstone',name:'Silverstone Circuit'},
+  {id:'spa',name:'Circuit de Spa-Francorchamps'}
+];
 const categories = {
   Hypercar:{image:'HC.png',css:'hyper'},
   'LMP2 ELMS':{image:'LMP2.png',css:'lmp2'},
@@ -33,6 +52,9 @@ function logo(category) {
 }
 function badge(category) { return `<span class="event-category-badge ${categories[category]?.css || ''}">${logo(category)}<span>${esc(category)}</span></span>`; }
 function eventTypeBadge(type) { const item=EVENT_TYPES[type]||EVENT_TYPES.private; return `<span class="event-type-badge ${item.css}">${item.label}</span>`; }
+function circuitInfo(id) { return CIRCUITS.find(c=>c.id===id) || null; }
+function circuitLabel(id) { return circuitInfo(id)?.name || 'Circuit à préciser'; }
+function circuitVisual(id, compact=false) { const circuit=circuitInfo(id); if(!circuit)return ''; return `<span class="circuit-visual ${compact?'compact':''}"><img data-circuit="${circuit.id}" src="/images/circuits/${circuit.id}.png" alt="Plan du ${esc(circuit.name)}" loading="lazy"><span>${esc(circuit.name)}</span></span>`; }
 function button(action,label,extra='',css='secondary-button') { return `<button type="button" class="${css}" data-action="${action}" ${extra}>${label}</button>`; }
 function carPreferenceChoices(category, selected=[], any=false) {
   const values = Array.isArray(selected) ? selected : (selected ? [selected] : []);
@@ -81,9 +103,9 @@ function renderHome(message='') {
     <div class="toolbar">${button('refresh','Actualiser')}${button('my-entries','Mes inscriptions')}${!user?button('guest-link','Mon lien personnel'):''}</div>
     ${events.length?`<div class="event-list">${events.map(event=>{
       const next=event.departures.find(d=>d.startsAt>Date.now());
-      return `<button class="event-card" data-action="open" data-id="${event.id}">
-        <span class="event-name">${esc(event.name)}</span>
-        <span class="event-info">${eventTypeBadge(event.eventType)} · ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0)} inscription(s)</span>
+      return `<button class="event-card event-type-${event.eventType||'private'}" data-action="open" data-id="${event.id}">
+        <span class="event-card-main"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} · ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0)} inscription(s)</span></span>
+        ${circuitVisual(event.circuit,true)}
         <span class="event-category-badges">${event.categories.map(badge).join('')}</span>
         <span class="event-countdown ${next?'':'finished'}">${next?`Prochain départ : ${esc(dateLabel(next))} à ${next.time} · <span data-countdown="${next.startsAt}">${countdown(next.startsAt)}</span>`:'Tous les départs sont passés'}</span>
       </button>`;
@@ -152,7 +174,7 @@ function renderEvent(message='') {
   const totalPilots=new Set(event.departures.flatMap(d=>d.availability.filter(r=>r.status!=='unavailable').map(r=>r.id))).size;
   const totalCrews=event.departures.reduce((sum,d)=>sum+(d.crews||[]).length,0);
   app.innerHTML=`${button('home','← Retour aux événements','','secondary-button back-button')}
-    <div class="event-header event-type-${event.eventType||'private'}"><div class="event-heading-line"><div><h1 class="event-title">${esc(event.name)}</h1><p class="event-subtitle">${eventTypeBadge(event.eventType)} · Course de ${event.durationHours||6} h · Horaires de Paris · ${event.departures.length} départ(s)</p></div></div>
+    <div class="event-header event-type-${event.eventType||'private'}"><div class="event-heading-line"><div><h1 class="event-title">${esc(event.name)}</h1><p class="event-subtitle">${eventTypeBadge(event.eventType)} · Course de ${event.durationHours||6} h · Horaires de Paris · ${event.departures.length} départ(s)</p></div>${circuitVisual(event.circuit)}</div>
     <div class="event-category-badges">${event.categories.map(badge).join('')}</div></div>
     <div class="toolbar">${button('refresh','Actualiser')}${canManage()?button('edit-event','Modifier l’événement',`data-id="${event.id}"`):''}${isAdmin()?button('delete-event','Supprimer l’événement',`data-id="${event.id}"`,'danger-button'):''}</div>
     ${message?`<p class="creation-success" role="status">${esc(message)}</p>`:''}${errorBox()}
@@ -160,7 +182,7 @@ function renderEvent(message='') {
     <section class="race-recap" aria-label="Récapitulatif de la course">
       <div class="recap-intro"><div><p class="recap-kicker">${eventSection==='crews'?'GESTION DES ÉQUIPAGES':'RÉCAPITULATIF DE LA COURSE'}</p><h2>${esc(event.name)}</h2><p>${eventSection==='crews'?'Les organisateurs composent les équipages à partir des pilotes inscrits.':'Les départs et les inscriptions sont regroupés dans les volets ci-dessous.'}</p></div><span class="recap-countdown">${nextDeparture?`Prochain départ <strong data-countdown="${nextDeparture.startsAt}">${countdown(nextDeparture.startsAt)}</strong>`:'Course terminée'}</span></div>
       <div class="recap-stats"><div><strong>${event.durationHours||6} h</strong><span>durée</span></div><div><strong>${event.departures.length}</strong><span>départ${event.departures.length>1?'s':''}</span></div><div><strong>${totalPilots}</strong><span>pilote${totalPilots>1?'s':''}</span></div><div><strong>${totalCrews}</strong><span>équipage${totalCrews>1?'s':''}</span></div></div>
-      <div class="recap-categories"><span>Catégories :</span>${event.categories.map(badge).join('')}</div>
+      <div class="recap-circuit"><strong>Circuit</strong><span>${esc(circuitLabel(event.circuit))}</span></div><div class="recap-categories"><span>Catégories :</span>${event.categories.map(badge).join('')}</div>
     </section>
     ${eventSection==='crews'?renderCrewPage(event,nextDeparture):`<section class="departure-accordion" aria-label="Départs de la course">${event.departures.map((departure,index)=>renderDeparturePanel(event,departure,index,departure.id===nextDeparture?.id||departure.id===selectedDepartureId)).join('')}</section>`}`;
   showRecoveryLink();
@@ -237,6 +259,7 @@ function renderEventForm(event=null) {
       <label class="form-label" for="eventName">Nom de l’événement</label><input id="eventName" name="eventName" maxlength="100" value="${esc(event?.name||'')}" placeholder="Ex : Daytona 8H" required>
       <label class="form-label" for="eventDuration">Durée de la course (heures)</label><input id="eventDuration" name="eventDuration" type="number" min="1" max="24" step="1" value="${esc(event?.durationHours||6)}" required><p class="creation-help">Cette durée crée automatiquement une case de disponibilité pour chaque heure de course.</p>
       <label class="form-label" for="eventType">Type d’événement</label><select id="eventType" name="eventType" class="event-type-select">${Object.entries(EVENT_TYPES).map(([key,item])=>`<option value="${key}" ${((event?.eventType||'private')===key)?'selected':''}>${item.label}</option>`).join('')}</select><p class="creation-help">La couleur sera visible sur la page des événements et dans le détail de la course.</p>
+      <label class="form-label" for="eventCircuit">Circuit</label><select id="eventCircuit" name="eventCircuit" class="event-circuit-select" required><option value="">Sélectionner un circuit</option>${CIRCUITS.map(c=>`<option value="${c.id}" ${(event?.circuit||'')===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select><p class="creation-help">Les images doivent être placées dans <code>public/images/circuits/</code> avec le nom du circuit (par exemple <code>daytona.png</code>).</p>
       <fieldset class="creation-fieldset"><legend class="form-label">Catégories autorisées</legend><p class="creation-help">Une ou plusieurs catégories.</p>
         <div class="event-category-options">${CATEGORIES.map(category=>`<label class="event-category-option ${categories[category].css}"><input type="checkbox" name="eventCategory" value="${esc(category)}" ${event?.categories.includes(category)?'checked':''}>${logo(category)}<span>${esc(category)}</span></label>`).join('')}</div></fieldset>
       <fieldset class="creation-fieldset"><legend class="form-label">Départs possibles</legend><p class="creation-help">Les dates et heures sont celles de Paris, pour tous les pilotes.</p>
@@ -279,8 +302,9 @@ async function submitRegistration(form) {
   await refreshAfterSave('Inscription enregistrée.');
 }
 async function submitEvent(form) {
-  const data={name:form.elements.eventName.value.trim(),durationHours:Number(form.elements.eventDuration.value),eventType:form.elements.eventType.value,categories:[...form.querySelectorAll('[name="eventCategory"]:checked')].map(input=>input.value),departures:[...form.querySelectorAll('.departure-field')].map(row=>({id:row.dataset.id||undefined,date:row.querySelector('[name="date"]').value,time:row.querySelector('[name="time"]').value})),version:editingEvent?.version};
+  const data={name:form.elements.eventName.value.trim(),durationHours:Number(form.elements.eventDuration.value),eventType:form.elements.eventType.value,circuit:form.elements.eventCircuit.value,categories:[...form.querySelectorAll('[name="eventCategory"]:checked')].map(input=>input.value),departures:[...form.querySelectorAll('.departure-field')].map(row=>({id:row.dataset.id||undefined,date:row.querySelector('[name="date"]').value,time:row.querySelector('[name="time"]').value})),version:editingEvent?.version};
   if(!data.categories.length)throw Error('Sélectionne au moins une catégorie.');
+  if(!data.circuit)throw Error('Sélectionne le circuit de la course.');
   const editing=!!editingEvent;
   const result=await api(editing?`/api/events/${editingEvent.id}`:'/api/events',editing?'PATCH':'POST',data);
   if(editing){currentEventId=editingEvent.id;page='event';}else{page='home';currentEventId=null;}
@@ -383,6 +407,12 @@ document.addEventListener('change',event=>{
   if(field.name==='crewCar'&&crewDraft)crewDraft.car=field.value;
 });
 document.addEventListener('input',event=>{if(!crewDraft)return;const key={crewName:'name'}[event.target.name];if(key)crewDraft[key]=event.target.value;});
+document.addEventListener('error',event=>{
+  const image=event.target;
+  if(!(image instanceof HTMLImageElement)||!image.matches('.circuit-visual img'))return;
+  const slug=image.dataset.circuit, attempts=Number(image.dataset.attempts||0), sources=[`/images/${slug}.png`,`/images/circuits/${slug}.jpg`,`/images/${slug}.jpg`,`/images/circuits/${slug}.webp`,`/images/${slug}.webp`];
+  if(attempts<sources.length){image.dataset.attempts=String(attempts+1);image.src=sources[attempts];}else image.remove();
+},true);
 document.addEventListener('change',event=>{
   if(event.target.id!=='departure-select')return;
   if(busy||(crewDraft&&!confirm('Quitter le formulaire d’équipage sans l’enregistrer ?'))){event.target.value=selectedDepartureId;return;}

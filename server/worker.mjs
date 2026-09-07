@@ -1,5 +1,6 @@
 const CATEGORIES = ['Hypercar', 'LMP2 ELMS', 'LMP2 WEC', 'LMP3', 'GT3', 'GTE'];
 const EVENT_TYPES = ['special', 'lmu', 'private'];
+const CIRCUITS = ['bahrain','barcelona','cota','daytona','fuji','imola','interlagos','laguna-seca','le-mans','lusail','monza','nurburgring','paul-ricard','portimao','sebring','silverstone','spa'];
 const CARS = {
   Hypercar: ['Alpine A424','Aston Martin Valkyrie AMR LMH','BMW M Hybrid V8','Cadillac V-Series.R','Ferrari 499P','Genesis GMR-001 LMDh','Glickenhaus SCG 007','Isotta Fraschini Tipo 6-C','Lamborghini SC63','Peugeot 9X8','Porsche 963','Toyota GR010 Hybrid','Vanwall Vandervell 680'],
   'LMP2 ELMS': ['Oreca 07 Gibson ELMS'],
@@ -109,6 +110,8 @@ function validateEvent(input, existing = null) {
   if (!Number.isInteger(durationHours) || durationHours < 1 || durationHours > 24) fail(400, 'La durée doit être comprise entre 1 et 24 heures.');
   const eventType = input.eventType || 'private';
   if (!EVENT_TYPES.includes(eventType)) fail(400, 'Type d’événement invalide.');
+  const circuit = input.circuit == null ? (existing?.circuit || '') : (input.circuit === '' ? '' : text(input.circuit, 40, 'Circuit'));
+  if (circuit && !CIRCUITS.includes(circuit)) fail(400, 'Choisis un circuit proposé.');
   if (!Array.isArray(input.categories) || !input.categories.length || input.categories.some(c => !CATEGORIES.includes(c))) fail(400, 'Choisis au moins une catégorie autorisée.');
   if (!Array.isArray(input.departures) || !input.departures.length || input.departures.length > 30) fail(400, 'Ajoute entre 1 et 30 départs.');
   const known = existing ? JSON.parse(existing.departures) : [];
@@ -124,7 +127,7 @@ function validateEvent(input, existing = null) {
     if (previous && previous.startsAt <= Date.now() && startsAt !== previous.startsAt) fail(400, 'Un départ passé ne peut plus être déplacé.');
     return {id: departureId, date: item.date, time: item.time, startsAt};
   }).sort((a, b) => a.startsAt - b.startsAt);
-  return {name, durationHours, eventType, categories: [...new Set(input.categories)], departures};
+  return {name, durationHours, eventType, circuit, categories: [...new Set(input.categories)], departures};
 }
 function validateRegistration(input, event) {
   const name = text(input.name, 30, 'Pseudo');
@@ -172,7 +175,7 @@ async function listEvents(env, actor) {
   const memberships = (await env.DB.prepare('SELECT crew_id,registration_id FROM crew_members').all()).results;
   const grouped = new Map();
   for (const reg of registrations) { const key = `${reg.event_id}:${reg.departure_id}`; if (!grouped.has(key)) grouped.set(key, []); grouped.get(key).push(publicRegistration(reg, actor)); }
-  return rows.map(row => ({id:row.id, name:row.name, durationHours:Number(row.duration_hours)||3, eventType:row.event_type||'private', categories:JSON.parse(row.categories), version:row.version, departures:JSON.parse(row.departures).map(d => ({...d, availability:grouped.get(`${row.id}:${d.id}`) || [], crews:crews.filter(c=>c.event_id===row.id&&c.departure_id===d.id).map(c=>({id:c.id,name:c.name,category:c.category,car:c.car,version:c.version,registrationIds:memberships.filter(m=>m.crew_id===c.id).map(m=>m.registration_id)}))}))}));
+  return rows.map(row => ({id:row.id, name:row.name, circuit:row.circuit||'', durationHours:Number(row.duration_hours)||3, eventType:row.event_type||'private', categories:JSON.parse(row.categories), version:row.version, departures:JSON.parse(row.departures).map(d => ({...d, availability:grouped.get(`${row.id}:${d.id}`) || [], crews:crews.filter(c=>c.event_id===row.id&&c.departure_id===d.id).map(c=>({id:c.id,name:c.name,category:c.category,car:c.car,version:c.version,registrationIds:memberships.filter(m=>m.crew_id===c.id).map(m=>m.registration_id)}))}))}));
 }
 async function oauthStart(request, env) {
   requireDiscord(env); await rateLimit(request, env, 'oauth', 20); await cleanup(env);
@@ -289,7 +292,7 @@ async function api(request, env) {
   if (path === '/api/events' && method === 'POST') {
     requireRole(actor.user);
     const data = validateEvent(await body(request)), eventId = id();
-    await env.DB.prepare('INSERT INTO events(id,name,duration_hours,event_type,categories,departures,created_by,created_at) VALUES(?,?,?,?,?,?,?,?)').bind(eventId, data.name, data.durationHours, data.eventType, JSON.stringify(data.categories), JSON.stringify(data.departures), actor.user.id, now()).run();
+    await env.DB.prepare('INSERT INTO events(id,name,duration_hours,event_type,circuit,categories,departures,created_by,created_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(eventId, data.name, data.durationHours, data.eventType, data.circuit, JSON.stringify(data.categories), JSON.stringify(data.departures), actor.user.id, now()).run();
     return json({id:eventId}, 201);
   }
   const eventMatch = path.match(/^\/api\/events\/([a-f0-9-]{36})$/);
@@ -304,10 +307,10 @@ async function api(request, env) {
     }
     const data = validateEvent(input, event), cats = JSON.stringify(data.categories), deps = JSON.stringify(data.departures);
     // Keep booked departures and their categories valid, including concurrent registrations.
-    const result = await env.DB.prepare(`UPDATE events SET name=?,duration_hours=?,event_type=?,categories=?,departures=?,version=version+1 WHERE id=? AND version=?
+    const result = await env.DB.prepare(`UPDATE events SET name=?,duration_hours=?,event_type=?,circuit=?,categories=?,departures=?,version=version+1 WHERE id=? AND version=?
       AND NOT EXISTS (SELECT 1 FROM registrations r WHERE r.event_id=events.id AND
         (NOT EXISTS (SELECT 1 FROM json_each(?) d WHERE json_extract(d.value,'$.id')=r.departure_id)
-      OR (r.category!='' AND NOT EXISTS (SELECT 1 FROM json_each(?) c WHERE c.value=r.category))))`).bind(data.name, data.durationHours, data.eventType, cats, deps, event.id, input.version, deps, cats).run();
+      OR (r.category!='' AND NOT EXISTS (SELECT 1 FROM json_each(?) c WHERE c.value=r.category))))`).bind(data.name, data.durationHours, data.eventType, data.circuit, cats, deps, event.id, input.version, deps, cats).run();
     if (!result.meta.changes) fail(409, 'Modification impossible : événement modifié ailleurs, départ supprimé avec des inscrits, ou catégorie encore utilisée.');
     return json({ok:true});
   }

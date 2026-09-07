@@ -43,7 +43,7 @@ Gardez l’adresse gratuite actuelle. Une seule adresse canonique est acceptée 
 3. Exécutez le contenu de `migrations/0001_initial.sql`, une seule fois. Si la console ne prend qu’une instruction à la fois, exécutez les instructions dans leur ordre.
 4. Vérifiez la présence des tables `users`, `sessions`, `oauth_states`, `events`, `registrations`, `rate_limits`, `crews` et `crew_members`.
 
-Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0006` sont déjà appliquées ; pour cette version, une base déjà à jour jusqu’à `0006` doit recevoir uniquement `migrations/0007_registration_car_preferences.sql`.
+Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0007` sont déjà appliquées ; pour cette version, une base déjà à jour jusqu’à `0007` doit recevoir uniquement `migrations/0008_event_circuit.sql`.
 
 ## 3. Créer l’application Discord
 

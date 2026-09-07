@@ -16,6 +16,7 @@ function harness(){
  DB.db.exec(readFileSync(new URL('../migrations/0005_registration_preference.sql',import.meta.url),'utf8'));
  DB.db.exec(readFileSync(new URL('../migrations/0006_registration_car.sql',import.meta.url),'utf8'));
  DB.db.exec(readFileSync(new URL('../migrations/0007_registration_car_preferences.sql',import.meta.url),'utf8'));
+ DB.db.exec(readFileSync(new URL('../migrations/0008_event_circuit.sql',import.meta.url),'utf8'));
  const env={DB,APP_ORIGIN:ROOT,DISCORD_CLIENT_ID:'app-id',DISCORD_CLIENT_SECRET:'test-only-secret',ADMIN_DISCORD_IDS:ADMIN,ASSETS:{fetch:async()=>new Response('static')}};
  const jars=new Map();
  async function req(path,method='GET',data,actor='guest',options={}){

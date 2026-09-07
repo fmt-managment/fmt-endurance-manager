@@ -1394,3 +1394,59 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .crew-coverage { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .coverage-heading span:nth-child(2) { display: none; }
 }
+
+/* Course recap and foldable departure panels. */
+.race-recap { margin: 20px 0 24px; padding: 24px; border: 1px solid #39464a; border-radius: 16px; background: linear-gradient(135deg,#172126,#101416 70%); }
+.recap-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.recap-kicker { margin: 0 0 8px; color: #7ee38f; font-size: 13px; font-weight: 800; letter-spacing: .12em; }
+.recap-intro h2 { margin: 0; font-size: clamp(24px,4vw,34px); }
+.recap-intro p:not(.recap-kicker) { margin: 8px 0 0; color: #b6c4c5; font-size: 15px; }
+.recap-countdown { min-width: 150px; padding: 12px 14px; border: 1px solid #42535a; border-radius: 10px; color: #b6c4c5; font-size: 13px; text-align: right; }
+.recap-countdown strong { display: block; margin-top: 5px; color: #f2f7f6; font-size: 16px; }
+.recap-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin: 22px 0; }
+.recap-stats div { padding: 14px; border: 1px solid #334146; border-radius: 10px; background: rgba(7,12,14,.45); }
+.recap-stats strong, .recap-stats span { display: block; }
+.recap-stats strong { font-size: 22px; color: #f5fbf8; }
+.recap-stats span { margin-top: 4px; color: #9eafb1; font-size: 13px; }
+.recap-categories { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: #aebcbe; font-size: 14px; }
+.departure-accordion { display: grid; gap: 12px; }
+.departure-fold { overflow: hidden; border: 1px solid #354247; border-radius: 14px; background: #111719; }
+.departure-fold[open] { border-color: #56716d; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+.departure-fold > summary { display: grid; grid-template-columns: 46px minmax(0,1fr) auto auto; align-items: center; gap: 14px; min-height: 82px; padding: 14px 18px; cursor: pointer; list-style: none; }
+.departure-fold > summary::-webkit-details-marker { display: none; }
+.departure-fold > summary::after { content: '+'; width: 28px; height: 28px; border: 1px solid #536166; border-radius: 50%; color: #b8c5c6; font-size: 22px; line-height: 25px; text-align: center; }
+.departure-fold[open] > summary::after { content: '−'; }
+.fold-index { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 9px; background: #263439; color: #9feab0; font-size: 15px; font-weight: 800; }
+.fold-date strong, .fold-date span { display: block; }
+.fold-date strong { color: #f0f5f4; font-size: 17px; }
+.fold-date span { margin-top: 5px; color: #9eafb1; font-size: 14px; }
+.fold-meta, .fold-countdown { color: #b8c5c6; font-size: 14px; white-space: nowrap; }
+.fold-countdown { min-width: 94px; text-align: right; }
+.departure-fold-body { padding: 0 22px 24px; border-top: 1px solid #2f3a3e; }
+.fold-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0; color: #aebcbe; font-size: 14px; }
+.fold-toolbar button { min-height: 40px; }
+.fold-section { margin-top: 18px; padding: 18px; border: 1px solid #2d3a3e; border-radius: 12px; background: #151c1f; }
+.fold-section > h2 { margin: 0 0 14px; font-size: 19px; }
+.fold-section .pilot-section, .fold-section .crew-section { padding: 0; }
+.fold-section .pilot-section-title { display: none; }
+.fold-section .crew-heading h2 { display: none; }
+.fold-section .crew-heading { margin-bottom: 6px; }
+.fold-registration .registration-form { padding: 0; }
+.fold-registration .form-title { margin-top: 0; }
+.fold-registration .form-section > input { max-width: 100%; }
+.departure-fold .empty { margin: 0; }
+@media(max-width:700px) {
+  .race-recap { padding: 16px; }
+  .recap-intro { flex-direction: column; gap: 12px; }
+  .recap-countdown { width: 100%; text-align: left; }
+  .recap-stats { grid-template-columns: repeat(2,minmax(0,1fr)); margin: 16px 0; }
+  .departure-fold > summary { grid-template-columns: 38px minmax(0,1fr) 26px; gap: 10px; padding: 12px; }
+  .fold-index { width: 34px; height: 34px; }
+  .fold-date strong { font-size: 15px; }
+  .fold-date span, .fold-meta, .fold-countdown { font-size: 13px; }
+  .fold-meta { grid-column: 2; }
+  .fold-countdown { display: none; }
+  .departure-fold-body { padding: 0 10px 14px; }
+  .fold-toolbar { align-items: flex-start; flex-direction: column; }
+  .fold-section { padding: 12px; }
+}

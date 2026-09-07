@@ -13,18 +13,18 @@ function interfaceHarness(role='pilot',duration=6) {
   vm.runInContext(`events=${JSON.stringify([event])};user={role:${JSON.stringify(role)}};currentEventId='event';`,context);
   return {app,context,run:code=>vm.runInContext(code,context)};
 }
-test('one selected departure, three views, read-only crews for pilots, escaped names',()=>{
+test('course recap, foldable departures, read-only crews for pilots, escaped names',()=>{
   const h=interfaceHarness();h.run('renderEvent()');
-  assert(h.app.innerHTML.includes('id="departure-first"'));assert(!h.app.innerHTML.includes('id="departure-second"'));
-  assert.equal((h.app.innerHTML.match(/data-action="event-view"/g)||[]).length,3);
-  assert(h.app.innerHTML.includes('aria-pressed="true"'));
+  assert(h.app.innerHTML.includes('RÉCAPITULATIF DE LA COURSE'));
+  assert(h.app.innerHTML.includes('id="departure-first"'));assert(h.app.innerHTML.includes('id="departure-second"'));
+  assert.equal((h.app.innerHTML.match(/class="departure-fold"/g)||[]).length,2);
   h.run("eventView='crews';renderEvent()");
   assert(h.app.innerHTML.includes('6/6 h couvertes'));
   assert(h.app.innerHTML.includes('FMT &lt;test&gt;'));
   assert(!h.app.innerHTML.includes('data-action="new-crew"'));
   assert(!h.app.innerHTML.includes('data-action="add-crew-pilot"'));
-  h.run("selectedDepartureId='second';renderEvent()");
-  assert(h.app.innerHTML.includes('Aucun équipage créé'));assert(!h.app.innerHTML.includes('id="departure-first"'));
+  assert(h.app.innerHTML.includes('Mon inscription'));
+  assert(!h.app.innerHTML.includes('data-action="event-view"'));
 });
 test('organizer crew controls and hourly palette scale to 1, 4, 6 and 24 hours',async()=>{
   for(const duration of [1,4,6,24]) {

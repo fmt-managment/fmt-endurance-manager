@@ -1152,6 +1152,25 @@ input:focus {
   }
 }
 
+
+.event-creation .form-label { font-size: 14px; }
+.creation-fieldset { border: 0; padding: 0; min-width: 0; }
+.creation-help { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+.event-category-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.event-category-option { display: flex; align-items: center; gap: 10px; padding: 14px; background: var(--panel2); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 16px; }
+.event-category-option input { width: 18px; height: 18px; margin: 0; accent-color: var(--green); }
+.event-category-option:has(input:checked) { border-color: var(--green); background: #14251b; }
+.event-creation input { font-size: 16px; min-width: 0; }
+.event-creation .departure-field { align-items: end; }
+.event-creation .remove-departure { height: 42px; }
+.remove-departure:disabled { opacity: .35; cursor: default; }
+.add-departure-button { margin-top: 12px; }
+.creation-error { color: #ff9999; font-size: 16px; }
+.event-creation button:focus-visible, .event-creation input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .event-category-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .event-creation .departure-field { grid-template-columns: minmax(0, 1fr) minmax(0, .75fr) 36px; gap: 6px; }
+}
 </style>
 </head>
 
@@ -1199,6 +1218,16 @@ input:focus {
 
 
 <script>
+const EVENT_CATEGORIES = ["Hypercar", "LMP2 ELMS", "LMP2 WEC", "LMP3", "GT3", "GTE"];
+
+function getEventCategories(event) {
+  // Preserve the categories of events saved before category configuration existed.
+  return Array.isArray(event.categories) && event.categories.length
+    ? event.categories
+    : ["Hypercar", "LMP2", "LMP3", "GT3"];
+}
+
+
 
 
 /* =========================================================
@@ -1229,6 +1258,9 @@ const categoryImages = {
   Hypercar: "images/HC.png",
 
   LMP2: "images/LMP2.png",
+  "LMP2 ELMS": "images/LMP2.png",
+  "LMP2 WEC": "images/LMP2.png",
+  GTE: "images/GT3.png",
 
   LMP3: "images/P3.png",
 
@@ -1710,7 +1742,7 @@ function renderEvent() {
       </div>
 
       <div class="event-subtitle">
-
+        ${getEventCategories(event).map(escapeHtml).join(" · ")}<br>
         ${event.departures.length}
 
         départ${
@@ -2040,12 +2072,7 @@ function renderPilotGroups(
   finished
 ) {
 
-  const categories = [
-    "Hypercar",
-    "LMP2",
-    "LMP3",
-    "GT3"
-  ];
+  const categories = [...EVENT_CATEGORIES, "LMP2"];
 
 
   let html = "";
@@ -2482,33 +2509,9 @@ function renderForm(
 
         <div class="categories">
 
-          ${renderCategoryButton(
-            departure.id,
-            "Hypercar",
-            state.category ===
-              "Hypercar"
-          )}
-
-          ${renderCategoryButton(
-            departure.id,
-            "LMP2",
-            state.category ===
-              "LMP2"
-          )}
-
-          ${renderCategoryButton(
-            departure.id,
-            "LMP3",
-            state.category ===
-              "LMP3"
-          )}
-
-          ${renderCategoryButton(
-            departure.id,
-            "GT3",
-            state.category ===
-              "GT3"
-          )}
+          ${getEventCategories(event).map(category => renderCategoryButton(
+            departure.id, category, state.category === category
+          )).join("")}
 
         </div>
 
@@ -2610,42 +2613,13 @@ function renderCategoryButton(
    CLASSES CATEGORIES
 ========================================================= */
 
-function getCategoryButtonClass(
-  category
-) {
-
-  if (
-    category ===
-    "Hypercar"
-  ) {
-    return "hyper";
-  }
-
-  if (
-    category ===
-    "LMP2"
-  ) {
-    return "lmp2";
-  }
-
-  if (
-    category ===
-    "LMP3"
-  ) {
-    return "lmp3";
-  }
-
-  if (
-    category ===
-    "GT3"
-  ) {
-    return "gt3";
-  }
-
+function getCategoryButtonClass(category) {
+  if (category === "Hypercar") return "hyper";
+  if (["LMP2", "LMP2 ELMS", "LMP2 WEC"].includes(category)) return "lmp2";
+  if (category === "LMP3") return "lmp3";
+  if (["GT3", "GTE"].includes(category)) return "gt3";
   return "";
-
 }
-
 
 /* =========================================================
    ETAT FORMULAIRE
@@ -3081,6 +3055,11 @@ function saveAvailability(
   }
 
 
+  if (status !== "unavailable" && !getEventCategories(event).includes(state.category)) {
+    alert("Choisis une catégorie autorisée pour cet événement.");
+    return;
+  }
+
   const existingIndex =
     departure.availability
       .findIndex(
@@ -3396,287 +3375,124 @@ function toggleDeparture(
 ========================================================= */
 
 function showCreateEvent() {
-
   currentEventId = null;
-
   editingPilot = null;
-
   departureFieldCount = 0;
-
-
-  document.getElementById(
-    "app"
-  ).innerHTML = `
-
-    <button
-      class="secondary-button back-button"
-      onclick="renderHome()"
-    >
-      ← Retour
-    </button>
-
-
-    <div class="page-title">
-      NOUVEL ÉVÉNEMENT
-    </div>
-
-
-    <div class="page-subtitle">
-      Créer une nouvelle course d'endurance
-    </div>
-
-
-    <div class="form-panel">
-
+  document.getElementById("app").innerHTML = `
+    <button class="secondary-button back-button" onclick="renderHome()">← Retour</button>
+    <div class="page-title">NOUVEL ÉVÉNEMENT</div>
+    <div class="page-subtitle">Créer une course d'endurance</div>
+    <form id="createEventForm" class="form-panel event-creation" novalidate onsubmit="event.preventDefault(); createEvent()">
       <div class="form-group">
-
-        <label class="form-label">
-          Nom de l'événement
-        </label>
-
-        <input
-          id="eventName"
-          type="text"
-          placeholder="Ex : Spa 6H"
-        >
-
+        <label class="form-label" for="eventName">Nom de l'événement</label>
+        <input id="eventName" type="text" maxlength="100" required placeholder="Ex : Daytona 8H">
       </div>
-
-
-      <div class="form-group">
-
-        <label class="form-label">
-          Départs
-        </label>
-
-        <div
-          id="departureFields"
-          class="departure-fields"
-        ></div>
-
-      </div>
-
-
-      <button
-        class="secondary-button"
-        onclick="addDepartureField()"
-      >
-        + Ajouter un départ
-      </button>
-
-
-      <div style="height:15px"></div>
-
-
-      <button
-        class="primary-button"
-        onclick="createEvent()"
-      >
-        CRÉER L'ÉVÉNEMENT
-      </button>
-
-    </div>
-
-  `;
-
-
+      <fieldset class="form-group creation-fieldset">
+        <legend class="form-label">Catégories autorisées</legend>
+        <p class="creation-help">Sélectionne une ou plusieurs catégories pour cette course.</p>
+        <div class="event-category-options">
+          ${EVENT_CATEGORIES.map(category => `
+            <label class="event-category-option">
+              <input type="checkbox" name="eventCategory" value="${escapeHtml(category)}">
+              <span>${escapeHtml(category)}</span>
+            </label>`).join("")}
+        </div>
+      </fieldset>
+      <fieldset class="form-group creation-fieldset">
+        <legend class="form-label">Départs possibles</legend>
+        <div id="departureFields" class="departure-fields"></div>
+        <button type="button" class="secondary-button add-departure-button" onclick="addDepartureField()">+ Ajouter un départ</button>
+      </fieldset>
+      <p id="creationError" class="creation-error" role="alert" tabindex="-1" hidden></p>
+      <button type="submit" class="primary-button">CRÉER L'ÉVÉNEMENT</button>
+    </form>`;
   addDepartureField();
-
 }
 
-
-/* =========================================================
-   AJOUT DEPART
-========================================================= */
-
-function addDepartureField(
-  date = "",
-  time = ""
-) {
-
-  departureFieldCount++;
-
-
-  const id =
-    "departureField" +
-    departureFieldCount;
-
-
-  const container =
-    document.getElementById(
-      "departureFields"
-    );
-
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-
-  div.className =
-    "departure-field";
-
-
+function addDepartureField(date = "", time = "") {
+  const id = "departureField" + ++departureFieldCount;
+  const div = document.createElement("div");
+  div.className = "departure-field";
   div.id = id;
-
-
   div.innerHTML = `
-
-    <input
-      type="date"
-      class="new-departure-date"
-      value="${date}"
-    >
-
-
-    <input
-      type="time"
-      class="new-departure-time"
-      value="${time}"
-    >
-
-
-    <button
-      class="remove-departure"
-      onclick="document.getElementById('${id}').remove()"
-    >
-      ×
-    </button>
-
-  `;
-
-
-  container.appendChild(
-    div
-  );
-
+    <div><label class="form-label" for="${id}Date">Date</label>
+      <input id="${id}Date" type="date" class="new-departure-date" required value="${escapeHtml(date)}"></div>
+    <div><label class="form-label" for="${id}Time">Heure</label>
+      <input id="${id}Time" type="time" class="new-departure-time" required value="${escapeHtml(time)}"></div>
+    <button type="button" class="remove-departure" aria-label="Supprimer ce départ" onclick="removeDepartureField('${id}')">×</button>`;
+  document.getElementById("departureFields").appendChild(div);
+  updateDepartureRemoveButtons();
 }
 
+function updateDepartureRemoveButtons() {
+  const buttons = document.querySelectorAll("#departureFields .remove-departure");
+  buttons.forEach(button => button.disabled = buttons.length === 1);
+}
 
-/* =========================================================
-   CREER EVENEMENT
-========================================================= */
+function removeDepartureField(id) {
+  if (document.querySelectorAll("#departureFields .departure-field").length <= 1) return;
+  document.getElementById(id)?.remove();
+  updateDepartureRemoveButtons();
+}
+
+function showCreationError(message, field) {
+  const error = document.getElementById("creationError");
+  error.textContent = message;
+  error.hidden = false;
+  (field || error).focus();
+}
 
 function createEvent() {
-
-  const name =
-    document
-      .getElementById(
-        "eventName"
-      )
-      .value
-      .trim();
-
-
-  if (!name) {
-
-    alert(
-      "Donne un nom à l'événement."
-    );
-
+  const nameInput = document.getElementById("eventName");
+  const name = nameInput.value.trim();
+  document.getElementById("creationError").hidden = true;
+  if (!name || name.length > 100) {
+    showCreationError("Indique un nom d'événement de 1 à 100 caractères.", nameInput);
     return;
-
   }
-
-
-  const fields =
-    document.querySelectorAll(
-      ".departure-field"
-    );
-
-
+  const categories = Array.from(document.querySelectorAll('input[name="eventCategory"]:checked'))
+    .map(input => input.value).filter(category => EVENT_CATEGORIES.includes(category));
+  if (!categories.length) {
+    showCreationError("Sélectionne au moins une catégorie.", document.querySelector('input[name="eventCategory"]'));
+    return;
+  }
+  const fields = Array.from(document.querySelectorAll("#departureFields .departure-field"));
+  if (!fields.length) {
+    showCreationError("Ajoute au moins un départ.");
+    return;
+  }
   const departures = [];
-
-
-  fields.forEach(
-    field => {
-
-      const date =
-        field
-          .querySelector(
-            ".new-departure-date"
-          )
-          .value;
-
-
-      const time =
-        field
-          .querySelector(
-            ".new-departure-time"
-          )
-          .value;
-
-
-      if (
-        date &&
-        time
-      ) {
-
-        departures.push({
-
-          id:
-            generateId(),
-
-          date,
-
-          time,
-
-          availability: []
-
-        });
-
-      }
-
+  const seen = new Set();
+  for (const [index, field] of fields.entries()) {
+    const dateInput = field.querySelector(".new-departure-date");
+    const timeInput = field.querySelector(".new-departure-time");
+    const date = dateInput.value;
+    const time = timeInput.value;
+    if (!date || !time || !dateInput.checkValidity() || !timeInput.checkValidity() ||
+        !Number.isFinite(new Date(date + "T" + time).getTime())) {
+      showCreationError(`Complète la date et l'heure du départ ${index + 1}.`, !date || !dateInput.checkValidity() ? dateInput : timeInput);
+      return;
     }
-  );
-
-
-  if (!departures.length) {
-
-    alert(
-      "Ajoute au moins un départ avec une date et une heure."
-    );
-
-    return;
-
+    const key = date + "T" + time;
+    if (seen.has(key)) {
+      showCreationError(`Le départ ${index + 1} a la même date et la même heure qu'un autre départ.`, dateInput);
+      return;
+    }
+    seen.add(key);
+    departures.push({id: generateId(), date, time, availability: []});
   }
-
-
-  departures.sort(
-    (a, b) =>
-      getDepartureTimestamp(a) -
-      getDepartureTimestamp(b)
-  );
-
-
-  const newEvent = {
-
-    id:
-      generateId(),
-
-    name,
-
-    departures
-
-  };
-
-
-  events.push(
-    newEvent
-  );
-
-
-  saveEvents();
-
-
-  openEvent(
-    newEvent.id
-  );
-
+  departures.sort((a, b) => getDepartureTimestamp(a) - getDepartureTimestamp(b));
+  const newEvent = {id: generateId(), name, categories, departures};
+  events.push(newEvent);
+  try {
+    saveEvents();
+  } catch (error) {
+    events.pop();
+    showCreationError("L'enregistrement a échoué. Vérifie que le stockage du navigateur est autorisé, puis réessaie.");
+    return;
+  }
+  openEvent(newEvent.id);
 }
-
-
 
 /* =========================================================
    CHAMPIONNAT DEMO OCTOBRE 2026

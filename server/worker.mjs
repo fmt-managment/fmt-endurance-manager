@@ -1,0 +1,291 @@
+const CATEGORIES = ['Hypercar', 'LMP2 ELMS', 'LMP2 WEC', 'LMP3', 'GT3', 'GTE'];
+const COOKIE_SESSION = '__Host-fmt_session';
+const COOKIE_GUEST = '__Host-fmt_guest';
+const COOKIE_STATE = '__Host-fmt_oauth';
+const DAY = 86400;
+class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
+const fail = (status, message) => { throw new HttpError(status, message); };
+const now = () => Math.floor(Date.now() / 1000);
+const id = () => crypto.randomUUID();
+function token() { return Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join(''); }
+async function hash(value) { return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))), b => b.toString(16).padStart(2, '0')).join(''); }
+function cookie(request, name) {
+  return (request.headers.get('Cookie') || '').split(';').map(x => x.trim()).find(x => x.startsWith(name + '='))?.slice(name.length + 1) || '';
+}
+function setCookie(name, value, age) { return `${name}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${age}`; }
+function json(data, status = 200, cookies = []) {
+  const headers = new Headers({'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer'});
+  for (const c of cookies) headers.append('Set-Cookie', c);
+  return new Response(JSON.stringify(data), {status, headers});
+}
+function redirect(location, cookies = []) {
+  const response = json({}, 302, cookies); response.headers.set('Location', location); return response;
+}
+function origin(env) {
+  let parsed;
+  try { parsed = new URL(env.APP_ORIGIN); } catch { fail(503, 'Le site attend sa configuration Cloudflare.'); }
+  if (parsed.protocol !== 'https:' || parsed.origin !== env.APP_ORIGIN) fail(503, 'L’adresse du site doit être une origine HTTPS sans barre finale.');
+  return parsed.origin;
+}
+function requireDiscord(env) {
+  if (!env.DISCORD_CLIENT_ID || !env.DISCORD_CLIENT_SECRET) fail(503, 'La connexion Discord n’est pas encore configurée.');
+}
+const administrators = env => String(env.ADMIN_DISCORD_IDS || '').split(',').map(x => x.trim()).filter(x => /^\d{15,22}$/.test(x));
+function publicUser(row, env) { return row ? {id: row.id, name: row.name, role: administrators(env).includes(row.id) ? 'admin' : row.role} : null; }
+function requireRole(user, admin = false) {
+  if (!user) fail(401, 'Connecte-toi avec Discord.');
+  if (admin ? user.role !== 'admin' : !['admin', 'organizer'].includes(user.role)) fail(403, 'Tu n’as pas l’autorisation de gérer les événements.');
+}
+async function identity(request, env) {
+  const raw = cookie(request, COOKIE_SESSION);
+  let user = null;
+  if (/^[a-f0-9]{64}$/.test(raw)) {
+    const row = await env.DB.prepare('SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?').bind(await hash(raw), now()).first();
+    user = publicUser(row, env);
+  }
+  const guest = cookie(request, COOKIE_GUEST);
+  return {user, guestHash: /^[a-f0-9]{64}$/.test(guest) ? await hash(guest) : null, guestToken: /^[a-f0-9]{64}$/.test(guest) ? guest : null};
+}
+function owned(reg, actor) { return !!((actor.user && reg.user_id === actor.user.id) || (actor.guestHash && reg.guest_hash === actor.guestHash)); }
+async function body(request) {
+  if (!request.headers.get('Content-Type')?.startsWith('application/json')) fail(415, 'Format JSON requis.');
+  const reader = request.body?.getReader();
+  if (!reader) fail(400, 'Formulaire vide.');
+  let size = 0; const chunks = [];
+  while (true) { const {value, done} = await reader.read(); if (done) break; size += value.length; if (size > 24000) { await reader.cancel(); fail(413, 'Formulaire trop volumineux.'); } chunks.push(value); }
+  const all = new Uint8Array(size); let offset = 0;
+  for (const chunk of chunks) { all.set(chunk, offset); offset += chunk.length; }
+  try { const value = JSON.parse(new TextDecoder().decode(all)); if (!value || Array.isArray(value) || typeof value !== 'object') throw Error(); return value; } catch { fail(400, 'Formulaire invalide.'); }
+}
+async function rateLimit(request, env, kind, limit) {
+  const bucket = Math.floor(now() / 600);
+  const key = await hash(`${kind}:${request.headers.get('CF-Connecting-IP') || 'local'}:${bucket}`);
+  const row = await env.DB.prepare('INSERT INTO rate_limits(key,count,expires_at) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1 RETURNING count').bind(key, (bucket + 1) * 600).first();
+  if (row.count > limit) fail(429, 'Trop de tentatives. Réessaie dans quelques minutes.');
+}
+async function cleanup(env) {
+  const timestamp = now();
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM oauth_states WHERE state_hash IN (SELECT state_hash FROM oauth_states WHERE expires_at<? LIMIT 500)').bind(timestamp),
+    env.DB.prepare('DELETE FROM sessions WHERE token_hash IN (SELECT token_hash FROM sessions WHERE expires_at<? LIMIT 500)').bind(timestamp),
+    env.DB.prepare('DELETE FROM rate_limits WHERE key IN (SELECT key FROM rate_limits WHERE expires_at<? LIMIT 500)').bind(timestamp)
+  ]);
+}
+function text(value, max, label) {
+  if (typeof value !== 'string' || !value.trim() || value.trim().length > max) fail(400, `${label} : indique de 1 à ${max} caractères.`);
+  return value.trim();
+}
+// Convert a Europe/Paris local time explicitly, rejecting nonexistent DST times.
+function parisTimestamp(date, time) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) fail(400, 'Date ou heure invalide.');
+  const [y, m, d] = date.split('-').map(Number), [h, min] = time.split(':').map(Number);
+  if (y < 2020 || y > 2100 || h > 23 || min > 59) fail(400, 'Date ou heure invalide.');
+  const utc = Date.UTC(y, m - 1, d, h, min);
+  const fmt = new Intl.DateTimeFormat('en-GB', {timeZone: 'Europe/Paris', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'});
+  const matches = [];
+  for (const hours of [2, 1]) {
+    const stamp = utc - hours * 3600000;
+    const p = Object.fromEntries(fmt.formatToParts(stamp).map(x => [x.type, x.value]));
+    if (`${p.year}-${p.month}-${p.day}` === date && `${p.hour}:${p.minute}` === time) matches.push(stamp);
+  }
+  if (matches.length !== 1) fail(400, 'Cette heure est inexistante ou ambiguë lors du changement d’heure. Choisis un autre horaire.');
+  return matches[0];
+}
+function validateEvent(input, existing = null) {
+  const name = text(input.name, 100, 'Nom de l’événement');
+  if (!Array.isArray(input.categories) || !input.categories.length || input.categories.some(c => !CATEGORIES.includes(c))) fail(400, 'Choisis au moins une catégorie autorisée.');
+  if (!Array.isArray(input.departures) || !input.departures.length || input.departures.length > 30) fail(400, 'Ajoute entre 1 et 30 départs.');
+  const known = existing ? JSON.parse(existing.departures) : [];
+  const seen = new Set(), ids = new Set();
+  const departures = input.departures.map(item => {
+    if (!item || typeof item !== 'object') fail(400, 'Départ invalide.');
+    const startsAt = parisTimestamp(item.date, item.time);
+    if (seen.has(startsAt)) fail(400, 'Deux départs ont la même date et la même heure.'); seen.add(startsAt);
+    const previous = item.id ? known.find(d => d.id === item.id) : null;
+    if (item.id && !previous) fail(400, 'Départ inconnu.');
+    const departureId = previous?.id || id();
+    if (ids.has(departureId)) fail(400, 'Départ répété.'); ids.add(departureId);
+    if (previous && previous.startsAt <= Date.now() && startsAt !== previous.startsAt) fail(400, 'Un départ passé ne peut plus être déplacé.');
+    return {id: departureId, date: item.date, time: item.time, startsAt};
+  }).sort((a, b) => a.startsAt - b.startsAt);
+  return {name, categories: [...new Set(input.categories)], departures};
+}
+function validateRegistration(input, event) {
+  const name = text(input.name, 30, 'Pseudo');
+  const allowed = ['whole','unavailable','beginning','middle','end','beginning,middle','beginning,end','middle,end'];
+  if (!allowed.includes(input.status)) fail(400, 'Choisis une disponibilité.');
+  const category = input.status === 'unavailable' ? '' : input.category;
+  if (category && !JSON.parse(event.categories).includes(category) || input.status !== 'unavailable' && !category) fail(400, 'Choisis une catégorie de cet événement.');
+  return {name, nameKey: name.normalize('NFKC').toLocaleLowerCase('fr-FR'), status: input.status, category};
+}
+async function eventById(env, eventId) {
+  const row = await env.DB.prepare('SELECT * FROM events WHERE id=?').bind(eventId).first();
+  if (!row) fail(404, 'Événement introuvable.'); return row;
+}
+function departureById(event, departureId) {
+  const departure = JSON.parse(event.departures).find(d => d.id === departureId);
+  if (!departure) fail(404, 'Départ introuvable.');
+  return departure;
+}
+function publicRegistration(reg, actor) {
+  return {id:reg.id, name:reg.name, category:reg.category, status:reg.status, version:reg.version, mine:owned(reg, actor), canEdit:owned(reg, actor) || actor.user?.role === 'admin'};
+}
+async function listEvents(env, actor) {
+  const rows = (await env.DB.prepare('SELECT * FROM events ORDER BY created_at DESC, id DESC').all()).results;
+  const registrations = (await env.DB.prepare('SELECT * FROM registrations ORDER BY created_at').all()).results;
+  const grouped = new Map();
+  for (const reg of registrations) { const key = `${reg.event_id}:${reg.departure_id}`; if (!grouped.has(key)) grouped.set(key, []); grouped.get(key).push(publicRegistration(reg, actor)); }
+  return rows.map(row => ({id:row.id, name:row.name, categories:JSON.parse(row.categories), version:row.version, departures:JSON.parse(row.departures).map(d => ({...d, availability:grouped.get(`${row.id}:${d.id}`) || []}))}));
+}
+async function oauthStart(request, env) {
+  requireDiscord(env); await rateLimit(request, env, 'oauth', 20); await cleanup(env);
+  const state = token();
+  await env.DB.prepare('INSERT INTO oauth_states(state_hash,expires_at) VALUES(?,?)').bind(await hash(state), now() + 600).run();
+  const auth = new URL('https://discord.com/oauth2/authorize');
+  auth.search = new URLSearchParams({client_id:env.DISCORD_CLIENT_ID, response_type:'code', redirect_uri:origin(env) + '/api/auth/discord/callback', scope:'identify', state}).toString();
+  return redirect(auth.href, [setCookie(COOKIE_STATE, state, 600)]);
+}
+async function oauthCallback(request, env) {
+  requireDiscord(env);
+  const url = new URL(request.url), state = url.searchParams.get('state');
+  const clear = setCookie(COOKIE_STATE, '', 0);
+  if (!state || !/^[a-f0-9]{64}$/.test(state) || state !== cookie(request, COOKIE_STATE)) return redirect(origin(env) + '/?auth=error', [clear]);
+  const row = await env.DB.prepare('DELETE FROM oauth_states WHERE state_hash=? AND expires_at>? RETURNING state_hash').bind(await hash(state), now()).first();
+  if (!row || !url.searchParams.get('code') || url.searchParams.has('error')) return redirect(origin(env) + '/?auth=error', [clear]);
+  try {
+    const response = await fetch('https://discord.com/api/oauth2/token', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams({client_id:env.DISCORD_CLIENT_ID, client_secret:env.DISCORD_CLIENT_SECRET, grant_type:'authorization_code', code:url.searchParams.get('code'), redirect_uri:origin(env) + '/api/auth/discord/callback'}), signal:AbortSignal.timeout(10000)});
+    if (!response.ok) throw Error('token');
+    const auth = await response.json();
+    const profileResponse = await fetch('https://discord.com/api/v10/users/@me', {headers:{Authorization:`Bearer ${auth.access_token}`}, signal:AbortSignal.timeout(10000)});
+    if (!profileResponse.ok) throw Error('profile');
+    const profile = await profileResponse.json();
+    if (!/^\d{15,22}$/.test(profile.id)) throw Error('identity');
+    const display = String(profile.global_name || profile.username || 'Pilote').slice(0, 80);
+    const session = token();
+    await env.DB.batch([
+      env.DB.prepare('INSERT INTO users(id,name,created_at) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name').bind(profile.id, display, now()),
+      env.DB.prepare('INSERT INTO sessions(token_hash,user_id,expires_at) VALUES(?,?,?)').bind(await hash(session), profile.id, now() + 7 * DAY)
+    ]);
+    const old = cookie(request, COOKIE_SESSION);
+    if (old) await env.DB.prepare('DELETE FROM sessions WHERE token_hash=?').bind(await hash(old)).run();
+    return redirect(origin(env) + '/', [clear, setCookie(COOKIE_SESSION, session, 7 * DAY)]);
+  } catch {
+    return redirect(origin(env) + '/?auth=error', [clear]);
+  }
+}
+async function api(request, env) {
+  if (!env.DB) fail(503, 'La base partagée n’est pas encore configurée.');
+  const url = new URL(request.url), path = url.pathname, method = request.method;
+  const canonical = origin(env);
+  if (url.origin !== canonical) fail(403, 'Utilise l’adresse principale du site pour cette action.');
+  if (!['GET','HEAD'].includes(method)) {
+    if (request.headers.get('Origin') !== canonical) fail(403, 'Origine de la requête refusée.');
+    await rateLimit(request, env, 'write', 80);
+  }
+  if (path === '/api/auth/discord' && method === 'GET') return oauthStart(request, env);
+  if (path === '/api/auth/discord/callback' && method === 'GET') return oauthCallback(request, env);
+  const actor = await identity(request, env);
+  if (path === '/api/session' && method === 'GET') return json({user:actor.user, discordReady:!!(env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET), adminConfigured:administrators(env).length > 0});
+  if (path === '/api/auth/logout' && method === 'POST') {
+    const raw = cookie(request, COOKIE_SESSION);
+    if (raw) await env.DB.prepare('DELETE FROM sessions WHERE token_hash=?').bind(await hash(raw)).run();
+    return json({ok:true}, 200, [setCookie(COOKIE_SESSION, '', 0)]);
+  }
+  if (path === '/api/guest/recover' && method === 'POST') {
+    const input = await body(request);
+    if (!/^[a-f0-9]{64}$/.test(input.token || '')) fail(400, 'Lien personnel invalide.');
+    const reg = await env.DB.prepare('SELECT id FROM registrations WHERE guest_hash=? LIMIT 1').bind(await hash(input.token)).first();
+    if (!reg) fail(404, 'Ce lien ne correspond plus à une inscription.');
+    return json({ok:true}, 200, [setCookie(COOKIE_GUEST, input.token, 365 * DAY)]);
+  }
+  if (path === '/api/guest/link' && method === 'POST') {
+    if (!actor.guestToken || !(await env.DB.prepare('SELECT id FROM registrations WHERE guest_hash=? LIMIT 1').bind(actor.guestHash).first())) fail(404, 'Aucune inscription invitée sur cet appareil.');
+    return json({link:canonical + '/#access=' + actor.guestToken});
+  }
+  if (path === '/api/events' && method === 'GET') return json({events:await listEvents(env, actor)});
+  if (path === '/api/events' && method === 'POST') {
+    requireRole(actor.user);
+    const data = validateEvent(await body(request)), eventId = id();
+    await env.DB.prepare('INSERT INTO events(id,name,categories,departures,created_by,created_at) VALUES(?,?,?,?,?,?)').bind(eventId, data.name, JSON.stringify(data.categories), JSON.stringify(data.departures), actor.user.id, now()).run();
+    return json({id:eventId}, 201);
+  }
+  const eventMatch = path.match(/^\/api\/events\/([a-f0-9-]{36})$/);
+  if (eventMatch && ['PATCH','DELETE'].includes(method)) {
+    requireRole(actor.user, method === 'DELETE');
+    const event = await eventById(env, eventMatch[1]), input = await body(request);
+    if (input.version !== event.version) fail(409, 'Cet événement a changé. Actualise avant de réessayer.');
+    if (method === 'DELETE') {
+      const result = await env.DB.prepare('DELETE FROM events WHERE id=? AND version=?').bind(event.id, input.version).run();
+      if (!result.meta.changes) fail(409, 'Cet événement a changé. Actualise la page.');
+      return json({ok:true});
+    }
+    const data = validateEvent(input, event), cats = JSON.stringify(data.categories), deps = JSON.stringify(data.departures);
+    // Keep booked departures and their categories valid, including concurrent registrations.
+    const result = await env.DB.prepare(`UPDATE events SET name=?,categories=?,departures=?,version=version+1 WHERE id=? AND version=?
+      AND NOT EXISTS (SELECT 1 FROM registrations r WHERE r.event_id=events.id AND
+        (NOT EXISTS (SELECT 1 FROM json_each(?) d WHERE json_extract(d.value,'$.id')=r.departure_id)
+         OR (r.category!='' AND NOT EXISTS (SELECT 1 FROM json_each(?) c WHERE c.value=r.category))))`).bind(data.name, cats, deps, event.id, input.version, deps, cats).run();
+    if (!result.meta.changes) fail(409, 'Modification impossible : événement modifié ailleurs, départ supprimé avec des inscrits, ou catégorie encore utilisée.');
+    return json({ok:true});
+  }
+  const departureMatch = path.match(/^\/api\/events\/([a-f0-9-]{36})\/departures\/([a-f0-9-]{36})\/registrations$/);
+  if (departureMatch && method === 'POST') {
+    const event = await eventById(env, departureMatch[1]);
+    const departure = departureById(event, departureMatch[2]);
+    if (departure.startsAt <= Date.now()) fail(409, 'Ce départ est passé. Les inscriptions sont fermées.');
+    const input = await body(request), data = validateRegistration(input, event);
+    const guestToken = actor.user ? null : actor.guestToken || token();
+    const guestHash = guestToken ? await hash(guestToken) : null;
+    const regId = id();
+    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,guest_hash,name,name_key,category,status,created_at)
+      SELECT ?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,actor.user?.id || null,guestHash,data.name,data.nameKey,data.category,data.status,now(),event.id,event.version).run();
+    if (!result.meta.changes) fail(409, 'Cet événement a changé. Actualise avant de t’inscrire.');
+    return json({id:regId, recoveryLink:guestToken ? canonical + '/#access=' + guestToken : null}, 201, guestToken ? [setCookie(COOKIE_GUEST, guestToken, 365 * DAY)] : []);
+  }
+  const regMatch = path.match(/^\/api\/registrations\/([a-f0-9-]{36})$/);
+  if (regMatch && ['PATCH','DELETE'].includes(method)) {
+    const reg = await env.DB.prepare('SELECT * FROM registrations WHERE id=?').bind(regMatch[1]).first();
+    if (!reg) fail(404, 'Inscription introuvable.');
+    if (!owned(reg,actor) && actor.user?.role !== 'admin') fail(403, 'Cette inscription ne t’appartient pas. Utilise ton lien personnel ou ton compte Discord.');
+    const event = await eventById(env, reg.event_id), departure = departureById(event,reg.departure_id);
+    if (departure.startsAt <= Date.now()) fail(409, 'Ce départ est passé. Les inscriptions sont verrouillées.');
+    const input = await body(request);
+    if (input.version !== reg.version) fail(409, 'Cette inscription a changé. Actualise la page.');
+    let result;
+    if (method === 'DELETE') result = await env.DB.prepare('DELETE FROM registrations WHERE id=? AND version=?').bind(reg.id,input.version).run();
+    else {
+      const data = validateRegistration(input,event);
+      result = await env.DB.prepare(`UPDATE registrations SET name=?,name_key=?,category=?,status=?,version=version+1 WHERE id=? AND version=? AND EXISTS(SELECT 1 FROM events WHERE id=? AND version=?)`).bind(data.name,data.nameKey,data.category,data.status,reg.id,input.version,event.id,event.version).run();
+    }
+    if (!result.meta.changes) fail(409, 'Les données ont changé. Actualise avant de réessayer.');
+    return json({ok:true});
+  }
+  if (path === '/api/members' && method === 'GET') {
+    requireRole(actor.user,true);
+    const rows = (await env.DB.prepare('SELECT * FROM users ORDER BY name LIMIT 200').all()).results;
+    return json({members:rows.map(u => publicUser(u,env))});
+  }
+  const memberMatch = path.match(/^\/api\/members\/(\d{15,22})$/);
+  if (memberMatch && method === 'PATCH') {
+    requireRole(actor.user,true);
+    if (administrators(env).includes(memberMatch[1])) fail(403, 'Les administrateurs principaux sont définis dans la configuration du site.');
+    const input = await body(request);
+    if (!['pilot','organizer'].includes(input.role)) fail(400, 'Rôle invalide.');
+    const result = await env.DB.prepare('UPDATE users SET role=? WHERE id=?').bind(input.role,memberMatch[1]).run();
+    if (!result.meta.changes) fail(404, 'Ce pilote doit d’abord se connecter avec Discord.');
+    return json({ok:true});
+  }
+  fail(404, 'Action introuvable.');
+}
+export default {
+  async fetch(request, env) {
+    if (!new URL(request.url).pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+    try { return await api(request, env); }
+    catch (error) {
+      if (error instanceof HttpError) return json({error:error.message},error.status);
+      if (String(error.message).includes('UNIQUE constraint failed: registrations.')) return json({error:'Une inscription existe déjà pour ce pilote ou ce pseudo sur ce départ. Actualise pour retrouver la tienne.'},409);
+      console.error('FMT API failure', error instanceof Error ? error.message.replace(/[a-f0-9]{64}/g,'[redacted]') : 'unknown');
+      return json({error:'Le service est momentanément indisponible. Tes changements ne sont pas confirmés ; réessaie dans un instant.'},503);
+    }
+  }
+};

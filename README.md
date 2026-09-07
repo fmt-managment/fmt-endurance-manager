@@ -21,7 +21,7 @@ Les deux catégories LMP2 sont distinctes mais utilisent le même logo P2. GTE u
 
 Le fichier `wrangler.jsonc` est maintenant renseigné pour `fmt-endurance-manager` et la base D1 déjà créée (identifiant repris de votre capture). Il déclare la liaison `DB` et le serveur. L’ajout de cette liaison par le formulaire Cloudflare n’est plus nécessaire : `wrangler deploy` appliquera cette configuration lors d’un déploiement réussi.
 
-Vos six tables existent déjà : **ne réexécutez pas la migration initiale**.
+Les tables de base et les tables d’équipages existent déjà : **ne réexécutez pas la migration initiale**.
 
 Cette configuration utilise la commande de déploiement `npx wrangler deploy`. Le script de compilation Workers est lancé par le fichier Wrangler. Vérifiez les commandes dans les paramètres du projet Cloudflare avant la mise à jour GitHub, en particulier la présence éventuelle d’un ancien argument `--assets` pointant vers la racine du dépôt. Ne servez jamais la racine du dépôt comme répertoire public ; seuls les fichiers du dossier généré `public` doivent être servis.
 
@@ -41,9 +41,9 @@ Gardez l’adresse gratuite actuelle. Une seule adresse canonique est acceptée 
 1. Dans Cloudflare, ouvrez **Storage & Databases → D1 SQL Database** et créez une base nommée `fmt-endurance` sur l’offre gratuite.
 2. Ouvrez la console SQL de cette nouvelle base.
 3. Exécutez le contenu de `migrations/0001_initial.sql`, une seule fois. Si la console ne prend qu’une instruction à la fois, exécutez les instructions dans leur ordre.
-4. Vérifiez la présence des tables `users`, `sessions`, `oauth_states`, `events`, `registrations` et `rate_limits`.
+4. Vérifiez la présence des tables `users`, `sessions`, `oauth_states`, `events`, `registrations`, `rate_limits`, `crews` et `crew_members`.
 
-Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Après cette mise à jour, exécutez une seule fois le contenu de `migrations/0002_event_duration.sql` sur la même base afin d’ajouter la durée des courses.
+Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0004` sont déjà appliquées ; pour cette version, une base déjà à jour jusqu’à `0004` doit recevoir uniquement `migrations/0005_registration_preference.sql`.
 
 ## 3. Créer l’application Discord
 

@@ -1435,6 +1435,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .fold-registration .form-title { margin-top: 0; }
 .fold-registration .form-section > input { max-width: 100%; }
 .departure-fold .empty { margin: 0; }
+.event-section-tabs { display: flex; gap: 8px; margin: 20px 0 14px; padding: 6px; border: 1px solid #344348; border-radius: 12px; background: #111719; }
+.event-section-tab { flex: 1; min-height: 48px; border: 1px solid transparent; border-radius: 8px; color: #adbcbe; background: transparent; font-size: 16px; font-weight: 800; }
+.event-section-tab[aria-pressed="true"] { color: #e9fff0; background: #1c4032; border-color: #438768; }
+.crew-page-accordion { margin-top: 18px; }
+.crew-only-section { margin-top: 0; }
+.crew-only-section .crew-section { padding: 0; }
+.crew-only-section .crew-heading h2 { display: none; }
+.crew-pilot-name { font-weight: 800; }
+.crew-category-hyper .crew-pilot-name { color: #ff7979; }
+.crew-category-lmp2 .crew-pilot-name { color: #80aefc; }
+.crew-category-lmp3 .crew-pilot-name { color: #ffb067; }
+.crew-category-gt3 .crew-pilot-name { color: #6edb9d; }
+.crew-category-gte .crew-pilot-name { color: #d59afc; }
+.pilot-preference { flex-basis: 100%; color: #aebcbe; font-size: 13px; }
+.pilot-preference strong { color: #e9d48c; }
+.crew-availability-line { display: grid; grid-template-columns: repeat(auto-fit,minmax(18px,1fr)); gap: 3px; width: 100%; max-width: 520px; margin: 12px 0 4px; padding: 4px; border: 1px solid #3b494d; border-radius: 7px; background: #0d1113; }
+.crew-availability-hour { display: grid; place-items: center; min-height: 18px; border-radius: 3px; background: #283135; color: #9caaad; font-size: 10px; font-weight: 800; }
+.crew-availability-hour.covered { background: var(--phase-color); color: #101416; }
+.crew-availability-hour.gap { border: 1px dashed #627175; }
+.crew-card .coverage-note { margin: 6px 0 0; font-size: 13px; }
+.crew-card .crew-roster { margin: 14px 0 10px; }
 @media(max-width:700px) {
   .race-recap { padding: 16px; }
   .recap-intro { flex-direction: column; gap: 12px; }
@@ -1449,4 +1470,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .departure-fold-body { padding: 0 10px 14px; }
   .fold-toolbar { align-items: flex-start; flex-direction: column; }
   .fold-section { padding: 12px; }
+  .event-section-tabs { margin-top: 14px; }
+  .event-section-tab { min-height: 44px; font-size: 14px; }
 }

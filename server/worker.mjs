@@ -117,6 +117,7 @@ function validateEvent(input, existing = null) {
 }
 function validateRegistration(input, event) {
   const name = text(input.name, 30, 'Pseudo');
+  const preferredPilot = typeof input.preferredPilot === 'string' && input.preferredPilot.trim() ? text(input.preferredPilot, 30, 'Pilote souhaité') : '';
   const durationHours = Number(event.duration_hours) || 3;
   const parts = typeof input.status === 'string' ? input.status.split(',').filter(Boolean) : [];
   const hourParts = parts.filter(part => /^h([1-9]|1[0-9]|2[0-4])$/.test(part));
@@ -127,7 +128,7 @@ function validateRegistration(input, event) {
   if (!validParts) fail(400, 'Choisis au moins une heure de disponibilité.');
   const category = input.status === 'unavailable' ? '' : input.category;
   if (category && !JSON.parse(event.categories).includes(category) || input.status !== 'unavailable' && !category) fail(400, 'Choisis une catégorie de cet événement.');
-  return {name, nameKey: name.normalize('NFKC').toLocaleLowerCase('fr-FR'), status: input.status, category};
+  return {name, nameKey: name.normalize('NFKC').toLocaleLowerCase('fr-FR'), status: input.status, category, preferredPilot};
 }
 async function eventById(env, eventId) {
   const row = await env.DB.prepare('SELECT * FROM events WHERE id=?').bind(eventId).first();
@@ -139,7 +140,7 @@ function departureById(event, departureId) {
   return departure;
 }
 function publicRegistration(reg, actor) {
-  return {id:reg.id, name:reg.name, category:reg.category, status:reg.status, version:reg.version, mine:owned(reg, actor), canEdit:owned(reg, actor) || actor.user?.role === 'admin'};
+  return {id:reg.id, name:reg.name, category:reg.category, status:reg.status, preferredPilot:reg.preferred_pilot || '', version:reg.version, mine:owned(reg, actor), canEdit:owned(reg, actor) || actor.user?.role === 'admin'};
 }
 async function listEvents(env, actor) {
   const rows = (await env.DB.prepare('SELECT * FROM events ORDER BY created_at DESC, id DESC').all()).results;
@@ -298,8 +299,8 @@ async function api(request, env) {
     const guestHash = guestToken ? await hash(guestToken) : null;
     const userId = managedRegistration ? null : actor.user?.id || null;
     const regId = id();
-    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,guest_hash,name,name_key,category,status,created_at)
-      SELECT ?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,guestHash,data.name,data.nameKey,data.category,data.status,now(),event.id,event.version).run();
+    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,guest_hash,name,name_key,category,status,preferred_pilot,created_at)
+      SELECT ?,?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,guestHash,data.name,data.nameKey,data.category,data.status,data.preferredPilot,now(),event.id,event.version).run();
     if (!result.meta.changes) fail(409, 'Cet événement a changé. Actualise avant de t’inscrire.');
     return json({id:regId, recoveryLink:guestToken ? canonical + '/#access=' + guestToken : null}, 201, guestToken ? [setCookie(COOKIE_GUEST, guestToken, 365 * DAY)] : []);
   }
@@ -316,7 +317,7 @@ async function api(request, env) {
     if (method === 'DELETE') result = await env.DB.prepare('DELETE FROM registrations WHERE id=? AND version=?').bind(reg.id,input.version).run();
     else {
       const data = validateRegistration(input,event);
-      result = await env.DB.prepare(`UPDATE registrations SET name=?,name_key=?,category=?,status=?,version=version+1 WHERE id=? AND version=? AND EXISTS(SELECT 1 FROM events WHERE id=? AND version=?)`).bind(data.name,data.nameKey,data.category,data.status,reg.id,input.version,event.id,event.version).run();
+      result = await env.DB.prepare(`UPDATE registrations SET name=?,name_key=?,category=?,status=?,preferred_pilot=?,version=version+1 WHERE id=? AND version=? AND EXISTS(SELECT 1 FROM events WHERE id=? AND version=?)`).bind(data.name,data.nameKey,data.category,data.status,data.preferredPilot,reg.id,input.version,event.id,event.version).run();
     }
     if (!result.meta.changes) fail(409, 'Les données ont changé. Actualise avant de réessayer.');
     return json({ok:true});

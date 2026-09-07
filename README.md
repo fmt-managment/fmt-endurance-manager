@@ -43,7 +43,7 @@ Gardez l’adresse gratuite actuelle. Une seule adresse canonique est acceptée 
 3. Exécutez le contenu de `migrations/0001_initial.sql`, une seule fois. Si la console ne prend qu’une instruction à la fois, exécutez les instructions dans leur ordre.
 4. Vérifiez la présence des tables `users`, `sessions`, `oauth_states`, `events`, `registrations` et `rate_limits`.
 
-Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs.
+Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Après cette mise à jour, exécutez une seule fois le contenu de `migrations/0002_event_duration.sql` sur la même base afin d’ajouter la durée des courses.
 
 ## 3. Créer l’application Discord
 

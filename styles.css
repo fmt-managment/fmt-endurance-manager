@@ -1172,6 +1172,11 @@ input:focus {
 .event-creation .remove-departure { height: 42px; }
 .remove-departure:disabled { opacity: .35; cursor: default; }
 .add-departure-button { margin-top: 12px; }
+.hour-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; width: 100%; }
+.hour-buttons .relay-button { min-height: 48px; padding: 10px 12px; font-size: 14px; border: 2px solid var(--border); background: var(--panel2); color: var(--text); }
+.hour-buttons .relay-button.active { background: #1f7a4d; border-color: #38c878; color: #fff; box-shadow: 0 0 0 2px rgba(56,200,120,.2); }
+.hour-buttons .relay-button:hover { border-color: var(--green); }
+.event-creation #eventDuration { max-width: 180px; }
 .creation-error { color: #ff9999; font-size: 16px; }
 .event-creation button:focus-visible, .event-creation input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (max-width: 700px) {

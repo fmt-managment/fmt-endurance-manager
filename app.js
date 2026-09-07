@@ -87,7 +87,7 @@ function draftFor(departure) {
 }
 function statusLabel(status) {
   if(status==='whole')return 'Toute la course';if(status==='unavailable')return 'Indisponible';
-  return status.split(',').map(x=>({beginning:'Début',middle:'Milieu',end:'Fin'}[x]||'')).join(' + ');
+  return status.split(',').map(x=>/^h\d+$/.test(x)?`Heure ${x.slice(1)}`:({beginning:'Début',middle:'Milieu',end:'Fin'}[x]||'')).filter(Boolean).join(' · ');
 }
 function renderRegistration(reg,departure) {
   const locked=departure.startsAt<=Date.now();
@@ -96,14 +96,14 @@ function renderRegistration(reg,departure) {
     ${reg.canEdit&&!locked?button('edit-registration','Modifier',`data-id="${reg.id}" data-departure="${departure.id}"`,'edit-button'):''}</div>`;
 }
 function renderRegistrationForm(event,departure) {
-  const state=draftFor(departure),parts=state.status.split(',');
+  const state=draftFor(departure),parts=state.status.split(',').filter(Boolean),duration=event.durationHours||3;
   return `<form class="form-section registration-form" data-kind="registration" data-departure="${departure.id}">
     <h3 class="form-title">${state.id?'Modifier l’inscription':'Mon inscription'}</h3>
     ${state.id&&!departure.availability.find(r=>r.id===state.id)?.mine?'<p class="creation-help">Modification en tant qu’administrateur.</p>':''}
     <label class="form-label" for="name-${departure.id}">Pseudo pilote</label>
     <input id="name-${departure.id}" name="pilotName" data-departure="${departure.id}" value="${esc(state.name)}" maxlength="30" required autocomplete="nickname">
-    <div class="registration-choices"><span class="form-label">Disponibilités</span><div class="relay-buttons">
-      ${['beginning','middle','end'].map(part=>button('availability',{beginning:'DÉBUT',middle:'MILIEU',end:'FIN'}[part],`data-departure="${departure.id}" data-value="${part}" aria-pressed="${parts.includes(part)}"`,`relay-button ${part} ${parts.includes(part)?'active':''}`)).join('')}
+    <div class="registration-choices"><span class="form-label">Disponibilités heure par heure (${duration} h)</span><div class="relay-buttons hour-buttons">
+      ${Array.from({length:duration},(_,index)=>{const part=`h${index+1}`;return button('availability',`H${index+1}`,`data-departure="${departure.id}" data-value="${part}" aria-pressed="${parts.includes(part)}"`,`relay-button hour ${parts.includes(part)?'active':''}`);}).join('')}
     </div><div class="special-availability">
       ${button('availability','TOUTE LA COURSE',`data-departure="${departure.id}" data-value="whole" aria-pressed="${state.status==='whole'}"`,`special-button whole ${state.status==='whole'?'active':''}`)}
       ${button('availability','INDISPONIBLE',`data-departure="${departure.id}" data-value="unavailable" aria-pressed="${state.status==='unavailable'}"`,`special-button unavailable ${state.status==='unavailable'?'active':''}`)}
@@ -120,7 +120,7 @@ function renderEvent(message='') {
   const event=events.find(e=>e.id===currentEventId);
   if(!event){renderHome('Cet événement n’est plus disponible.');return;}
   app.innerHTML=`${button('home','← Retour aux événements','','secondary-button back-button')}
-    <div class="event-header"><h1 class="event-title">${esc(event.name)}</h1><p class="event-subtitle">Horaires de Paris · ${event.departures.length} départ(s)</p>
+    <div class="event-header"><h1 class="event-title">${esc(event.name)}</h1><p class="event-subtitle">Course de ${event.durationHours||3} h · Horaires de Paris · ${event.departures.length} départ(s)</p>
     <div class="event-category-badges">${event.categories.map(badge).join('')}</div></div>
     <div class="toolbar">${button('refresh','Actualiser')}${canManage()?button('edit-event','Modifier l’événement',`data-id="${event.id}"`):''}${isAdmin()?button('delete-event','Supprimer l’événement',`data-id="${event.id}"`,'danger-button'):''}</div>
     ${message?`<p class="creation-success" role="status">${esc(message)}</p>`:''}${errorBox()}
@@ -150,6 +150,7 @@ function renderEventForm(event=null) {
     <h1 class="page-title">${event?'MODIFIER L’ÉVÉNEMENT':'NOUVEL ÉVÉNEMENT'}</h1>
     <form class="form-panel event-creation" data-kind="event">
       <label class="form-label" for="eventName">Nom de l’événement</label><input id="eventName" name="eventName" maxlength="100" value="${esc(event?.name||'')}" placeholder="Ex : Daytona 8H" required>
+      <label class="form-label" for="eventDuration">Durée de la course (heures)</label><input id="eventDuration" name="eventDuration" type="number" min="1" max="24" step="1" value="${esc(event?.durationHours||6)}" required><p class="creation-help">Cette durée crée automatiquement une case de disponibilité pour chaque heure de course.</p>
       <fieldset class="creation-fieldset"><legend class="form-label">Catégories autorisées</legend><p class="creation-help">Une ou plusieurs catégories.</p>
         <div class="event-category-options">${CATEGORIES.map(category=>`<label class="event-category-option ${categories[category].css}"><input type="checkbox" name="eventCategory" value="${esc(category)}" ${event?.categories.includes(category)?'checked':''}>${logo(category)}<span>${esc(category)}</span></label>`).join('')}</div></fieldset>
       <fieldset class="creation-fieldset"><legend class="form-label">Départs possibles</legend><p class="creation-help">Les dates et heures sont celles de Paris, pour tous les pilotes.</p>
@@ -189,7 +190,7 @@ async function submitRegistration(form) {
   await refreshAfterSave('Inscription enregistrée.');
 }
 async function submitEvent(form) {
-  const data={name:form.elements.eventName.value.trim(),categories:[...form.querySelectorAll('[name="eventCategory"]:checked')].map(input=>input.value),departures:[...form.querySelectorAll('.departure-field')].map(row=>({id:row.dataset.id||undefined,date:row.querySelector('[name="date"]').value,time:row.querySelector('[name="time"]').value})),version:editingEvent?.version};
+  const data={name:form.elements.eventName.value.trim(),durationHours:Number(form.elements.eventDuration.value),categories:[...form.querySelectorAll('[name="eventCategory"]:checked')].map(input=>input.value),departures:[...form.querySelectorAll('.departure-field')].map(row=>({id:row.dataset.id||undefined,date:row.querySelector('[name="date"]').value,time:row.querySelector('[name="time"]').value})),version:editingEvent?.version};
   if(!data.categories.length)throw Error('Sélectionne au moins une catégorie.');
   const editing=!!editingEvent;
   const result=await api(editing?`/api/events/${editingEvent.id}`:'/api/events',editing?'PATCH':'POST',data);
@@ -223,7 +224,7 @@ async function perform(action,target) {
     case 'availability':{
       const departure=event.departures.find(d=>d.id===target.dataset.departure),state=draftFor(departure),value=target.dataset.value;
       if(['whole','unavailable'].includes(value))state.status=value;
-      else{const parts=new Set(['whole','unavailable'].includes(state.status)?[]:state.status.split(',').filter(Boolean));parts.has(value)?parts.delete(value):parts.add(value);state.status=parts.size===3?'whole':['beginning','middle','end'].filter(p=>parts.has(p)).join(',');}
+      else{const parts=new Set(['whole','unavailable'].includes(state.status)?[]:state.status.split(',').filter(part=>/^h\d+$/.test(part)));parts.has(value)?parts.delete(value):parts.add(value);const duration=event.durationHours||3;state.status=parts.size===duration?'whole':Array.from(parts).sort((a,b)=>Number(a.slice(1))-Number(b.slice(1))).join(',');}
       renderEvent();break;
     }
     case 'category':draftFor(event.departures.find(d=>d.id===target.dataset.departure)).category=target.dataset.value;renderEvent();break;

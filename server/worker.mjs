@@ -93,6 +93,8 @@ function parisTimestamp(date, time) {
 }
 function validateEvent(input, existing = null) {
   const name = text(input.name, 100, 'Nom de l’événement');
+  const durationHours = input.durationHours == null ? 6 : Number(input.durationHours);
+  if (!Number.isInteger(durationHours) || durationHours < 1 || durationHours > 24) fail(400, 'La durée doit être comprise entre 1 et 24 heures.');
   if (!Array.isArray(input.categories) || !input.categories.length || input.categories.some(c => !CATEGORIES.includes(c))) fail(400, 'Choisis au moins une catégorie autorisée.');
   if (!Array.isArray(input.departures) || !input.departures.length || input.departures.length > 30) fail(400, 'Ajoute entre 1 et 30 départs.');
   const known = existing ? JSON.parse(existing.departures) : [];
@@ -108,12 +110,18 @@ function validateEvent(input, existing = null) {
     if (previous && previous.startsAt <= Date.now() && startsAt !== previous.startsAt) fail(400, 'Un départ passé ne peut plus être déplacé.');
     return {id: departureId, date: item.date, time: item.time, startsAt};
   }).sort((a, b) => a.startsAt - b.startsAt);
-  return {name, categories: [...new Set(input.categories)], departures};
+  return {name, durationHours, categories: [...new Set(input.categories)], departures};
 }
 function validateRegistration(input, event) {
   const name = text(input.name, 30, 'Pseudo');
-  const allowed = ['whole','unavailable','beginning','middle','end','beginning,middle','beginning,end','middle,end'];
-  if (!allowed.includes(input.status)) fail(400, 'Choisis une disponibilité.');
+  const durationHours = Number(event.duration_hours) || 3;
+  const parts = typeof input.status === 'string' ? input.status.split(',').filter(Boolean) : [];
+  const hourParts = parts.filter(part => /^h([1-9]|1[0-9]|2[0-4])$/.test(part));
+  const legacy = ['beginning','middle','end'];
+  const validParts = input.status === 'whole' || input.status === 'unavailable' ||
+    (parts.length > 0 && parts.length <= durationHours && parts.every(part => hourParts.includes(part) && Number(part.slice(1)) <= durationHours)) ||
+    (parts.length > 0 && parts.length <= 3 && parts.every(part => legacy.includes(part)));
+  if (!validParts) fail(400, 'Choisis au moins une heure de disponibilité.');
   const category = input.status === 'unavailable' ? '' : input.category;
   if (category && !JSON.parse(event.categories).includes(category) || input.status !== 'unavailable' && !category) fail(400, 'Choisis une catégorie de cet événement.');
   return {name, nameKey: name.normalize('NFKC').toLocaleLowerCase('fr-FR'), status: input.status, category};
@@ -135,7 +143,7 @@ async function listEvents(env, actor) {
   const registrations = (await env.DB.prepare('SELECT * FROM registrations ORDER BY created_at').all()).results;
   const grouped = new Map();
   for (const reg of registrations) { const key = `${reg.event_id}:${reg.departure_id}`; if (!grouped.has(key)) grouped.set(key, []); grouped.get(key).push(publicRegistration(reg, actor)); }
-  return rows.map(row => ({id:row.id, name:row.name, categories:JSON.parse(row.categories), version:row.version, departures:JSON.parse(row.departures).map(d => ({...d, availability:grouped.get(`${row.id}:${d.id}`) || []}))}));
+  return rows.map(row => ({id:row.id, name:row.name, durationHours:Number(row.duration_hours)||3, categories:JSON.parse(row.categories), version:row.version, departures:JSON.parse(row.departures).map(d => ({...d, availability:grouped.get(`${row.id}:${d.id}`) || []}))}));
 }
 async function oauthStart(request, env) {
   requireDiscord(env); await rateLimit(request, env, 'oauth', 20); await cleanup(env);
@@ -206,7 +214,7 @@ async function api(request, env) {
   if (path === '/api/events' && method === 'POST') {
     requireRole(actor.user);
     const data = validateEvent(await body(request)), eventId = id();
-    await env.DB.prepare('INSERT INTO events(id,name,categories,departures,created_by,created_at) VALUES(?,?,?,?,?,?)').bind(eventId, data.name, JSON.stringify(data.categories), JSON.stringify(data.departures), actor.user.id, now()).run();
+    await env.DB.prepare('INSERT INTO events(id,name,duration_hours,categories,departures,created_by,created_at) VALUES(?,?,?,?,?,?,?)').bind(eventId, data.name, data.durationHours, JSON.stringify(data.categories), JSON.stringify(data.departures), actor.user.id, now()).run();
     return json({id:eventId}, 201);
   }
   const eventMatch = path.match(/^\/api\/events\/([a-f0-9-]{36})$/);
@@ -221,10 +229,10 @@ async function api(request, env) {
     }
     const data = validateEvent(input, event), cats = JSON.stringify(data.categories), deps = JSON.stringify(data.departures);
     // Keep booked departures and their categories valid, including concurrent registrations.
-    const result = await env.DB.prepare(`UPDATE events SET name=?,categories=?,departures=?,version=version+1 WHERE id=? AND version=?
+    const result = await env.DB.prepare(`UPDATE events SET name=?,duration_hours=?,categories=?,departures=?,version=version+1 WHERE id=? AND version=?
       AND NOT EXISTS (SELECT 1 FROM registrations r WHERE r.event_id=events.id AND
         (NOT EXISTS (SELECT 1 FROM json_each(?) d WHERE json_extract(d.value,'$.id')=r.departure_id)
-         OR (r.category!='' AND NOT EXISTS (SELECT 1 FROM json_each(?) c WHERE c.value=r.category))))`).bind(data.name, cats, deps, event.id, input.version, deps, cats).run();
+      OR (r.category!='' AND NOT EXISTS (SELECT 1 FROM json_each(?) c WHERE c.value=r.category))))`).bind(data.name, data.durationHours, cats, deps, event.id, input.version, deps, cats).run();
     if (!result.meta.changes) fail(409, 'Modification impossible : événement modifié ailleurs, départ supprimé avec des inscrits, ou catégorie encore utilisée.');
     return json({ok:true});
   }

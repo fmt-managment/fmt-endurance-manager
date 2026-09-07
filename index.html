@@ -3691,6 +3691,17 @@ function createEvent() {
 
 if (!events.length) {
 
+/* =========================================================
+   CHAMPIONNAT DEMO OCTOBRE 2026
+========================================================= */
+
+const championshipExists = events.some(
+  event =>
+    event.id === "demo-championship-2026"
+);
+
+if (!championshipExists) {
+
   events.push({
 
     id:
@@ -3761,12 +3772,9 @@ if (!events.length) {
 
   });
 
-
   saveEvents();
 
 }
-
-
 /* =========================================================
    DEMARRAGE
 ========================================================= */

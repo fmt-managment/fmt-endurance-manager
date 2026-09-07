@@ -99,11 +99,11 @@ function phaseColor(index,duration) {
   const ratio=duration>1?index/(duration-1):0;
   return `hsl(${Math.round(145-141*ratio)} 72% 48%)`;
 }
-function phaseClass(index) { return `phase-${Math.min(index,23)}`; }
+function phaseClass(index,duration) { return `phase-${duration>1?Math.round(index*23/(duration-1)):0}`; }
 function renderRegistration(reg,departure,duration) {
   const locked=departure.startsAt<=Date.now();
   const parts=new Set(reg.status.split(',').filter(x=>/^h\d+$/.test(x))),hours=Array.from({length:duration},(_,i)=>`h${i+1}`);
-  const timeline=`<div class="availability-readonly" aria-label="${esc(registrationSlotLabel(reg.status,departure,duration))}"><span class="timeline-edge">DÉPART</span><div class="availability-mini-grid duration-${duration}">${hours.map((hour,i)=>`<span class="availability-mini-hour ${phaseClass(i)} ${reg.status==='whole'||parts.has(hour)?'present':''}" title="Heure ${i+1}">${i+1}</span>`).join('')}</div><span class="timeline-edge">ARRIVÉE</span></div>`;
+  const timeline=`<div class="availability-readonly" aria-label="${esc(registrationSlotLabel(reg.status,departure,duration))}"><span class="timeline-edge">DÉPART</span><div class="availability-mini-grid duration-${duration}">${hours.map((hour,i)=>`<span class="availability-mini-hour ${phaseClass(i,duration)} ${reg.status==='whole'||parts.has(hour)?'present':''}" title="Heure ${i+1}">${i+1}</span>`).join('')}</div><span class="timeline-edge">ARRIVÉE</span></div>`;
   return `<div class="pilot-row"><div class="pilot-main"><span class="pilot-name">${esc(reg.name)}${reg.mine?' <small>(toi)</small>':''}</span>
     <span class="pilot-category-logo">${reg.category?logo(reg.category):'—'}</span><span class="registration-status">${esc(registrationSlotLabel(reg.status,departure,duration))}</span></div>${timeline}
     ${reg.canEdit&&!locked?button('edit-registration','Modifier',`data-id="${reg.id}" data-departure="${departure.id}"`,'edit-button'):''}</div>`;
@@ -115,7 +115,7 @@ function renderRegistrationForm(event,departure) {
     ${state.id&&!departure.availability.find(r=>r.id===state.id)?.mine?'<p class="creation-help">Modification en tant qu’administrateur.</p>':''}
     <label class="form-label" for="name-${departure.id}">Pseudo pilote</label>
     <input id="name-${departure.id}" name="pilotName" data-departure="${departure.id}" value="${esc(state.name)}" maxlength="30" required autocomplete="nickname">
-    <div class="registration-choices"><span class="form-label">Mes heures de présence (${duration} h)</span><p class="availability-hint">Appuie sur chaque heure où tu peux rouler. Les couleurs indiquent la progression de la course.</p><div class="availability-hour-grid duration-${duration}">${Array.from({length:duration},(_,index)=>{const part=`h${index+1}`;return button('availability',`<span class="hour-card-number">${index+1}</span><span class="hour-card-label">HEURE</span><span class="hour-card-state">${parts.includes(part)?'PRÉSENT':'DISPONIBLE ?'}</span>`,`data-departure="${departure.id}" data-value="${part}" aria-pressed="${parts.includes(part)}"`,`hour-card ${phaseClass(index)} ${parts.includes(part)?'active':''}`);}).join('')}</div><div class="special-availability">
+    <div class="registration-choices"><span class="form-label">Mes heures de présence (${duration} h)</span><p class="availability-hint">Appuie sur chaque heure où tu peux rouler. Les couleurs indiquent la progression de la course.</p><div class="availability-hour-grid duration-${duration}">${Array.from({length:duration},(_,index)=>{const part=`h${index+1}`;return button('availability',`<span class="hour-card-number">${index+1}</span><span class="hour-card-label">HEURE</span><span class="hour-card-state">${parts.includes(part)?'PRÉSENT':'DISPONIBLE ?'}</span>`,`data-departure="${departure.id}" data-value="${part}" aria-pressed="${parts.includes(part)}"`,`hour-card ${phaseClass(index,duration)} ${parts.includes(part)?'active':''}`);}).join('')}</div><div class="special-availability">
       ${button('availability','TOUTE LA COURSE',`data-departure="${departure.id}" data-value="whole" aria-pressed="${state.status==='whole'}"`,`special-button whole ${state.status==='whole'?'active':''}`)}
       ${button('availability','INDISPONIBLE',`data-departure="${departure.id}" data-value="unavailable" aria-pressed="${state.status==='unavailable'}"`,`special-button unavailable ${state.status==='unavailable'?'active':''}`)}
     </div></div>

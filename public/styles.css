@@ -1473,3 +1473,65 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .event-section-tabs { margin-top: 14px; }
   .event-section-tab { min-height: 44px; font-size: 14px; }
 }
+
+/* Compact one-line hour selector: it remains usable from 1 to 24 hours. */
+.registration-form .availability-hour-grid.compact-hours {
+  display: grid;
+  grid-template-columns: repeat(var(--duration, 6), minmax(18px, 1fr));
+  gap: clamp(2px, .45vw, 5px);
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.registration-form .compact-hours .hour-card {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: clamp(42px, 5.5vw, 60px);
+  padding: 4px 1px;
+  border-width: 1px;
+  border-radius: 6px;
+  gap: 2px;
+  text-shadow: none;
+}
+.registration-form .compact-hours .hour-card::before { width: 2px; }
+.registration-form .compact-hours .hour-card-number {
+  font-size: clamp(8px, 1.6vw, 18px);
+  line-height: 1;
+}
+.registration-form .compact-hours .hour-card-state {
+  min-height: 12px;
+  margin-top: 0;
+  color: inherit;
+  font-size: clamp(8px, 1.35vw, 15px);
+  line-height: 1;
+}
+.registration-form .compact-hours .hour-card:not(.active) {
+  filter: brightness(.5) saturate(.75);
+}
+.registration-form .compact-hours .hour-card.active {
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--phase-color) 65%, transparent);
+}
+
+/* Crew identity colors are stable for a crew, regardless of its category. */
+.crew-pilot-group { margin: 12px 0; padding: 10px 12px; border: 1px solid var(--crew-color); border-left: 4px solid var(--crew-color); border-radius: 9px; background: color-mix(in srgb, var(--crew-color) 8%, #151c1f); }
+.crew-pilot-group-header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; color: var(--crew-color); font-size: 14px; }
+.crew-pilot-group-header span { color: #c4d0d0; font-size: 12px; text-align: right; }
+.crew-pilot-group .pilot-row { margin-top: 8px; padding: 8px 0; border-top: 1px solid color-mix(in srgb, var(--crew-color) 25%, transparent); }
+.crew-pilot-group .pilot-name, .crew-pilot-group .pilot-car { color: var(--crew-color); }
+.crew-card.crew-palette-0, .crew-pilot-group.crew-palette-0 { --crew-color: #53d8ff; }
+.crew-card.crew-palette-1, .crew-pilot-group.crew-palette-1 { --crew-color: #c58cff; }
+.crew-card.crew-palette-2, .crew-pilot-group.crew-palette-2 { --crew-color: #ffae62; }
+.crew-card.crew-palette-3, .crew-pilot-group.crew-palette-3 { --crew-color: #ff79aa; }
+.crew-card.crew-palette-4, .crew-pilot-group.crew-palette-4 { --crew-color: #75a9ff; }
+.crew-card.crew-palette-5, .crew-pilot-group.crew-palette-5 { --crew-color: #b5df62; }
+.crew-card.crew-palette-6, .crew-pilot-group.crew-palette-6 { --crew-color: #ffd45e; }
+.crew-card.crew-palette-7, .crew-pilot-group.crew-palette-7 { --crew-color: #66e0b1; }
+.crew-card.crew-palette-8, .crew-pilot-group.crew-palette-8 { --crew-color: #ff7777; }
+.crew-card.crew-palette-9, .crew-pilot-group.crew-palette-9 { --crew-color: #b99cff; }
+.crew-card[class*="crew-palette-"] { border-color: color-mix(in srgb, var(--crew-color) 48%, #344247); }
+.crew-card[class*="crew-palette-"] h3 { color: var(--crew-color); }
+.pilot-car { color: #b9c7c8; font-size: 13px; }
+.car-choice-label { display: block; margin-top: 18px; }
+.car-choice { display: block; width: 100%; max-width: 560px; min-height: 44px; margin-top: 7px; padding: 9px 12px; border: 1px solid #475359; border-radius: 8px; background: #101416; color: #f4f7f6; }

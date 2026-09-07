@@ -15,7 +15,7 @@ Cette version remplace la sauvegarde locale des événements par une base Cloudf
 
 Les droits sont vérifiés côté serveur pour chaque action. Le pseudo ne donne aucun droit. Les administrateurs principaux sont définis explicitement dans Cloudflare par leurs identifiants Discord. Le premier visiteur connecté ne devient jamais administrateur automatiquement.
 
-Les deux catégories LMP2 sont distinctes mais utilisent le même logo P2. GTE utilise un badge texte car le dépôt ne contient pas de logo GTE. Les horaires sont interprétés en heure de Paris, été comme hiver. Les inscriptions se verrouillent au départ. Un départ avec des inscrits ne peut pas être supprimé, ni une catégorie encore utilisée. Modifier un horaire n’envoie pas de notification : prévenez les pilotes.
+Les deux catégories LMP2 sont distinctes mais utilisent le même logo P2. GTE utilise un badge texte car le dépôt ne contient pas de logo GTE. Les pilotes peuvent indiquer une voiture LMU facultative lors de leur inscription ; le choix est contrôlé côté serveur selon la catégorie. Les horaires sont interprétés en heure de Paris, été comme hiver. Les inscriptions se verrouillent au départ. Un départ avec des inscrits ne peut pas être supprimé, ni une catégorie encore utilisée. Modifier un horaire n’envoie pas de notification : prévenez les pilotes.
 
 ## Configuration préparée pour votre Worker existant
 
@@ -43,7 +43,7 @@ Gardez l’adresse gratuite actuelle. Une seule adresse canonique est acceptée 
 3. Exécutez le contenu de `migrations/0001_initial.sql`, une seule fois. Si la console ne prend qu’une instruction à la fois, exécutez les instructions dans leur ordre.
 4. Vérifiez la présence des tables `users`, `sessions`, `oauth_states`, `events`, `registrations`, `rate_limits`, `crews` et `crew_members`.
 
-Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0004` sont déjà appliquées ; pour cette version, une base déjà à jour jusqu’à `0004` doit recevoir uniquement `migrations/0005_registration_preference.sql`.
+Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0005` sont déjà appliquées ; pour cette version, une base déjà à jour jusqu’à `0005` doit recevoir uniquement `migrations/0006_registration_car.sql`.
 
 ## 3. Créer l’application Discord
 

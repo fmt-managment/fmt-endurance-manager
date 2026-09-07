@@ -1,5 +1,13 @@
 const CATEGORIES = ['Hypercar', 'LMP2 ELMS', 'LMP2 WEC', 'LMP3', 'GT3', 'GTE'];
 const EVENT_TYPES = ['special', 'lmu', 'private'];
+const CARS = {
+  Hypercar: ['Alpine A424','Aston Martin Valkyrie AMR LMH','BMW M Hybrid V8','BMW M Hybrid V8 Evo (2026)','Cadillac V-Series.R','Cadillac V-Series.R Evo (2026)','Ferrari 499P','Genesis GMR-001 LMDh','Glickenhaus SCG 007','Isotta Fraschini Tipo 6-C','Lamborghini SC63','Peugeot 9X8 2023','Peugeot 9X8 2024','Porsche 963','Toyota GR010 Hybrid','Toyota TR010 Hybrid (2026)','Vanwall Vandervell 680'],
+  'LMP2 ELMS': ['Oreca 07 Gibson ELMS'],
+  'LMP2 WEC': ['Oreca 07 Gibson'],
+  LMP3: ['Ligier JS P325','Ginetta G61-LT-P3 Evo','Duqueine D09','Adess AD25'],
+  GT3: ['Aston Martin Vantage AMR LMGT3 Evo','BMW M4 LMGT3','BMW M4 LMGT3 Evo','Chevrolet Corvette Z06 LMGT3.R','Ferrari 296 LMGT3','Ferrari 296 LMGT3 Evo','Ford Mustang LMGT3','Ford Mustang LMGT3 Evo','Lamborghini Huracán LMGT3 Evo 2','Lexus RC F LMGT3','Mercedes-AMG LMGT3','McLaren 720S LMGT3 Evo','Porsche 911 LMGT3 R (992)','Porsche 911 LMGT3 R (992) 2026'],
+  GTE: ['Aston Martin Vantage GTE','Chevrolet Corvette C8.R','Ferrari 488 GTE Evo','Porsche 911 RSR-19']
+};
 const COOKIE_SESSION = '__Host-fmt_session';
 const COOKIE_GUEST = '__Host-fmt_guest';
 const COOKIE_STATE = '__Host-fmt_oauth';
@@ -128,7 +136,9 @@ function validateRegistration(input, event) {
   if (!validParts) fail(400, 'Choisis au moins une heure de disponibilité.');
   const category = input.status === 'unavailable' ? '' : input.category;
   if (category && !JSON.parse(event.categories).includes(category) || input.status !== 'unavailable' && !category) fail(400, 'Choisis une catégorie de cet événement.');
-  return {name, nameKey: name.normalize('NFKC').toLocaleLowerCase('fr-FR'), status: input.status, category, preferredPilot};
+  const car = input.status === 'unavailable' || !input.car ? '' : text(input.car, 100, 'Voiture');
+  if (car && !CARS[category]?.includes(car)) fail(400, 'Choisis une voiture proposée pour cette catégorie.');
+  return {name, nameKey: name.normalize('NFKC').toLocaleLowerCase('fr-FR'), status: input.status, category, car, preferredPilot};
 }
 async function eventById(env, eventId) {
   const row = await env.DB.prepare('SELECT * FROM events WHERE id=?').bind(eventId).first();
@@ -140,7 +150,7 @@ function departureById(event, departureId) {
   return departure;
 }
 function publicRegistration(reg, actor) {
-  return {id:reg.id, name:reg.name, category:reg.category, status:reg.status, preferredPilot:reg.preferred_pilot || '', version:reg.version, mine:owned(reg, actor), canEdit:owned(reg, actor) || actor.user?.role === 'admin'};
+  return {id:reg.id, name:reg.name, category:reg.category, car:reg.car || '', status:reg.status, preferredPilot:reg.preferred_pilot || '', version:reg.version, mine:owned(reg, actor), canEdit:owned(reg, actor) || actor.user?.role === 'admin'};
 }
 async function listEvents(env, actor) {
   const rows = (await env.DB.prepare('SELECT * FROM events ORDER BY created_at DESC, id DESC').all()).results;
@@ -299,8 +309,8 @@ async function api(request, env) {
     const guestHash = guestToken ? await hash(guestToken) : null;
     const userId = managedRegistration ? null : actor.user?.id || null;
     const regId = id();
-    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,guest_hash,name,name_key,category,status,preferred_pilot,created_at)
-      SELECT ?,?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,guestHash,data.name,data.nameKey,data.category,data.status,data.preferredPilot,now(),event.id,event.version).run();
+    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,guest_hash,name,name_key,category,car,status,preferred_pilot,created_at)
+      SELECT ?,?,?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,guestHash,data.name,data.nameKey,data.category,data.car,data.status,data.preferredPilot,now(),event.id,event.version).run();
     if (!result.meta.changes) fail(409, 'Cet événement a changé. Actualise avant de t’inscrire.');
     return json({id:regId, recoveryLink:guestToken ? canonical + '/#access=' + guestToken : null}, 201, guestToken ? [setCookie(COOKIE_GUEST, guestToken, 365 * DAY)] : []);
   }
@@ -317,7 +327,7 @@ async function api(request, env) {
     if (method === 'DELETE') result = await env.DB.prepare('DELETE FROM registrations WHERE id=? AND version=?').bind(reg.id,input.version).run();
     else {
       const data = validateRegistration(input,event);
-      result = await env.DB.prepare(`UPDATE registrations SET name=?,name_key=?,category=?,status=?,preferred_pilot=?,version=version+1 WHERE id=? AND version=? AND EXISTS(SELECT 1 FROM events WHERE id=? AND version=?)`).bind(data.name,data.nameKey,data.category,data.status,data.preferredPilot,reg.id,input.version,event.id,event.version).run();
+      result = await env.DB.prepare(`UPDATE registrations SET name=?,name_key=?,category=?,car=?,status=?,preferred_pilot=?,version=version+1 WHERE id=? AND version=? AND EXISTS(SELECT 1 FROM events WHERE id=? AND version=?)`).bind(data.name,data.nameKey,data.category,data.car,data.status,data.preferredPilot,reg.id,input.version,event.id,event.version).run();
     }
     if (!result.meta.changes) fail(409, 'Les données ont changé. Actualise avant de réessayer.');
     return json({ok:true});

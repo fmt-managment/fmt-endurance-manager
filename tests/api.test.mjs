@@ -14,6 +14,7 @@ function harness(){
  const DB=new D1();
  DB.db.exec(readFileSync(new URL('../migrations/0004_crews.sql',import.meta.url),'utf8'));
  DB.db.exec(readFileSync(new URL('../migrations/0005_registration_preference.sql',import.meta.url),'utf8'));
+ DB.db.exec(readFileSync(new URL('../migrations/0006_registration_car.sql',import.meta.url),'utf8'));
  const env={DB,APP_ORIGIN:ROOT,DISCORD_CLIENT_ID:'app-id',DISCORD_CLIENT_SECRET:'test-only-secret',ADMIN_DISCORD_IDS:ADMIN,ASSETS:{fetch:async()=>new Response('static')}};
  const jars=new Map();
  async function req(path,method='GET',data,actor='guest',options={}){
@@ -48,7 +49,8 @@ test('crews: manager-only writes, category/departure integrity, concurrency and 
  assert.equal((await req(base+'/crews','POST',payload,'pilot')).status,403);
  const created=await req(base+'/crews','POST',payload,'organizer');assert.equal(created.status,201);
  const id=created.data.id,crewPath='/api/crews/'+id;
- const reg=await req(base+'/registrations','POST',{name:'Pilote A',category:'Hypercar',status:'h1,h3',preferredPilot:'Pilote B'},'pilot');assert.equal(reg.status,201);
+ const invalidCar=await req(base+'/registrations','POST',{name:'Pilote invalide',category:'Hypercar',car:'Voiture inconnue',status:'whole'},'guest-invalid');assert.equal(invalidCar.status,400);
+ const reg=await req(base+'/registrations','POST',{name:'Pilote A',category:'Hypercar',car:'Ferrari 499P',status:'h1,h3',preferredPilot:'Pilote B'},'pilot');assert.equal(reg.status,201);
  const bad=await req(base+'/registrations','POST',{name:'Pilote B',category:'GTE',status:'whole'},'guest2');assert.equal(bad.status,201);
  const elsewhere=await req(`/api/events/${event.id}/departures/${second.id}/registrations`,'POST',{name:'Pilote C',category:'Hypercar',status:'whole'},'guest3');
  const add=(registrationId,version=1,actor='organizer')=>req(crewPath+'/members','POST',{registrationId,version},actor);
@@ -59,6 +61,7 @@ test('crews: manager-only writes, category/departure integrity, concurrency and 
  let listing=(await req('/api/events')).data.events[0].departures[0].crews[0];
  assert.equal(listing.car,'Prototype test');assert.deepEqual(listing.registrationIds,[reg.data.id]);assert.equal(listing.version,2);
  assert.equal((await req('/api/events')).data.events[0].departures[0].availability.find(r=>r.id===reg.data.id).preferredPilot,'Pilote B');
+ assert.equal((await req('/api/events')).data.events[0].departures[0].availability.find(r=>r.id===reg.data.id).car,'Ferrari 499P');
  assert.equal((await req(crewPath,'PATCH',{...payload,version:1},'organizer')).status,409);
  const duplicate=await req(base+'/crews','POST',{...payload,name:'FMT 2'},'admin');assert.equal(duplicate.status,201);
  assert.equal((await req('/api/crews/'+duplicate.data.id+'/members','POST',{registrationId:reg.data.id,version:1},'admin')).status,409);

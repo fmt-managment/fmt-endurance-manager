@@ -3,9 +3,6 @@
   "main": "server/worker.mjs",
   "compatibility_date": "2026-09-07",
   "keep_vars": true,
-  "build": {
-    "command": "npm run build:workers"
-  },
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",

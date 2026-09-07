@@ -1,0 +1,11 @@
+{
+  "name": "fmt-endurance-manager",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:workers": "node scripts/build.mjs --workers",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": { "node": ">=22.13.0" }
+}

@@ -1,0 +1,111 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import worker from '../server/worker.mjs';
+const ROOT='https://fmt.example';
+const ADMIN='111111111111111111', PILOT='222222222222222222', OTHER='333333333333333333';
+class D1 {
+  constructor(){this.db=new DatabaseSync(':memory:');this.db.exec('PRAGMA foreign_keys=ON;');this.db.exec(readFileSync(new URL('../migrations/0001_initial.sql',import.meta.url),'utf8'));}
+  prepare(sql){const self=this;return {params:[],bind(...params){this.params=params;return this;},async first(){return self.db.prepare(sql).get(...this.params)||null;},async all(){return {results:self.db.prepare(sql).all(...this.params)};},async run(){const result=self.db.prepare(sql).run(...this.params);return {success:true,meta:{changes:Number(result.changes)}};}};}
+  async batch(statements){this.db.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());this.db.exec('COMMIT');return results;}catch(error){this.db.exec('ROLLBACK');throw error;}}
+}
+function harness(){
+ const DB=new D1();
+ const env={DB,APP_ORIGIN:ROOT,DISCORD_CLIENT_ID:'app-id',DISCORD_CLIENT_SECRET:'test-only-secret',ADMIN_DISCORD_IDS:ADMIN,ASSETS:{fetch:async()=>new Response('static')}};
+ const jars=new Map();
+ async function req(path,method='GET',data,actor='guest',options={}){
+  const jar=jars.get(actor)||{};
+  const headers={'CF-Connecting-IP':actor,'Cookie':Object.entries(jar).map(([k,v])=>`${k}=${v}`).join('; '),...options.headers};
+  if(method!=='GET'){headers['Origin']=options.origin ?? ROOT;headers['Content-Type']='application/json';}
+  const response=await worker.fetch(new Request(ROOT+path,{method,headers,body:method==='GET'?undefined:JSON.stringify(data||{})}),env);
+  for(const raw of response.headers.getSetCookie()){const [pair]=raw.split(';');const i=pair.indexOf('=');const name=pair.slice(0,i),value=pair.slice(i+1);if(value)jar[name]=value;else delete jar[name];}
+  jars.set(actor,jar);
+  const result=await response.clone().json().catch(()=>null);
+  return {response,status:response.status,data:result};
+ }
+ async function login(discordId,actor){
+  const start=await req('/api/auth/discord','GET',null,actor);assert.equal(start.status,302);
+  const url=new URL(start.response.headers.get('Location'));assert.equal(url.searchParams.get('scope'),'identify');
+  const realFetch=globalThis.fetch;
+  globalThis.fetch=async url=>new Response(JSON.stringify(String(url).endsWith('/token')?{access_token:'mock-discord-token'}:{id:discordId,username:'Pilote '+discordId}),{headers:{'Content-Type':'application/json'}});
+  try{const callback=await req('/api/auth/discord/callback?code=test-code&state='+url.searchParams.get('state'),'GET',null,actor);assert.equal(callback.status,302);assert.equal(callback.response.headers.get('Location'),ROOT+'/');return url.searchParams.get('state');}finally{globalThis.fetch=realFetch;}
+ }
+ return {DB,env,req,login,jars};
+}
+const eventInput={name:'Daytona 8H',categories:['Hypercar','LMP2 ELMS','GTE'],departures:[{date:'2090-10-15',time:'15:00'},{date:'2090-10-14',time:'14:00'}]};
+test('shared events, actual Discord callback, role grants/revocation, guest recovery and ownership',async()=>{
+ const h=harness(),{req,login,DB}=h;
+ assert.equal((await req('/api/events','POST',eventInput)).status,401);
+ await login(ADMIN,'admin');await login(PILOT,'pilot');await login(OTHER,'other');
+ assert.equal((await req('/api/session','GET',null,'admin')).data.user.role,'admin');
+ assert.equal((await req('/api/events','POST',eventInput,'pilot')).status,403);
+ assert.equal((await req('/api/members','GET',null,'pilot')).status,403);
+ assert.equal((await req('/api/members/'+PILOT,'PATCH',{role:'organizer'},'admin')).status,200);
+ assert.equal((await req('/api/session','GET',null,'pilot')).data.user.role,'organizer');
+ const created=await req('/api/events','POST',eventInput,'pilot');assert.equal(created.status,201);
+ let event=(await req('/api/events')).data.events[0];assert.equal(event.name,'Daytona 8H');assert.equal(event.departures[0].date,'2090-10-14');
+ const eventId=event.id,depId=event.departures[0].id;
+ assert.equal((await req('/api/events/'+eventId,'DELETE',{version:1},'pilot')).status,403);
+ const regPath=`/api/events/${eventId}/departures/${depId}/registrations`;
+ const reg=await req(regPath,'POST',{name:'Nathan',category:'GTE',status:'whole'});assert.equal(reg.status,201);assert(reg.data.recoveryLink.startsWith(ROOT+'/#access='));
+ const regId=reg.data.id;
+ event=(await req('/api/events')).data.events[0];assert.equal(event.departures[0].availability[0].mine,true);
+ const outsider=(await req('/api/events','GET',null,'outsider')).data.events[0].departures[0].availability[0];assert.equal(outsider.mine,false);assert.equal(outsider.canEdit,false);assert(!JSON.stringify(outsider).includes('guest_hash'));
+ assert.equal((await req('/api/registrations/'+regId,'PATCH',{name:'Nathan',status:'unavailable',version:1},'outsider')).status,403);
+ assert.equal((await req(regPath,'POST',{name:'Nathan',category:'GTE',status:'whole'},'outsider')).status,409);
+ assert.equal((await req('/api/guest/recover','POST',{token:new URL(reg.data.recoveryLink).hash.split('=')[1]},'new-device')).status,200);
+ assert.equal((await req('/api/registrations/'+regId,'PATCH',{name:'Nathan',category:'Hypercar',status:'beginning,end',version:1},'new-device')).status,200);
+ assert.equal((await req('/api/registrations/'+regId,'PATCH',{name:'Nathan',status:'whole',category:'GTE',version:1})).status,409);
+ // Removing a category or a departure that still has a registration must be rejected atomically.
+ assert.equal((await req('/api/events/'+eventId,'PATCH',{...event,categories:['GTE']},'pilot')).status,409);
+ assert.equal((await req('/api/events/'+eventId,'PATCH',{...event,departures:[event.departures[1]]},'pilot')).status,409);
+ const changed=await req('/api/events/'+eventId,'PATCH',{...event,name:'Daytona 8H — FMT'},'pilot');assert.equal(changed.status,200);
+ assert.equal((await req('/api/events/'+eventId,'PATCH',{...event,name:'stale'},'pilot')).status,409);
+ // A connected account owns its registration independently of the display name.
+ const own=await req(regPath,'POST',{name:'Etienne',category:'LMP2 ELMS',status:'middle'},'other');assert.equal(own.status,201);
+ assert.equal((await req('/api/registrations/'+own.data.id,'DELETE',{version:1},'other')).status,200);
+ assert.equal((await req('/api/members/'+PILOT,'PATCH',{role:'pilot'},'admin')).status,200);
+ assert.equal((await req('/api/events','POST',eventInput,'pilot')).status,403);
+ assert.equal((await req('/api/members/'+ADMIN,'PATCH',{role:'pilot'},'admin')).status,403);
+ assert.equal((await req('/api/events','POST',eventInput,'admin',{origin:'https://evil.example'})).status,403);
+ assert.equal((await req('/api/auth/logout','POST',{},'admin')).status,200);
+ assert.equal((await req('/api/events','POST',eventInput,'admin')).status,401);
+ await login(ADMIN,'admin');
+ event=(await req('/api/events')).data.events[0];
+ assert.equal((await req('/api/events/'+event.id,'DELETE',{version:event.version},'admin')).status,200);
+ assert.equal(DB.db.prepare('SELECT count(*) n FROM registrations').get().n,0);
+ assert.equal((await req('/api/events')).data.events.length,0);
+});
+test('OAuth state is bound to browser, single-use, and profile cannot grant admin',async()=>{
+ const h=harness();
+ const state=await h.login(PILOT,'pilot');
+ assert.equal((await h.req('/api/session','GET',null,'pilot')).data.user.role,'pilot');
+ const invalid=await h.req('/api/auth/discord/callback?code=test&state='+state,'GET',null,'attacker');assert.equal(invalid.response.headers.get('Location'),ROOT+'/?auth=error');
+ h.jars.get('pilot')['__Host-fmt_oauth']=state;
+ const replay=await h.req('/api/auth/discord/callback?code=test&state='+state,'GET',null,'pilot');assert.equal(replay.response.headers.get('Location'),ROOT+'/?auth=error');
+ const cookie=h.jars.get('pilot')['__Host-fmt_session'];assert.equal(cookie.length,64);
+ assert(!JSON.stringify(h.DB.db.prepare('SELECT * FROM sessions').all()).includes(cookie));
+ h.DB.db.exec('UPDATE sessions SET expires_at=1');assert.equal((await h.req('/api/session','GET',null,'pilot')).data.user,null);
+});
+test('validation, closed departures, guest link rejection and free-tier rate limiting',async()=>{
+ const h=harness();await h.login(ADMIN,'admin');
+ for(const data of [{...eventInput,name:' '},{...eventInput,categories:['LMP2']},{...eventInput,departures:[{date:'2090-02-30',time:'14:00'}]},{...eventInput,departures:[eventInput.departures[0],eventInput.departures[0]]}])assert.equal((await h.req('/api/events','POST',data,'admin')).status,400);
+ assert.equal((await h.req('/api/guest/recover','POST',{token:'a'.repeat(64)})).status,404);
+ const old=await h.req('/api/events','POST',{...eventInput,departures:[{date:'2020-01-01',time:'14:00'}]},'admin');assert.equal(old.status,201);
+ const event=(await h.req('/api/events')).data.events[0];
+ assert.equal((await h.req(`/api/events/${event.id}/departures/${event.departures[0].id}/registrations`,'POST',{name:'Late',status:'whole',category:'GTE'})).status,409);
+ for(let i=0;i<80;i++)assert.notEqual((await h.req('/api/guest/recover','POST',{token:'bad'},'spam')).status,429);
+ assert.equal((await h.req('/api/guest/recover','POST',{token:'bad'},'spam')).status,429);
+ assert.equal((await h.req('/api/events','POST',eventInput,'admin',{headers:{'Cookie':'__Host-fmt_session=forged'}})).status,401);
+});
+test('Paris timezone is stable across seasons and rejects ambiguous/nonexistent clock changes',async()=>{
+ const h=harness();await h.login(ADMIN,'admin');
+ for(const [date,expected] of [['2027-01-10','2027-01-10T14:00:00.000Z'],['2027-07-10','2027-07-10T13:00:00.000Z']]){
+   const created=await h.req('/api/events','POST',{...eventInput,departures:[{date,time:'15:00'}]},'admin');
+   assert.equal(created.status,201);
+   const event=(await h.req('/api/events')).data.events.find(e=>e.id===created.data.id);
+   assert.equal(new Date(event.departures[0].startsAt).toISOString(),expected);
+ }
+ for(const date of ['2027-03-28','2027-10-31'])assert.equal((await h.req('/api/events','POST',{...eventInput,departures:[{date,time:'02:30'}]},'admin')).status,400);
+});

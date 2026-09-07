@@ -9,12 +9,12 @@ const categories = {
   GTE:{css:'gte'}
 };
 const CARS = {
-  Hypercar: ['Alpine A424','Aston Martin Valkyrie AMR LMH','BMW M Hybrid V8','BMW M Hybrid V8 Evo (2026)','Cadillac V-Series.R','Cadillac V-Series.R Evo (2026)','Ferrari 499P','Genesis GMR-001 LMDh','Glickenhaus SCG 007','Isotta Fraschini Tipo 6-C','Lamborghini SC63','Peugeot 9X8 2023','Peugeot 9X8 2024','Porsche 963','Toyota GR010 Hybrid','Toyota TR010 Hybrid (2026)','Vanwall Vandervell 680'],
+  Hypercar: ['Alpine A424','Aston Martin Valkyrie AMR LMH','BMW M Hybrid V8','Cadillac V-Series.R','Ferrari 499P','Genesis GMR-001 LMDh','Glickenhaus SCG 007','Isotta Fraschini Tipo 6-C','Lamborghini SC63','Peugeot 9X8','Porsche 963','Toyota GR010 Hybrid','Vanwall Vandervell 680'],
   'LMP2 ELMS': ['Oreca 07 Gibson ELMS'],
   'LMP2 WEC': ['Oreca 07 Gibson'],
-  LMP3: ['Ligier JS P325','Ginetta G61-LT-P3 Evo','Duqueine D09','Adess AD25'],
-  GT3: ['Aston Martin Vantage AMR LMGT3 Evo','BMW M4 LMGT3','BMW M4 LMGT3 Evo','Chevrolet Corvette Z06 LMGT3.R','Ferrari 296 LMGT3','Ferrari 296 LMGT3 Evo','Ford Mustang LMGT3','Ford Mustang LMGT3 Evo','Lamborghini Huracán LMGT3 Evo 2','Lexus RC F LMGT3','Mercedes-AMG LMGT3','McLaren 720S LMGT3 Evo','Porsche 911 LMGT3 R (992)','Porsche 911 LMGT3 R (992) 2026'],
-  GTE: ['Aston Martin Vantage GTE','Chevrolet Corvette C8.R','Ferrari 488 GTE Evo','Porsche 911 RSR-19']
+  LMP3: ['Ligier JS P325','Ginetta G61-LT-P3','Duqueine D09','Adess AD25'],
+  GT3: ['Aston Martin Vantage AMR LMGT3','BMW M4 LMGT3','Chevrolet Corvette Z06 LMGT3.R','Ferrari 296 LMGT3','Ford Mustang LMGT3','Lamborghini Huracán LMGT3','Lexus RC F LMGT3','Mercedes-AMG LMGT3','McLaren 720S LMGT3','Porsche 911 GT3 R LMGT3'],
+  GTE: ['Aston Martin Vantage GTE','Chevrolet Corvette C8.R','Ferrari 488 GTE','Porsche 911 RSR-19']
 };
 const app = document.getElementById('app');
 const nav = document.getElementById('navigation');
@@ -34,7 +34,11 @@ function logo(category) {
 function badge(category) { return `<span class="event-category-badge ${categories[category]?.css || ''}">${logo(category)}<span>${esc(category)}</span></span>`; }
 function eventTypeBadge(type) { const item=EVENT_TYPES[type]||EVENT_TYPES.private; return `<span class="event-type-badge ${item.css}">${item.label}</span>`; }
 function button(action,label,extra='',css='secondary-button') { return `<button type="button" class="${css}" data-action="${action}" ${extra}>${label}</button>`; }
-function carOptions(category, selected='') { return (CARS[category]||[]).map(car=>`<option value="${esc(car)}" ${selected===car?'selected':''}>${esc(car)}</option>`).join(''); }
+function carPreferenceChoices(category, selected=[], any=false) {
+  const values = Array.isArray(selected) ? selected : (selected ? [selected] : []);
+  return `<div class="car-preference-panel"><label class="car-any-option"><input type="checkbox" name="carAny" ${any?'checked':''}> <strong>Peu importe la voiture</strong><span>Je peux rouler avec n’importe quel modèle de cette catégorie.</span></label><div class="car-preference-grid">${(CARS[category]||[]).map(car=>`<label class="car-preference-option"><input type="checkbox" name="carPreference" value="${esc(car)}" ${values.includes(car)&&!any?'checked':''} ${any?'disabled':''}><span>${esc(car)}</span></label>`).join('')}</div></div>`;
+}
+function registrationCarLabel(reg) { return reg.carAny ? 'N’importe quelle voiture' : ((reg.cars?.length ? reg.cars.join(' · ') : reg.car) || 'Pas de préférence'); }
 function crewColorClass(crewId, index=null) { if(index!=null) return `crew-palette-${index%10}`; let hash=0; for(const char of String(crewId||'')) hash=(hash*31+char.charCodeAt(0))>>>0; return `crew-palette-${hash%10}`; }
 function errorBox() { return '<p id="error" class="creation-error" role="alert" tabindex="-1" hidden></p>'; }
 function showError(error) {
@@ -94,7 +98,7 @@ function ownRegistration(departure) { return departure.availability.find(r=>r.mi
 function draftFor(departure) {
   if (!drafts[departure.id]) {
     const mine=ownRegistration(departure);
-    drafts[departure.id]={name:mine?.name || pilotName, category:mine?.category || '',car:mine?.car || '',status:mine?.status || '',preferredPilot:mine?.preferredPilot || '',id:mine?.id || null,version:mine?.version || null};
+    drafts[departure.id]={name:mine?.name || pilotName, category:mine?.category || '',cars:mine?.cars || (mine?.car?[mine.car]:[]),carAny:!!mine?.carAny,status:mine?.status || '',preferredPilot:mine?.preferredPilot || '',id:mine?.id || null,version:mine?.version || null};
   }
   return drafts[departure.id];
 }
@@ -117,7 +121,7 @@ function renderRegistration(reg,departure,duration) {
   const presentCount=reg.status==='whole'?duration:parts.size;
   const timeline=`<div class="availability-readonly" aria-label="${esc(registrationSlotLabel(reg.status,departure,duration))}"><span class="timeline-edge">DÉPART</span><div class="availability-mini-grid duration-${duration}">${hours.map((hour,i)=>`<span class="availability-mini-hour ${phaseClass(i,duration)} ${reg.status==='whole'||parts.has(hour)?'present':''}" title="Heure ${i+1}">${i+1}</span>`).join('')}</div><span class="timeline-edge">ARRIVÉE</span></div>`;
   return `<div class="pilot-row"><div class="pilot-main"><span class="pilot-name">${esc(reg.name)}${reg.mine?' <small>(toi)</small>':''}</span>
-    <span class="pilot-category-logo">${reg.category?logo(reg.category):'—'}</span>${reg.car?`<span class="pilot-car">${esc(reg.car)}</span>`:''}<span class="registration-status">${reg.status==='unavailable'?'Indisponible':`${presentCount} h disponible${presentCount>1?'s':''}`}</span>${reg.preferredPilot?`<span class="pilot-preference">Souhaite rouler avec : <strong>${esc(reg.preferredPilot)}</strong></span>`:''}</div>${timeline}
+    <span class="pilot-category-logo">${reg.category?logo(reg.category):'—'}</span><span class="pilot-car">${esc(registrationCarLabel(reg))}</span><span class="registration-status">${reg.status==='unavailable'?'Indisponible':`${presentCount} h disponible${presentCount>1?'s':''}`}</span>${reg.preferredPilot?`<span class="pilot-preference">Souhaite rouler avec : <strong>${esc(reg.preferredPilot)}</strong></span>`:''}</div>${timeline}
     ${reg.canEdit&&!locked?button('edit-registration','Modifier',`data-id="${reg.id}" data-departure="${departure.id}"`,'edit-button'):''}</div>`;
 }
 function renderRegistrationForm(event,departure) {
@@ -135,7 +139,7 @@ function renderRegistrationForm(event,departure) {
     </div></div>
     ${state.status==='unavailable'?'':`<div class="category-area"><span class="form-label">Catégorie</span><div class="categories">
       ${event.categories.map(category=>button('category',`${logo(category)}<span>${esc(category)}</span>`,`data-departure="${departure.id}" data-value="${esc(category)}" aria-pressed="${state.category===category}"`,`category-button ${categories[category]?.css||''} ${state.category===category?'active':''}`)).join('')}
-    </div>${state.category?`<label class="form-label car-choice-label" for="car-${departure.id}">Voiture souhaitée <span class="muted">(facultatif)</span></label><select id="car-${departure.id}" name="car" data-departure="${departure.id}" class="car-choice"><option value="">Je n’ai pas encore choisi</option>${carOptions(state.category,state.car)}</select><p class="creation-help">Les organisateurs verront ce choix pour composer les équipages.</p>`:''}</div>`}
+    </div>${state.category?`<label class="form-label car-choice-label">Voiture(s) souhaitée(s)</label>${carPreferenceChoices(state.category,state.cars,state.carAny)}<p class="creation-help">Sélectionne un ou plusieurs modèles, ou coche « Peu importe ». Cette préférence aide les organisateurs à composer les équipages.</p>`:''}</div>`}
     <div class="save-row"><button type="submit" class="save-button">${state.id?'ENREGISTRER':'S’INSCRIRE'}</button>
       ${state.id?button('delete-registration','Se désinscrire',`data-id="${state.id}" data-departure="${departure.id}"`,'danger-button'):''}</div>
   </form>`;
@@ -187,11 +191,15 @@ function renderPilots(event,departure) {
 function coversHour(reg,index) { return reg.status==='whole'||reg.status.split(',').includes(`h${index+1}`); }
 function renderCrewForm(event) {
   const draft=crewDraft;
+  const departure=event.departures.find(d=>d.id===draft.departureId);
+  const preferences=(departure?.availability||[]).filter(r=>r.status!=='unavailable'&&r.category===draft.category);
+  const preferenceList=preferences.length?`<ul class="crew-preference-list">${preferences.map(r=>`<li><strong>${esc(r.name)}</strong><span>${esc(registrationCarLabel(r))}</span></li>`).join('')}</ul>`:'<p class="muted">Aucun pilote inscrit dans cette catégorie pour ce départ.</p>';
   return `<form class="crew-form" data-kind="crew" data-departure="${esc(draft.departureId||selectedDepartureId||'')}"><h3>${draft.id?'Modifier l’équipage':'Nouvel équipage'}</h3>
     <label>Nom de l’équipage<input name="crewName" maxlength="60" required value="${esc(draft.name)}" placeholder="Ex. FMT Racing 1"></label>
     <label>Catégorie<select name="crewCategory">${event.categories.map(c=>`<option ${draft.category===c?'selected':''} value="${esc(c)}">${esc(c)}</option>`).join('')}</select></label>
-    <label>Modèle de voiture <span class="muted">(facultatif)</span><input name="crewCar" maxlength="100" value="${esc(draft.car)}" placeholder="Modèle choisi par l’organisateur"></label>
-    <p class="creation-help">Indique le modèle ou laisse vide si la voiture reste à choisir. Les pilotes sont affectés après l’enregistrement.</p>
+    <label>Voiture de l’équipage<select name="crewCar"><option value="">Voiture à définir</option>${(CARS[draft.category]||[]).map(car=>`<option value="${esc(car)}" ${draft.car===car?'selected':''}>${esc(car)}</option>`).join('')}</select></label>
+    <div class="crew-preferences"><strong>Préférences des pilotes à affecter</strong>${preferenceList}</div>
+    <p class="creation-help">Choisis le modèle retenu pour l’équipage. Les préférences affichées viennent des pilotes inscrits.</p>
     <div class="toolbar"><button type="submit" class="primary-button">Enregistrer l’équipage</button>${button('cancel-crew','Annuler')}</div></form>`;
 }
 function renderCrews(event,departure) {
@@ -206,7 +214,7 @@ function renderCrews(event,departure) {
       const candidates=unassigned.filter(r=>r.category===crew.category);
       const covered=counts.filter(n=>n>0).length;
       return `<article class="crew-card crew-category-${categories[crew.category]?.css||''} ${crewColorClass(crew.id,crewIndex)}" data-crew="${crew.id}"><div class="crew-card-header"><div>${badge(crew.category)}<h3>${esc(crew.name)}</h3><p class="crew-car">${esc(crew.car||'Voiture à choisir')}</p></div><span class="coverage-summary">${regs.length} pilote(s) · ${covered}/${duration} h</span></div>
-        <ul class="crew-roster">${regs.map(r=>`<li><div><strong class="crew-pilot-name">${esc(r.name)}</strong><small>${r.car?`${esc(r.car)} · `:''}${esc(statusLabel(r.status))}${r.preferredPilot?` · souhaite ${esc(r.preferredPilot)}`:''}</small></div>${manage?button('remove-crew-pilot','Retirer',`data-id="${crew.id}" data-departure="${departure.id}" data-registration="${r.id}" aria-label="Retirer ${esc(r.name)} de cet équipage"`):''}</li>`).join('')||'<li>Aucun pilote affecté.</li>'}</ul>
+        <ul class="crew-roster">${regs.map(r=>`<li><div><strong class="crew-pilot-name">${esc(r.name)}</strong><small>${esc(registrationCarLabel(r))} · ${esc(statusLabel(r.status))}${r.preferredPilot?` · souhaite ${esc(r.preferredPilot)}`:''}</small></div>${manage?button('remove-crew-pilot','Retirer',`data-id="${crew.id}" data-departure="${departure.id}" data-registration="${r.id}" aria-label="Retirer ${esc(r.name)} de cet équipage"`):''}</li>`).join('')||'<li>Aucun pilote affecté.</li>'}</ul>
         <div class="crew-availability-line duration-${duration}" aria-label="Disponibilité de l’équipage">${counts.map((n,i)=>`<span class="crew-availability-hour ${phaseClass(i,duration)} ${n?'covered':'gap'}" title="Heure ${i+1} : ${n?`${n} pilote(s)`:'aucun pilote'}">${i+1}</span>`).join('')}</div>
         <p class="coverage-note">${covered===duration?'Toutes les heures sont couvertes.':`${duration-covered} heure(s) sans présence.`}</p>
         ${regs.some(r=>/beginning|middle|end/.test(r.status))?'<p class="coverage-note">Certaines disponibilités anciennes doivent être précisées heure par heure ; elles ne sont pas comptées dans la couverture.</p>':''}
@@ -260,8 +268,10 @@ async function submitRegistration(form) {
   if(!state.name)throw Error('Indique ton pseudo.');
   if(!state.status)throw Error('Choisis ta disponibilité.');
   if(state.status!=='unavailable'&&!state.category)throw Error('Choisis ta catégorie.');
-  state.car=form.elements.car?.value || '';
-  const payload={name:state.name,status:state.status,category:state.category,car:state.car||'',preferredPilot:state.preferredPilot||'',version:state.version};
+  state.cars=[...form.querySelectorAll('[name="carPreference"]:checked')].map(input=>input.value);
+  state.carAny=!!form.elements.carAny?.checked;
+  if(state.status!=='unavailable'&&!state.carAny&&!state.cars.length)throw Error('Choisis au moins une voiture, ou coche « Peu importe la voiture ».');
+  const payload={name:state.name,status:state.status,category:state.category,cars:state.cars,carAny:state.carAny,preferredPilot:state.preferredPilot||'',version:state.version};
   const result=await api(state.id?`/api/registrations/${state.id}`:`/api/events/${event.id}/departures/${departure.id}/registrations`,state.id?'PATCH':'POST',payload);
   pilotName=state.name;try{localStorage.setItem('fmt_pilot_name',pilotName);}catch{}
   if(result.recoveryLink)recoveryLink=result.recoveryLink;
@@ -336,14 +346,14 @@ async function perform(action,target) {
     case 'new-registration':{
       selectedDepartureId=target.dataset.departure;
       const departure=event.departures.find(d=>d.id===target.dataset.departure);
-      drafts[departure.id]={name:'',category:'',car:'',status:'',preferredPilot:'',id:null,version:null};
+      drafts[departure.id]={name:'',category:'',cars:[],carAny:false,status:'',preferredPilot:'',id:null,version:null};
       renderEvent();document.getElementById('name-'+departure.id)?.focus();break;
     }
-    case 'category':{selectedDepartureId=target.dataset.departure;const state=draftFor(event.departures.find(d=>d.id===target.dataset.departure));state.category=target.dataset.value;if(!CARS[state.category]?.includes(state.car))state.car='';renderEvent();break;}
+    case 'category':{selectedDepartureId=target.dataset.departure;const state=draftFor(event.departures.find(d=>d.id===target.dataset.departure));state.category=target.dataset.value;state.cars=(state.cars||[]).filter(car=>CARS[state.category]?.includes(car));state.carAny=false;renderEvent();break;}
     case 'edit-registration':{
       selectedDepartureId=target.dataset.departure;
       const departure=event.departures.find(d=>d.id===target.dataset.departure),reg=departure.availability.find(r=>r.id===target.dataset.id);
-      if(!reg?.canEdit)throw Error('Cette inscription ne t’appartient pas.');drafts[departure.id]={name:reg.name,id:reg.id,version:reg.version,status:reg.status,preferredPilot:reg.preferredPilot||'',category:reg.category,car:reg.car||''};eventSection='race';renderEvent();document.getElementById('name-'+departure.id)?.focus();break;
+      if(!reg?.canEdit)throw Error('Cette inscription ne t’appartient pas.');drafts[departure.id]={name:reg.name,id:reg.id,version:reg.version,status:reg.status,preferredPilot:reg.preferredPilot||'',category:reg.category,cars:reg.cars|| (reg.car?[reg.car]:[]),carAny:!!reg.carAny};eventSection='race';renderEvent();document.getElementById('name-'+departure.id)?.focus();break;
     }
     case 'delete-registration':{
       const departure=event.departures.find(d=>d.id===target.dataset.departure),reg=departure.availability.find(r=>r.id===target.dataset.id);
@@ -359,9 +369,20 @@ async function perform(action,target) {
     case 'hide-link':recoveryLink='';target.closest('.recovery-panel').remove();break;
   }
 }
-document.addEventListener('input',event=>{const field=event.target;if(field.dataset.departure&&drafts[field.dataset.departure]){if(field.name==='pilotName')drafts[field.dataset.departure].name=field.value;if(field.name==='preferredPilot')drafts[field.dataset.departure].preferredPilot=field.value;if(field.name==='car')drafts[field.dataset.departure].car=field.value;}});
-document.addEventListener('change',event=>{const field=event.target;if(field.name==='car'&&field.dataset.departure&&drafts[field.dataset.departure])drafts[field.dataset.departure].car=field.value;});
-document.addEventListener('input',event=>{if(!crewDraft)return;const key={crewName:'name',crewCategory:'category',crewCar:'car'}[event.target.name];if(key)crewDraft[key]=event.target.value;});
+document.addEventListener('input',event=>{const field=event.target;if(field.dataset.departure&&drafts[field.dataset.departure]){if(field.name==='pilotName')drafts[field.dataset.departure].name=field.value;if(field.name==='preferredPilot')drafts[field.dataset.departure].preferredPilot=field.value;}});
+document.addEventListener('change',event=>{
+  const field=event.target;
+  if(field.dataset.departure&&drafts[field.dataset.departure]&&(field.name==='carPreference'||field.name==='carAny')){
+    const draft=drafts[field.dataset.departure];
+    draft.cars=[...field.form.querySelectorAll('[name="carPreference"]:checked')].map(input=>input.value);
+    draft.carAny=!!field.form.elements.carAny?.checked;
+    if(draft.carAny)draft.cars=[];
+    renderEvent();
+  }
+  if(field.name==='crewCategory'&&crewDraft){crewDraft.category=field.value;crewDraft.car='';renderEvent();return;}
+  if(field.name==='crewCar'&&crewDraft)crewDraft.car=field.value;
+});
+document.addEventListener('input',event=>{if(!crewDraft)return;const key={crewName:'name'}[event.target.name];if(key)crewDraft[key]=event.target.value;});
 document.addEventListener('change',event=>{
   if(event.target.id!=='departure-select')return;
   if(busy||(crewDraft&&!confirm('Quitter le formulaire d’équipage sans l’enregistrer ?'))){event.target.value=selectedDepartureId;return;}

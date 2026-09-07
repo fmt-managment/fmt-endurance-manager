@@ -1535,3 +1535,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pilot-car { color: #b9c7c8; font-size: 13px; }
 .car-choice-label { display: block; margin-top: 18px; }
 .car-choice { display: block; width: 100%; max-width: 560px; min-height: 44px; margin-top: 7px; padding: 9px 12px; border: 1px solid #475359; border-radius: 8px; background: #101416; color: #f4f7f6; }
+.car-preference-panel { margin-top: 8px; max-width: 760px; padding: 12px; border: 1px solid #344147; border-radius: 10px; background: #101416; }
+.car-any-option { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 12px; border: 1px solid #3f6f56; border-radius: 8px; background: #13261d; cursor: pointer; }
+.car-any-option input, .car-preference-option input { accent-color: #54d98a; }
+.car-any-option span { flex-basis: 100%; color: #aababb; font-size: 12px; margin-left: 24px; }
+.car-preference-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; margin-top: 10px; }
+.car-preference-option { display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 8px 10px; border: 1px solid #303b40; border-radius: 7px; color: #d9e2e0; font-size: 13px; cursor: pointer; }
+.car-preference-option:has(input:checked) { border-color: #54d98a; background: #173c28; color: #fff; }
+.car-preference-option:has(input:disabled) { opacity: .5; cursor: not-allowed; }
+.crew-preferences { grid-column: 1/-1; padding: 12px 14px; border: 1px solid #344147; border-radius: 9px; background: #101416; color: #d9e2e0; }
+.crew-preference-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px 14px; list-style: none; padding: 8px 0 0; margin: 0; }
+.crew-preference-list li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid #293438; padding: 5px 0; font-size: 13px; }
+.crew-preference-list li span { color: #8fe2ac; text-align: right; }
+@media (max-width: 640px) { .car-preference-grid, .crew-preference-list { grid-template-columns: 1fr; } .car-preference-option { min-height: 42px; } }

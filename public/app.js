@@ -57,7 +57,7 @@ function circuitVisual(id, compact=false) { const circuit=circuitInfo(id); if(!c
 function button(action,label,extra='',css='secondary-button') { return `<button type="button" class="${css}" data-action="${action}" ${extra}>${label}</button>`; }
 function carPreferenceChoices(category, selected=[], any=false) {
   const values = Array.isArray(selected) ? selected : (selected ? [selected] : []);
-  return `<div class="car-preference-panel"><label class="car-any-option"><input type="checkbox" name="carAny" ${any?'checked':''}> <strong>Peu importe la voiture</strong><span>Je peux rouler avec n’importe quel modèle de cette catégorie.</span></label><div class="car-preference-grid">${(CARS[category]||[]).map(car=>`<label class="car-preference-option"><input type="checkbox" name="carPreference" value="${esc(car)}" ${values.includes(car)&&!any?'checked':''} ${any?'disabled':''}><span>${esc(car)}</span></label>`).join('')}</div></div>`;
+  return `<fieldset class="car-preference-panel"><legend class="form-label">Voiture(s) souhaitée(s)</legend><label class="car-any-option"><input type="checkbox" name="carAny" ${any?'checked':''}><span>Peu importe la voiture</span></label><div class="car-preference-grid">${(CARS[category]||[]).map(car=>`<label class="car-preference-option"><input type="checkbox" name="carPreference" value="${esc(car)}" ${values.includes(car)&&!any?'checked':''} ${any?'disabled':''}><span>${esc(car)}</span></label>`).join('')}</div><p class="car-preference-help">Choisis un ou plusieurs modèles, ou coche « Peu importe la voiture ». Ces souhaits aident les organisateurs à former les équipages.</p></fieldset>`;
 }
 function registrationCarLabel(reg) { return reg.carAny ? 'N’importe quelle voiture' : ((reg.cars?.length ? reg.cars.join(' · ') : reg.car) || 'Pas de préférence'); }
 function pilotWishes(reg) {
@@ -172,7 +172,7 @@ function renderRegistrationForm(event,departure) {
     </div></div>
     ${state.status==='unavailable'?'':`<div class="category-area"><span class="form-label">Catégorie</span><div class="categories">
       ${event.categories.map(category=>button('category',`${logo(category)}<span>${esc(category)}</span>`,`data-departure="${departure.id}" data-value="${esc(category)}" aria-pressed="${state.category===category}"`,`category-button ${categories[category]?.css||''} ${state.category===category?'active':''}`)).join('')}
-    </div>${state.category?`<label class="form-label car-choice-label">Voiture(s) souhaitée(s)</label>${carPreferenceChoices(state.category,state.cars,state.carAny)}<p class="creation-help">Sélectionne un ou plusieurs modèles, ou coche « Peu importe ». Cette préférence aide les organisateurs à composer les équipages.</p>`:''}</div>`}
+    </div>${state.category?carPreferenceChoices(state.category,state.cars,state.carAny):''}</div>`}
     <div class="save-row"><button type="submit" class="save-button">${state.id?'ENREGISTRER':'S’INSCRIRE'}</button>
       ${state.id?button('delete-registration','Se désinscrire',`data-id="${state.id}" data-departure="${departure.id}"`,'danger-button'):''}</div>
   </form>`;
@@ -410,12 +410,16 @@ document.addEventListener('input',event=>{const field=event.target;if(field.data
 document.addEventListener('change',event=>{
   const field=event.target;
   if(field.hasAttribute('data-assignment-preview')){updateAssignmentPreview(field);return;}
-  if(field.dataset.departure&&drafts[field.dataset.departure]&&(field.name==='carPreference'||field.name==='carAny')){
-    const draft=drafts[field.dataset.departure];
+  const departureId=field.form?.dataset.departure;
+  if(departureId&&drafts[departureId]&&(field.name==='carPreference'||field.name==='carAny')){
+    const draft=drafts[departureId];
     draft.cars=[...field.form.querySelectorAll('[name="carPreference"]:checked')].map(input=>input.value);
     draft.carAny=!!field.form.elements.carAny?.checked;
     if(draft.carAny)draft.cars=[];
-    renderEvent();
+    for(const input of field.form.querySelectorAll('[name="carPreference"]')){
+      input.disabled=draft.carAny;
+      if(draft.carAny)input.checked=false;
+    }
   }
   if(field.name==='crewCategory'&&crewDraft){crewDraft.category=field.value;crewDraft.car='';renderEvent();return;}
   if(field.name==='crewCar'&&crewDraft)crewDraft.car=field.value;

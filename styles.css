@@ -180,6 +180,12 @@ main {
   gap: 12px;
 }
 
+.event-agenda { display: grid; gap: 30px; }
+.event-period { min-width: 0; }
+.event-period-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 14px; margin: 4px 0 14px; padding-bottom: 10px; border-bottom: 1px solid #344147; color: #eef5f3; font-size: 19px; line-height: 1.4; }
+.event-period-heading > span::first-letter { text-transform: uppercase; }
+.event-period-heading small { color: #aababb; font-size: 13px; font-weight: 500; }
+
 .event-card {
   position: relative;
 

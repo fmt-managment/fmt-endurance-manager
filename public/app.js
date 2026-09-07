@@ -103,24 +103,61 @@ function countdown(timestamp) {
   return days?`${days}j ${hours}h ${minutes}m`:`${hours}h ${minutes}m ${seconds%60}s`;
 }
 function dateLabel(departure) { return new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',dateStyle:'full'}).format(new Date(departure.startsAt)); }
+function parisCalendar(timestamp) {
+  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(timestamp));
+  const value=type=>Number(parts.find(part=>part.type===type).value);
+  return {year:value('year'),month:value('month'),day:Date.UTC(value('year'),value('month')-1,value('day'))};
+}
+function eventSchedule(event,now) {
+  const departures=[...event.departures].filter(d=>Number.isFinite(d.startsAt)).sort((a,b)=>a.startsAt-b.startsAt);
+  const duration=(event.durationHours||6)*3600000;
+  const next=departures.find(d=>d.startsAt>now);
+  const running=departures.find(d=>d.startsAt<=now&&d.startsAt+duration>now);
+  const end=departures.length?departures[departures.length-1].startsAt+duration:null;
+  return {event,next,running,end,archived:end!==null&&end<=now,timestamp:running?.startsAt??next?.startsAt??end};
+}
+function groupEvents(source,filter,now=Date.now()) {
+  const today=parisCalendar(now);
+  const monday=today.day-((new Date(today.day).getUTCDay()+6)%7)*86400000;
+  const monthLabel=timestamp=>new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',month:'long',...(parisCalendar(timestamp).year!==today.year?{year:'numeric'}:{})}).format(new Date(timestamp));
+  const items=source.map(event=>eventSchedule(event,now)).filter(item=>filter==='archived'?item.archived:!item.archived);
+  items.sort((a,b)=>filter==='archived'?b.end-a.end:Number(!!b.running)-Number(!!a.running)||(a.timestamp??Infinity)-(b.timestamp??Infinity)||a.event.name.localeCompare(b.event.name,'fr'));
+  const groups=new Map();
+  for(const item of items){
+    let key,label;
+    if(item.timestamp===null){key='undated';label='Dates à confirmer';}
+    else {
+      const date=parisCalendar(item.timestamp);
+      key=`${date.year}-${date.month}`;
+      if(filter==='archived')label=monthLabel(item.timestamp);
+      else if(item.running){key='running';label='En cours';}
+      else if(date.day<monday+7*86400000){key='this-week';label='Cette semaine';}
+      else if(date.day<monday+14*86400000){key='next-week';label='La semaine prochaine';}
+      else label=`${date.year===today.year&&date.month===today.month?'Plus tard en ':''}${monthLabel(item.timestamp)}`;
+    }
+    if(!groups.has(key))groups.set(key,{key,label,items:[]});
+    groups.get(key).items.push(item);
+  }
+  return [...groups.values()];
+}
+function renderEventCard({event,next,running,archived,end}) {
+  return `<button class="event-card event-type-${event.eventType||'private'} ${archived?'archived':''}" data-action="open" data-id="${event.id}">
+    <span class="event-card-main"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} · ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0)} inscription(s)</span></span>
+    ${circuitVisual(event.circuit,true)}
+    <span class="event-category-badges">${event.categories.map(badge).join('')}</span>
+    ${running?'<span class="event-countdown">Course en cours</span>':''}
+    <span class="event-countdown ${archived?'finished':''}">${next?`Prochain départ : ${esc(dateLabel(next))} à ${esc(next.time)} · <span data-countdown="${next.startsAt}">${countdown(next.startsAt)}</span>`:archived?`Terminé le ${esc(dateLabel({startsAt:end}))}`:running?'Le dernier départ est encore en course.':'Dates à confirmer'}</span>
+  </button>`;
+}
 function renderHome(message='') {
   page='home';currentEventId=null;editingEvent=null;drafts={};
-  const filteredEvents=events.filter(event=>{const upcoming=event.departures.some(d=>d.startsAt>Date.now());return eventFilter==='all'||(eventFilter==='upcoming'?upcoming:!upcoming);});
+  const groups=groupEvents(events,eventFilter);
   app.innerHTML=`<h1 class="page-title">ÉVÉNEMENTS</h1>
     <p class="page-subtitle">Gestion des courses d’endurance · Horaires de Paris</p>
     ${message?`<p class="creation-success" role="status">${esc(message)}</p>`:''}${errorBox()}
     <div class="toolbar">${button('refresh','Actualiser')}${button('my-entries','Mes inscriptions')}${!user?button('guest-link','Mon lien personnel'):''}</div>
-    <div class="event-filter" role="group" aria-label="Filtrer les événements">${button('event-filter','À venir',`data-filter="upcoming" aria-pressed="${eventFilter==='upcoming'}"`,'event-filter-button')}${button('event-filter','Archivés',`data-filter="archived" aria-pressed="${eventFilter==='archived'}"`,'event-filter-button')}${button('event-filter','Tous',`data-filter="all" aria-pressed="${eventFilter==='all'}"`,'event-filter-button')}</div>
-    ${filteredEvents.length?`<div class="event-list">${filteredEvents.map(event=>{
-      const next=event.departures.find(d=>d.startsAt>Date.now());
-      const archived=!next;
-      return `<button class="event-card event-type-${event.eventType||'private'} ${archived?'archived':''}" data-action="open" data-id="${event.id}">
-        <span class="event-card-main"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} · ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0)} inscription(s)</span></span>
-        ${circuitVisual(event.circuit,true)}
-        <span class="event-category-badges">${event.categories.map(badge).join('')}</span>
-        <span class="event-countdown ${next?'':'finished'}">${next?`Prochain départ : ${esc(dateLabel(next))} à ${next.time} · <span data-countdown="${next.startsAt}">${countdown(next.startsAt)}</span>`:'Événement archivé · tous les départs sont passés'}</span>
-      </button>`;
-    }).join('')}</div>`:`<div class="empty">${eventFilter==='upcoming'?'Aucun événement à venir.':eventFilter==='archived'?'Aucun événement archivé.':'Aucun événement pour le moment. Un organisateur pourra créer la première course.'}</div>`}`;
+    <div class="event-filter" role="group" aria-label="Filtrer les événements">${button('event-filter','À venir',`data-filter="upcoming" aria-pressed="${eventFilter==='upcoming'}"`,'event-filter-button')}${button('event-filter','Archivés',`data-filter="archived" aria-pressed="${eventFilter==='archived'}"`,'event-filter-button')}</div>
+    ${groups.length?`<div class="event-agenda">${groups.map(group=>`<section class="event-period" aria-labelledby="period-${group.key}"><h2 class="event-period-heading" id="period-${group.key}"><span>${esc(group.label)}</span><small>${group.items.length} événement${group.items.length>1?'s':''}</small></h2><div class="event-list">${group.items.map(renderEventCard).join('')}</div></section>`).join('')}</div>`:`<div class="empty">${eventFilter==='upcoming'?'Aucun événement à venir.':'Aucun événement archivé.'}</div>`}`;
   showRecoveryLink();
 }
 function showRecoveryLink() {

@@ -37,7 +37,7 @@ const CARS = {
 const app = document.getElementById('app');
 const nav = document.getElementById('navigation');
 let events=[], user=null, discordReady=false, currentEventId=null, page='home', editingEvent=null;
-let drafts={}, recoveryLink='', busy=false, members=[], flash='';
+let drafts={}, recoveryLink='', busy=false, members=[], flash='', eventFilter='upcoming';
 let selectedDepartureId=null, eventSection='race', crewDraft=null;
 let pilotName='';
 try { pilotName = localStorage.getItem('fmt_pilot_name') || ''; } catch {}
@@ -53,7 +53,7 @@ function badge(category) { return `<span class="event-category-badge ${categorie
 function eventTypeBadge(type) { const item=EVENT_TYPES[type]||EVENT_TYPES.private; return `<span class="event-type-badge ${item.css}">${item.label}</span>`; }
 function circuitInfo(id) { return CIRCUITS.find(c=>c.id===id) || null; }
 function circuitLabel(id) { return circuitInfo(id)?.name || 'Circuit à préciser'; }
-function circuitVisual(id, compact=false) { const circuit=circuitInfo(id); if(!circuit)return ''; return `<span class="circuit-visual ${compact?'compact':''}"><img data-circuit="${circuit.id}" src="/images/circuits/${circuit.file}" alt="Plan du ${esc(circuit.name)}" loading="lazy"><span>${esc(circuit.name)}</span></span>`; }
+function circuitVisual(id, compact=false) { const circuit=circuitInfo(id); if(!circuit)return ''; return `<span class="circuit-visual ${compact?'compact':''}"><img data-circuit="${circuit.id}" src="/images/circuits/${circuit.file}" alt="Plan du ${esc(circuit.name)}" loading="lazy"></span>`; }
 function button(action,label,extra='',css='secondary-button') { return `<button type="button" class="${css}" data-action="${action}" ${extra}>${label}</button>`; }
 function carPreferenceChoices(category, selected=[], any=false) {
   const values = Array.isArray(selected) ? selected : (selected ? [selected] : []);
@@ -96,19 +96,22 @@ function countdown(timestamp) {
 function dateLabel(departure) { return new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',dateStyle:'full'}).format(new Date(departure.startsAt)); }
 function renderHome(message='') {
   page='home';currentEventId=null;editingEvent=null;drafts={};
+  const filteredEvents=events.filter(event=>{const upcoming=event.departures.some(d=>d.startsAt>Date.now());return eventFilter==='all'||(eventFilter==='upcoming'?upcoming:!upcoming);});
   app.innerHTML=`<h1 class="page-title">ÉVÉNEMENTS</h1>
     <p class="page-subtitle">Courses d’endurance FMT · Horaires de Paris</p>
     ${message?`<p class="creation-success" role="status">${esc(message)}</p>`:''}${errorBox()}
     <div class="toolbar">${button('refresh','Actualiser')}${button('my-entries','Mes inscriptions')}${!user?button('guest-link','Mon lien personnel'):''}</div>
-    ${events.length?`<div class="event-list">${events.map(event=>{
+    <div class="event-filter" role="group" aria-label="Filtrer les événements">${button('event-filter','À venir',`data-filter="upcoming" aria-pressed="${eventFilter==='upcoming'}"`,'event-filter-button')}${button('event-filter','Archivés',`data-filter="archived" aria-pressed="${eventFilter==='archived'}"`,'event-filter-button')}${button('event-filter','Tous',`data-filter="all" aria-pressed="${eventFilter==='all'}"`,'event-filter-button')}</div>
+    ${filteredEvents.length?`<div class="event-list">${filteredEvents.map(event=>{
       const next=event.departures.find(d=>d.startsAt>Date.now());
-      return `<button class="event-card event-type-${event.eventType||'private'}" data-action="open" data-id="${event.id}">
+      const archived=!next;
+      return `<button class="event-card event-type-${event.eventType||'private'} ${archived?'archived':''}" data-action="open" data-id="${event.id}">
         <span class="event-card-main"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} · ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0)} inscription(s)</span></span>
         ${circuitVisual(event.circuit,true)}
         <span class="event-category-badges">${event.categories.map(badge).join('')}</span>
-        <span class="event-countdown ${next?'':'finished'}">${next?`Prochain départ : ${esc(dateLabel(next))} à ${next.time} · <span data-countdown="${next.startsAt}">${countdown(next.startsAt)}</span>`:'Tous les départs sont passés'}</span>
+        <span class="event-countdown ${next?'':'finished'}">${next?`Prochain départ : ${esc(dateLabel(next))} à ${next.time} · <span data-countdown="${next.startsAt}">${countdown(next.startsAt)}</span>`:'Événement archivé · tous les départs sont passés'}</span>
       </button>`;
-    }).join('')}</div>`:'<div class="empty">Aucun événement pour le moment. Un organisateur pourra créer la première course.</div>'}`;
+    }).join('')}</div>`:`<div class="empty">${eventFilter==='upcoming'?'Aucun événement à venir.':eventFilter==='archived'?'Aucun événement archivé.':'Aucun événement pour le moment. Un organisateur pourra créer la première course.'}</div>`}`;
   showRecoveryLink();
 }
 function showRecoveryLink() {
@@ -169,6 +172,7 @@ function renderEvent(message='') {
   page='event';
   const event=events.find(e=>e.id===currentEventId);
   if(!event){renderHome('Cet événement n’est plus disponible.');return;}
+  if(!canManage()) eventSection='race';
   const nextDeparture=event.departures.find(d=>d.startsAt>Date.now())||event.departures[0];
   const totalPilots=new Set(event.departures.flatMap(d=>d.availability.filter(r=>r.status!=='unavailable').map(r=>r.id))).size;
   const totalCrews=event.departures.reduce((sum,d)=>sum+(d.crews||[]).length,0);
@@ -177,7 +181,7 @@ function renderEvent(message='') {
     <div class="event-category-badges">${event.categories.map(badge).join('')}</div></div>
     <div class="toolbar">${button('refresh','Actualiser')}${canManage()?button('edit-event','Modifier l’événement',`data-id="${event.id}"`):''}${isAdmin()?button('delete-event','Supprimer l’événement',`data-id="${event.id}"`,'danger-button'):''}</div>
     ${message?`<p class="creation-success" role="status">${esc(message)}</p>`:''}${errorBox()}
-    <nav class="event-section-tabs" aria-label="Sections de l’événement">${button('event-section','Course',`data-section="race" aria-pressed="${eventSection==='race'}"`,'event-section-tab')}${button('event-section','Équipages',`data-section="crews" aria-pressed="${eventSection==='crews'}"`,'event-section-tab')}</nav>
+    ${canManage()?`<nav class="event-section-tabs" aria-label="Sections de l’événement">${button('event-section','Course',`data-section="race" aria-pressed="${eventSection==='race'}"`,'event-section-tab')}${button('event-section','Équipages',`data-section="crews" aria-pressed="${eventSection==='crews'}"`,'event-section-tab')}</nav>`:''}
     <section class="race-recap" aria-label="Récapitulatif de la course">
       <div class="recap-intro"><div><p class="recap-kicker">${eventSection==='crews'?'GESTION DES ÉQUIPAGES':'RÉCAPITULATIF DE LA COURSE'}</p><h2>${esc(event.name)}</h2><p>${eventSection==='crews'?'Les organisateurs composent les équipages à partir des pilotes inscrits.':'Les départs et les inscriptions sont regroupés dans les volets ci-dessous.'}</p></div><span class="recap-countdown">${nextDeparture?`Prochain départ <strong data-countdown="${nextDeparture.startsAt}">${countdown(nextDeparture.startsAt)}</strong>`:'Course terminée'}</span></div>
       <div class="recap-stats"><div><strong>${event.durationHours||6} h</strong><span>durée</span></div><div><strong>${event.departures.length}</strong><span>départ${event.departures.length>1?'s':''}</span></div><div><strong>${totalPilots}</strong><span>pilote${totalPilots>1?'s':''}</span></div><div><strong>${totalCrews}</strong><span>équipage${totalCrews>1?'s':''}</span></div></div>
@@ -327,6 +331,7 @@ async function perform(action,target) {
   const event=events.find(e=>e.id===currentEventId);
   switch(action){
     case 'home':renderHome();break;
+    case 'event-filter':eventFilter=target.dataset.filter||'upcoming';renderHome();break;
     case 'refresh':await refresh();break;
     case 'open':currentEventId=target.dataset.id;selectedDepartureId=target.dataset.departure||null;eventSection='race';crewDraft=null;drafts={};renderEvent();break;
     case 'focus-registration':{const fold=document.getElementById('departure-'+target.dataset.departure);if(fold){fold.open=true;fold.querySelector('.fold-registration')?.scrollIntoView({behavior:'smooth',block:'start'});}break;}

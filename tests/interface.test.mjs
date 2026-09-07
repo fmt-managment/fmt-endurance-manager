@@ -23,12 +23,12 @@ test('course recap, foldable departures, read-only crews for pilots, escaped nam
   assert(h.app.innerHTML.includes('id="departure-first"'));assert(h.app.innerHTML.includes('id="departure-second"'));
   assert.equal((h.app.innerHTML.match(/class="departure-fold"/g)||[]).length,2);
   h.run("eventSection='crews';renderEvent()");
-  assert(h.app.innerHTML.includes('Toutes les heures sont couvertes.'));
-  assert(h.app.innerHTML.includes('FMT &lt;test&gt;'));
+  assert(h.app.innerHTML.includes('RÉCAPITULATIF DE LA COURSE'));
+  assert(!h.app.innerHTML.includes('data-section="crews"'));
   assert(!h.app.innerHTML.includes('data-action="new-crew"'));
   assert(!h.app.innerHTML.includes('data-action="add-crew-pilot"'));
-  assert(!h.app.innerHTML.includes('Mon inscription'));
-  assert(!h.app.innerHTML.includes('class="fold-registration"'));
+  assert(h.app.innerHTML.includes('Mon inscription'));
+  assert(h.app.innerHTML.includes('fold-registration'));
 });
 test('organizer crew controls and hourly palette scale to 1, 4, 6 and 24 hours',async()=>{
   for(const duration of [1,4,6,24]) {

@@ -59,7 +59,10 @@ async function identity(request, env) {
   const guest = cookie(request, COOKIE_GUEST);
   return {user, guestHash: /^[a-f0-9]{64}$/.test(guest) ? await hash(guest) : null, guestToken: /^[a-f0-9]{64}$/.test(guest) ? guest : null};
 }
-function owned(reg, actor) { return !!((actor.user && reg.user_id === actor.user.id) || (actor.guestHash && reg.guest_hash === actor.guestHash)); }
+function owned(reg, actor) {
+  return !!((actor.user && (reg.user_id === actor.user.id || reg.owner_user_id === actor.user.id)) ||
+    (actor.guestHash && reg.guest_hash === actor.guestHash));
+}
 async function body(request) {
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) fail(415, 'Format JSON requis.');
   const reader = request.body?.getReader();
@@ -202,8 +205,11 @@ async function oauthCallback(request, env) {
     if (!/^\d{15,22}$/.test(profile.id)) throw Error('identity');
     const display = String(profile.global_name || profile.username || 'Pilote').slice(0, 80);
     const session = token();
+    const guestRaw = cookie(request, COOKIE_GUEST);
+    const guestHash = /^[a-f0-9]{64}$/.test(guestRaw) ? await hash(guestRaw) : null;
     await env.DB.batch([
       env.DB.prepare('INSERT INTO users(id,name,created_at) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name').bind(profile.id, display, now()),
+      ...(guestHash ? [env.DB.prepare('UPDATE registrations SET owner_user_id=? WHERE guest_hash=? AND owner_user_id IS NULL').bind(profile.id, guestHash)] : []),
       env.DB.prepare('INSERT INTO sessions(token_hash,user_id,expires_at) VALUES(?,?,?)').bind(await hash(session), profile.id, now() + 7 * DAY)
     ]);
     const old = cookie(request, COOKIE_SESSION);
@@ -324,9 +330,10 @@ async function api(request, env) {
     const guestToken = managedRegistration ? token() : actor.user ? null : actor.guestToken || token();
     const guestHash = guestToken ? await hash(guestToken) : null;
     const userId = managedRegistration ? null : actor.user?.id || null;
+    const ownerUserId = actor.user?.id || null;
     const regId = id();
-    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,guest_hash,name,name_key,category,car,car_preferences,car_any,status,preferred_pilot,created_at)
-      SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,guestHash,data.name,data.nameKey,data.category,data.car,JSON.stringify(data.cars),data.carAny?1:0,data.status,data.preferredPilot,now(),event.id,event.version).run();
+    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,owner_user_id,guest_hash,name,name_key,category,car,car_preferences,car_any,status,preferred_pilot,created_at)
+      SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,ownerUserId,guestHash,data.name,data.nameKey,data.category,data.car,JSON.stringify(data.cars),data.carAny?1:0,data.status,data.preferredPilot,now(),event.id,event.version).run();
     if (!result.meta.changes) fail(409, 'Cet événement a changé. Actualise avant de t’inscrire.');
     return json({id:regId, recoveryLink:guestToken ? canonical + '/#access=' + guestToken : null}, 201, guestToken ? [setCookie(COOKIE_GUEST, guestToken, 365 * DAY)] : []);
   }

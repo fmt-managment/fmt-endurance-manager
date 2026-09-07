@@ -9,8 +9,8 @@ Cette version remplace la sauvegarde locale des événements par une base Cloudf
 | Profil | Droits |
 | --- | --- |
 | Visiteur | Consulter les courses, s’inscrire sans compte, gérer ses inscriptions avec un lien personnel |
-| Pilote connecté avec Discord | Retrouver ses inscriptions Discord et les modifier |
-| Organisateur | Droits pilote, création et modification des événements |
+| Pilote connecté avec Discord | Retrouver, modifier et supprimer ses inscriptions Discord |
+| Organisateur | Droits pilote, création et modification des événements, gestion de ses inscriptions créées |
 | Administrateur principal | Tous les droits, suppression des événements, gestion des inscriptions et des organisateurs |
 
 Les droits sont vérifiés côté serveur pour chaque action. Le pseudo ne donne aucun droit. Les administrateurs principaux sont définis explicitement dans Cloudflare par leurs identifiants Discord. Le premier visiteur connecté ne devient jamais administrateur automatiquement.
@@ -43,7 +43,7 @@ Gardez l’adresse gratuite actuelle. Une seule adresse canonique est acceptée 
 3. Exécutez le contenu de `migrations/0001_initial.sql`, une seule fois. Si la console ne prend qu’une instruction à la fois, exécutez les instructions dans leur ordre.
 4. Vérifiez la présence des tables `users`, `sessions`, `oauth_states`, `events`, `registrations`, `rate_limits`, `crews` et `crew_members`.
 
-Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0007` sont déjà appliquées ; pour cette version, une base déjà à jour jusqu’à `0007` doit recevoir uniquement `migrations/0008_event_circuit.sql`.
+Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0009` sont déjà appliquées ; une base déjà à jour jusqu’à `0008` doit recevoir `migrations/0009_registration_owner.sql`.
 
 ## 3. Créer l’application Discord
 
@@ -104,7 +104,7 @@ Un simple dépôt de l’ancien `index.html`, ou un hébergement purement statiq
 6. Demandez à un pilote de se connecter avec Discord. Il apparaîtra dans **Gestion des membres**. Attribuez-lui **Organisateur**, puis vérifiez qu’il peut créer et modifier une course.
 7. Retirez ce rôle pour vérifier qu’il perd les droits de gestion. Les permissions sont relues côté serveur à chaque requête.
 
-Sans compte, le lien personnel est le moyen de récupération des inscriptions de l’invité. Il donne accès à toutes les inscriptions associées à ce profil invité. Ne le partagez pas. Le même navigateur conserve aussi cet accès via un cookie protégé. Le bouton **Mon lien personnel** permet de le retrouver. Une inscription invitée n’est pas fusionnée automatiquement avec un compte Discord portant le même pseudo.
+Sans compte, le lien personnel est le moyen de récupération des inscriptions de l’invité. Il donne accès à toutes les inscriptions associées à ce profil invité. Ne le partagez pas. Le même navigateur conserve aussi cet accès via un cookie protégé. Si le pilote se connecte ensuite avec Discord depuis ce navigateur, les inscriptions invitées de ce navigateur sont rattachées à son compte pour rester disponibles après reconnexion. Le bouton **Mon lien personnel** reste nécessaire pour récupérer une inscription depuis un autre appareil.
 
 ## Variante : projet Cloudflare Workers
 

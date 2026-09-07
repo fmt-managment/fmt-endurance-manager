@@ -17,6 +17,7 @@ function harness(){
  DB.db.exec(readFileSync(new URL('../migrations/0006_registration_car.sql',import.meta.url),'utf8'));
  DB.db.exec(readFileSync(new URL('../migrations/0007_registration_car_preferences.sql',import.meta.url),'utf8'));
  DB.db.exec(readFileSync(new URL('../migrations/0008_event_circuit.sql',import.meta.url),'utf8'));
+ DB.db.exec(readFileSync(new URL('../migrations/0009_registration_owner.sql',import.meta.url),'utf8'));
  const env={DB,APP_ORIGIN:ROOT,DISCORD_CLIENT_ID:'app-id',DISCORD_CLIENT_SECRET:'test-only-secret',ADMIN_DISCORD_IDS:ADMIN,ASSETS:{fetch:async()=>new Response('static')}};
  const jars=new Map();
  async function req(path,method='GET',data,actor='guest',options={}){
@@ -104,6 +105,10 @@ test('shared events, actual Discord callback, role grants/revocation, guest reco
  const regPath=`/api/events/${eventId}/departures/${depId}/registrations`;
  const reg=await req(regPath,'POST',{name:'Nathan',category:'GTE',status:'whole'});assert.equal(reg.status,201);assert(reg.data.recoveryLink.startsWith(ROOT+'/#access='));
  const regId=reg.data.id;
+ await login(PILOT,'guest');
+ delete h.jars.get('guest')['__Host-fmt_guest'];
+ event=(await req('/api/events','GET',null,'guest')).data.events[0];
+ assert.equal(event.departures[0].availability.find(r=>r.id===regId).mine,true);
  event=(await req('/api/events')).data.events[0];assert.equal(event.departures[0].availability[0].mine,true);
  const outsider=(await req('/api/events','GET',null,'outsider')).data.events[0].departures[0].availability[0];assert.equal(outsider.mine,false);assert.equal(outsider.canEdit,false);assert(!JSON.stringify(outsider).includes('guest_hash'));
  assert.equal((await req('/api/registrations/'+regId,'PATCH',{name:'Nathan',status:'unavailable',version:1},'outsider')).status,403);
@@ -130,6 +135,23 @@ test('shared events, actual Discord callback, role grants/revocation, guest reco
  assert.equal((await req('/api/events/'+event.id,'DELETE',{version:event.version},'admin')).status,200);
  assert.equal(DB.db.prepare('SELECT count(*) n FROM registrations').get().n,0);
  assert.equal((await req('/api/events')).data.events.length,0);
+});
+test('pilot, organizer and admin keep ownership after Discord logout and login',async()=>{
+ const h=harness(),{req,login}=h;
+ await login(ADMIN,'admin');await login(PILOT,'pilot');await login(OTHER,'organizer');
+ assert.equal((await req('/api/members/'+OTHER,'PATCH',{role:'organizer'},'admin')).status,200);
+ const created=await req('/api/events','POST',eventInput,'admin');assert.equal(created.status,201);
+ const event=(await req('/api/events')).data.events[0],regPath=`/api/events/${event.id}/departures/${event.departures[0].id}/registrations`;
+ const actors=[['pilot','Pilote connecté',PILOT],['organizer','Organisateur connecté',OTHER],['admin','Administrateur connecté',ADMIN]];
+ for(const [actor,name,discordId] of actors){
+   const registration=await req(regPath,'POST',{name,category:'GTE',status:'whole'},actor);assert.equal(registration.status,201);
+   assert.equal((await req('/api/auth/logout','POST',{},actor)).status,200);
+   await login(discordId,actor);
+   const refreshed=(await req('/api/events','GET',null,actor)).data.events[0].departures[0].availability.find(r=>r.id===registration.data.id);
+   assert.equal(refreshed.mine,true,`${actor} registration should remain visible in My registrations`);
+   assert.equal(refreshed.canEdit,true,`${actor} registration should remain editable`);
+   assert.equal((await req('/api/registrations/'+registration.data.id,'DELETE',{version:1},actor)).status,200);
+ }
 });
 test('OAuth state is bound to browser, single-use, and profile cannot grant admin',async()=>{
  const h=harness();

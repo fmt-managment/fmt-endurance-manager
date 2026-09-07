@@ -1391,6 +1391,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .unassigned-list { margin-top: 22px; padding: 16px; background: #181e21; border-radius: 10px; }
 .unassigned-list summary { cursor: pointer; min-height: 32px; }
 .unassigned-list li { margin-top: 10px; overflow-wrap: anywhere; }
+.unassigned-pilots { list-style: none; padding: 0; margin: 12px 0 0; }
+.unassigned-pilots > li { padding: 12px 0; border-top: 1px solid #344247; }
+.assignment-wishes { margin-top: 10px; padding: 12px; border: 1px solid #344247; border-radius: 8px; background: #101719; color: #cbd5d8; font-size: 14px; }
+.pilot-wishes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; margin: 8px 0 0; font-size: 14px; line-height: 1.5; }
+.pilot-wishes > div { min-width: 0; }
+.pilot-wishes dt { color: #aabac0; font-size: 12px; }
+.pilot-wishes dd { margin: 2px 0 0; color: #f1f5f6; overflow-wrap: anywhere; }
+.crew-assignment select { min-width: 0; flex: 1; }
+@media (max-width: 600px) { .pilot-wishes { grid-template-columns: minmax(0, 1fr); } }
 @media(max-width:700px) {
   .departure-switcher { padding: 16px 12px 12px; gap: 8px; }
   .departure-arrows { flex-direction: column; gap: 4px; }

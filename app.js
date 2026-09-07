@@ -60,6 +60,15 @@ function carPreferenceChoices(category, selected=[], any=false) {
   return `<div class="car-preference-panel"><label class="car-any-option"><input type="checkbox" name="carAny" ${any?'checked':''}> <strong>Peu importe la voiture</strong><span>Je peux rouler avec n’importe quel modèle de cette catégorie.</span></label><div class="car-preference-grid">${(CARS[category]||[]).map(car=>`<label class="car-preference-option"><input type="checkbox" name="carPreference" value="${esc(car)}" ${values.includes(car)&&!any?'checked':''} ${any?'disabled':''}><span>${esc(car)}</span></label>`).join('')}</div></div>`;
 }
 function registrationCarLabel(reg) { return reg.carAny ? 'N’importe quelle voiture' : ((reg.cars?.length ? reg.cars.join(' · ') : reg.car) || 'Pas de préférence'); }
+function pilotWishes(reg) {
+  return `<dl class="pilot-wishes"><div><dt>Voiture(s) souhaitée(s)</dt><dd>${esc(registrationCarLabel(reg))}</dd></div><div><dt>Coéquipier souhaité</dt><dd>${esc(reg.preferredPilot || 'Aucune préférence renseignée')}</dd></div></dl>`;
+}
+function updateAssignmentPreview(select) {
+  const departure=events.find(e=>e.id===currentEventId)?.departures.find(d=>d.id===select.dataset.departure);
+  const reg=departure?.availability.find(r=>r.id===select.value);
+  const preview=document.getElementById(select.getAttribute('aria-controls'));
+  if(preview) preview.innerHTML=reg?`<strong>${esc(reg.name)}</strong>${pilotWishes(reg)}`:'Sélectionne un pilote pour voir ses souhaits avant de l’ajouter.';
+}
 function crewColorClass(crewId, index=null) { if(index!=null) return `crew-palette-${index%10}`; let hash=0; for(const char of String(crewId||'')) hash=(hash*31+char.charCodeAt(0))>>>0; return `crew-palette-${hash%10}`; }
 function errorBox() { return '<p id="error" class="creation-error" role="alert" tabindex="-1" hidden></p>'; }
 function showError(error) {
@@ -243,9 +252,9 @@ function renderCrews(event,departure) {
         <div class="crew-availability-line duration-${duration}" aria-label="Disponibilité de l’équipage">${counts.map((n,i)=>`<span class="crew-availability-hour ${phaseClass(i,duration)} ${n?'covered':'gap'}" title="Heure ${i+1} : ${n?`${n} pilote(s)`:'aucun pilote'}">${i+1}</span>`).join('')}</div>
         <p class="coverage-note">${covered===duration?'Toutes les heures sont couvertes.':`${duration-covered} heure(s) sans présence.`}</p>
         ${regs.some(r=>/beginning|middle|end/.test(r.status))?'<p class="coverage-note">Certaines disponibilités anciennes doivent être précisées heure par heure ; elles ne sont pas comptées dans la couverture.</p>':''}
-        ${manage?`<div class="crew-assignment"><label for="assign-${crew.id}">Ajouter un pilote inscrit · ${esc(crew.category)}</label><div><select id="assign-${crew.id}" ${!candidates.length?'disabled':''}><option value="">${candidates.length?'Choisir un pilote':'Aucun pilote à affecter dans cette catégorie'}</option>${candidates.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')}</select>${button('add-crew-pilot','Ajouter',`data-id="${crew.id}" data-departure="${departure.id}" ${!candidates.length?'disabled':''}`)}</div></div><div class="crew-actions">${button('edit-crew','Modifier',`data-id="${crew.id}" data-departure="${departure.id}"`)}${button('delete-crew','Supprimer',`data-id="${crew.id}" data-departure="${departure.id}"`,'danger-button')}</div>`:''}</article>`;
+        ${manage?`<div class="crew-assignment"><label for="assign-${crew.id}">Ajouter un pilote inscrit · ${esc(crew.category)}</label><div><select id="assign-${crew.id}" data-assignment-preview data-departure="${departure.id}" aria-controls="wishes-${crew.id}" ${!candidates.length?'disabled':''}><option value="">${candidates.length?'Choisir un pilote':'Aucun pilote à affecter dans cette catégorie'}</option>${candidates.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')}</select>${button('add-crew-pilot','Ajouter',`data-id="${crew.id}" data-departure="${departure.id}" ${!candidates.length?'disabled':''}`)}</div>${candidates.length?`<section id="wishes-${crew.id}" class="assignment-wishes" aria-live="polite">Sélectionne un pilote pour voir ses souhaits avant de l’ajouter.</section>`:''}</div><div class="crew-actions">${button('edit-crew','Modifier',`data-id="${crew.id}" data-departure="${departure.id}"`)}${button('delete-crew','Supprimer',`data-id="${crew.id}" data-departure="${departure.id}"`,'danger-button')}</div>`:''}</article>`;
     }).join('')}</div>`:'<div class="empty">Aucun équipage créé sur ce départ pour le moment.</div>'}
-    ${manage?`<details class="unassigned-list"><summary>${unassigned.length} pilote(s) restant à affecter</summary><ul>${unassigned.map(r=>`<li>${esc(r.name)} · ${esc(r.category)}</li>`).join('')||'<li>Tous les pilotes inscrits disponibles sont affectés.</li>'}</ul></details>`:''}</div>`;
+    ${manage?`<details class="unassigned-list"><summary>${unassigned.length} pilote(s) restant à affecter</summary><ul class="unassigned-pilots">${unassigned.map(r=>`<li><strong>${esc(r.name)}</strong> <span class="muted">· ${esc(r.category)}</span>${pilotWishes(r)}</li>`).join('')||'<li>Tous les pilotes inscrits disponibles sont affectés.</li>'}</ul></details>`:''}</div>`;
 }
 function departureFields(departure={}) {
   const fieldId=crypto.randomUUID();
@@ -400,6 +409,7 @@ async function perform(action,target) {
 document.addEventListener('input',event=>{const field=event.target;if(field.dataset.departure&&drafts[field.dataset.departure]){if(field.name==='pilotName')drafts[field.dataset.departure].name=field.value;if(field.name==='preferredPilot')drafts[field.dataset.departure].preferredPilot=field.value;}});
 document.addEventListener('change',event=>{
   const field=event.target;
+  if(field.hasAttribute('data-assignment-preview')){updateAssignmentPreview(field);return;}
   if(field.dataset.departure&&drafts[field.dataset.departure]&&(field.name==='carPreference'||field.name==='carAny')){
     const draft=drafts[field.dataset.departure];
     draft.cars=[...field.form.querySelectorAll('[name="carPreference"]:checked')].map(input=>input.value);

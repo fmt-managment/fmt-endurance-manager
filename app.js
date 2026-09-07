@@ -1,23 +1,22 @@
 const CATEGORIES = ['Hypercar','LMP2 ELMS','LMP2 WEC','LMP3','GT3','GTE'];
 const EVENT_TYPES = {special:{label:'Special event',css:'special'},lmu:{label:'Championnat LMU',css:'lmu'},private:{label:'Championnat privé',css:'private'}};
 const CIRCUITS = [
-  {id:'bahrain',name:'Bahrain International Circuit'},
-  {id:'barcelona',name:'Circuit de Barcelona-Catalunya'},
-  {id:'cota',name:'Circuit of the Americas'},
-  {id:'daytona',name:'Daytona International Speedway'},
-  {id:'fuji',name:'Fuji Speedway'},
-  {id:'imola',name:'Autodromo Enzo e Dino Ferrari (Imola)'},
-  {id:'interlagos',name:'Interlagos'},
-  {id:'laguna-seca',name:'WeatherTech Raceway Laguna Seca'},
-  {id:'le-mans',name:'Circuit de la Sarthe (Le Mans)'},
-  {id:'lusail',name:'Lusail International Circuit'},
-  {id:'monza',name:'Autodromo Nazionale Monza'},
-  {id:'nurburgring',name:'Nürburgring GP'},
-  {id:'paul-ricard',name:'Circuit Paul Ricard'},
-  {id:'portimao',name:'Algarve International Circuit (Portimão)'},
-  {id:'sebring',name:'Sebring International Raceway'},
-  {id:'silverstone',name:'Silverstone Circuit'},
-  {id:'spa',name:'Circuit de Spa-Francorchamps'}
+  {id:'bahrain',name:'Bahrain International Circuit',file:'bahrain.png'},
+  {id:'barcelona',name:'Circuit de Barcelona-Catalunya',file:'barcelone.png'},
+  {id:'cota',name:'Circuit of the Americas',file:'cota.png'},
+  {id:'daytona',name:'Daytona International Speedway',file:'daytona.png'},
+  {id:'fuji',name:'Fuji Speedway',file:'fuji.png'},
+  {id:'imola',name:'Autodromo Enzo e Dino Ferrari (Imola)',file:'imola.png'},
+  {id:'interlagos',name:'Interlagos',file:'interlagos.png'},
+  {id:'laguna-seca',name:'WeatherTech Raceway Laguna Seca',file:'laguna_seca.png'},
+  {id:'le-mans',name:'Circuit de la Sarthe (Le Mans)',file:'le_mans.png'},
+  {id:'lusail',name:'Lusail International Circuit',file:'lusail_international.png'},
+  {id:'monza',name:'Autodromo Nazionale Monza',file:'monza.png'},
+  {id:'paul-ricard',name:'Circuit Paul Ricard',file:'paul_ricard_elms.png'},
+  {id:'portimao',name:'Algarve International Circuit (Portimão)',file:'algarve.png'},
+  {id:'sebring',name:'Sebring International Raceway',file:'sebring.png'},
+  {id:'silverstone',name:'Silverstone Circuit',file:'silverstone.png'},
+  {id:'spa',name:'Circuit de Spa-Francorchamps',file:'spa_francorchamps.png'}
 ];
 const categories = {
   Hypercar:{image:'HC.png',css:'hyper'},
@@ -54,7 +53,7 @@ function badge(category) { return `<span class="event-category-badge ${categorie
 function eventTypeBadge(type) { const item=EVENT_TYPES[type]||EVENT_TYPES.private; return `<span class="event-type-badge ${item.css}">${item.label}</span>`; }
 function circuitInfo(id) { return CIRCUITS.find(c=>c.id===id) || null; }
 function circuitLabel(id) { return circuitInfo(id)?.name || 'Circuit à préciser'; }
-function circuitVisual(id, compact=false) { const circuit=circuitInfo(id); if(!circuit)return ''; return `<span class="circuit-visual ${compact?'compact':''}"><img data-circuit="${circuit.id}" src="/images/circuits/${circuit.id}.png" alt="Plan du ${esc(circuit.name)}" loading="lazy"><span>${esc(circuit.name)}</span></span>`; }
+function circuitVisual(id, compact=false) { const circuit=circuitInfo(id); if(!circuit)return ''; return `<span class="circuit-visual ${compact?'compact':''}"><img data-circuit="${circuit.id}" src="/images/circuits/${circuit.file}" alt="Plan du ${esc(circuit.name)}" loading="lazy"><span>${esc(circuit.name)}</span></span>`; }
 function button(action,label,extra='',css='secondary-button') { return `<button type="button" class="${css}" data-action="${action}" ${extra}>${label}</button>`; }
 function carPreferenceChoices(category, selected=[], any=false) {
   const values = Array.isArray(selected) ? selected : (selected ? [selected] : []);
@@ -410,7 +409,7 @@ document.addEventListener('input',event=>{if(!crewDraft)return;const key={crewNa
 document.addEventListener('error',event=>{
   const image=event.target;
   if(!(image instanceof HTMLImageElement)||!image.matches('.circuit-visual img'))return;
-  const slug=image.dataset.circuit, attempts=Number(image.dataset.attempts||0), sources=[`/images/${slug}.png`,`/images/circuits/${slug}.jpg`,`/images/${slug}.jpg`,`/images/circuits/${slug}.webp`,`/images/${slug}.webp`];
+  const circuit=circuitInfo(image.dataset.circuit), slug=image.dataset.circuit, attempts=Number(image.dataset.attempts||0), sources=[`/images/${circuit?.file||slug+'.png'}`,`/images/circuits/${slug}.png`,`/images/${slug}.png`,`/images/circuits/${slug}.jpg`,`/images/${slug}.jpg`,`/images/circuits/${slug}.webp`,`/images/${slug}.webp`];
   if(attempts<sources.length){image.dataset.attempts=String(attempts+1);image.src=sources[attempts];}else image.remove();
 },true);
 document.addEventListener('change',event=>{

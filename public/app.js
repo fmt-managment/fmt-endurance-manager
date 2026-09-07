@@ -98,7 +98,7 @@ function renderHome(message='') {
   page='home';currentEventId=null;editingEvent=null;drafts={};
   const filteredEvents=events.filter(event=>{const upcoming=event.departures.some(d=>d.startsAt>Date.now());return eventFilter==='all'||(eventFilter==='upcoming'?upcoming:!upcoming);});
   app.innerHTML=`<h1 class="page-title">ÉVÉNEMENTS</h1>
-    <p class="page-subtitle">Courses d’endurance FMT · Horaires de Paris</p>
+    <p class="page-subtitle">Gestion des courses d’endurance · Horaires de Paris</p>
     ${message?`<p class="creation-success" role="status">${esc(message)}</p>`:''}${errorBox()}
     <div class="toolbar">${button('refresh','Actualiser')}${button('my-entries','Mes inscriptions')}${!user?button('guest-link','Mon lien personnel'):''}</div>
     <div class="event-filter" role="group" aria-label="Filtrer les événements">${button('event-filter','À venir',`data-filter="upcoming" aria-pressed="${eventFilter==='upcoming'}"`,'event-filter-button')}${button('event-filter','Archivés',`data-filter="archived" aria-pressed="${eventFilter==='archived'}"`,'event-filter-button')}${button('event-filter','Tous',`data-filter="all" aria-pressed="${eventFilter==='all'}"`,'event-filter-button')}</div>
@@ -452,6 +452,6 @@ async function start(){
     const authError=new URLSearchParams(location.search).get('auth');
     if(authError){history.replaceState(null,'',location.pathname);flash='La connexion Discord n’a pas abouti. Tu peux réessayer.';}
     await load();renderHome(flash);
-  }catch(error){app.innerHTML=`<h1 class="page-title">FMT ENDURANCE</h1>${errorBox()}${button('refresh','Réessayer')}`;showError(error);}
+  }catch(error){app.innerHTML=`<h1 class="page-title">ENDURANCE MANAGER</h1>${errorBox()}${button('refresh','Réessayer')}`;showError(error);}
 }
 start();

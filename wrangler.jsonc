@@ -1,5 +1,5 @@
 {
-  "name": "fmt-endurance-manager",
+  "name": "app",
   "main": "server/worker.mjs",
   "compatibility_date": "2026-09-07",
   "keep_vars": true,
@@ -19,6 +19,6 @@
     }
   ],
   "vars": {
-    "APP_ORIGIN": "https://fmt-endurance-manager.raphael-nagel.workers.dev"
+    "APP_ORIGIN": "https://app.endurance-manager.workers.dev"
   }
 }

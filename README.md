@@ -1,4 +1,4 @@
-# FMT Endurance — version partagée Cloudflare + Discord
+# Endurance Manager — version partagée Cloudflare + Discord
 
 Cette version remplace la sauvegarde locale des événements par une base Cloudflare D1. Elle est préparée pour l’hébergement Cloudflare existant. Elle n’a pas encore été configurée ni publiée sur votre compte.
 
@@ -19,7 +19,7 @@ Les deux catégories LMP2 sont distinctes mais utilisent le même logo P2. GTE u
 
 ## Configuration préparée pour votre Worker existant
 
-Le fichier `wrangler.jsonc` est maintenant renseigné pour `fmt-endurance-manager` et la base D1 déjà créée (identifiant repris de votre capture). Il déclare la liaison `DB` et le serveur. L’ajout de cette liaison par le formulaire Cloudflare n’est plus nécessaire : `wrangler deploy` appliquera cette configuration lors d’un déploiement réussi.
+Le fichier `wrangler.jsonc` est maintenant renseigné pour le Worker `app` et la base D1 déjà créée (identifiant repris de votre capture). Avec le sous-domaine de compte `endurance-manager`, l’adresse publique sera `https://app.endurance-manager.workers.dev`. Il déclare la liaison `DB` et le serveur. L’ajout de cette liaison par le formulaire Cloudflare n’est plus nécessaire : `wrangler deploy` appliquera cette configuration lors d’un déploiement réussi.
 
 Les tables de base et les tables d’équipages existent déjà : **ne réexécutez pas la migration initiale**.
 

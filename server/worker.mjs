@@ -245,11 +245,13 @@ async function api(request, env) {
     const departure = departureById(event, departureMatch[2]);
     if (departure.startsAt <= Date.now()) fail(409, 'Ce départ est passé. Les inscriptions sont fermées.');
     const input = await body(request), data = validateRegistration(input, event);
-    const guestToken = actor.user ? null : actor.guestToken || token();
+    const managedRegistration = !!actor.user && ['admin','organizer'].includes(actor.user.role);
+    const guestToken = managedRegistration ? token() : actor.user ? null : actor.guestToken || token();
     const guestHash = guestToken ? await hash(guestToken) : null;
+    const userId = managedRegistration ? null : actor.user?.id || null;
     const regId = id();
     const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,guest_hash,name,name_key,category,status,created_at)
-      SELECT ?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,actor.user?.id || null,guestHash,data.name,data.nameKey,data.category,data.status,now(),event.id,event.version).run();
+      SELECT ?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,guestHash,data.name,data.nameKey,data.category,data.status,now(),event.id,event.version).run();
     if (!result.meta.changes) fail(409, 'Cet événement a changé. Actualise avant de t’inscrire.');
     return json({id:regId, recoveryLink:guestToken ? canonical + '/#access=' + guestToken : null}, 201, guestToken ? [setCookie(COOKIE_GUEST, guestToken, 365 * DAY)] : []);
   }

@@ -144,9 +144,11 @@ function publicRegistration(reg, actor) {
 async function listEvents(env, actor) {
   const rows = (await env.DB.prepare('SELECT * FROM events ORDER BY created_at DESC, id DESC').all()).results;
   const registrations = (await env.DB.prepare('SELECT * FROM registrations ORDER BY created_at').all()).results;
+  const crews = (await env.DB.prepare('SELECT id,event_id,departure_id,name,category,car,version FROM crews ORDER BY created_at,id').all()).results;
+  const memberships = (await env.DB.prepare('SELECT crew_id,registration_id FROM crew_members').all()).results;
   const grouped = new Map();
   for (const reg of registrations) { const key = `${reg.event_id}:${reg.departure_id}`; if (!grouped.has(key)) grouped.set(key, []); grouped.get(key).push(publicRegistration(reg, actor)); }
-  return rows.map(row => ({id:row.id, name:row.name, durationHours:Number(row.duration_hours)||3, eventType:row.event_type||'private', categories:JSON.parse(row.categories), version:row.version, departures:JSON.parse(row.departures).map(d => ({...d, availability:grouped.get(`${row.id}:${d.id}`) || []}))}));
+  return rows.map(row => ({id:row.id, name:row.name, durationHours:Number(row.duration_hours)||3, eventType:row.event_type||'private', categories:JSON.parse(row.categories), version:row.version, departures:JSON.parse(row.departures).map(d => ({...d, availability:grouped.get(`${row.id}:${d.id}`) || [], crews:crews.filter(c=>c.event_id===row.id&&c.departure_id===d.id).map(c=>({id:c.id,name:c.name,category:c.category,car:c.car,version:c.version,registrationIds:memberships.filter(m=>m.crew_id===c.id).map(m=>m.registration_id)}))}))}));
 }
 async function oauthStart(request, env) {
   requireDiscord(env); await rateLimit(request, env, 'oauth', 20); await cleanup(env);
@@ -214,6 +216,52 @@ async function api(request, env) {
     return json({link:canonical + '/#access=' + actor.guestToken});
   }
   if (path === '/api/events' && method === 'GET') return json({events:await listEvents(env, actor)});
+  const crewCreate = path.match(/^\/api\/events\/([a-f0-9-]{36})\/departures\/([a-f0-9-]{36})\/crews$/);
+  const crewRoute = path.match(/^\/api\/crews\/([a-f0-9-]{36})(?:\/members(?:\/([a-f0-9-]{36}))?)?$/);
+  if ((crewCreate && method==='POST') || (crewRoute && ['POST','PATCH','DELETE'].includes(method))) {
+    requireRole(actor.user);
+    const input=await body(request);
+    const crew=crewRoute ? await env.DB.prepare('SELECT * FROM crews WHERE id=?').bind(crewRoute[1]).first() : null;
+    if (crewRoute && !crew) fail(404,'Équipage introuvable.');
+    const event=await eventById(env,crew?.event_id || crewCreate[1]);
+    const departure=departureById(event,crew?.departure_id || crewCreate[2]);
+    if (departure.startsAt<=Date.now()) fail(409,'Ce départ est passé. Les équipages sont verrouillés.');
+    if (crew && input.version!==crew.version) fail(409,'Cet équipage a changé. Actualise avant de réessayer.');
+    const membership=crewRoute && path.includes('/members');
+    if (membership) {
+      if (method==='POST' && !crewRoute[2]) {
+        if (!/^[a-f0-9-]{36}$/.test(input.registrationId || '')) fail(400,'Sélectionne un pilote inscrit.');
+        // Bump version and assign in one atomic batch; stale writes cannot assign anyone.
+        const results=await env.DB.batch([
+          env.DB.prepare('UPDATE crews SET version=version+1 WHERE id=? AND version=?').bind(crew.id,input.version),
+          env.DB.prepare('INSERT INTO crew_members(registration_id,crew_id) SELECT ?,? WHERE changes()=1').bind(input.registrationId,crew.id)
+        ]);
+        if (!results[0].meta.changes) fail(409,'Cet équipage a changé. Actualise la page.');
+      } else if (method==='DELETE' && crewRoute[2]) {
+        const results=await env.DB.batch([
+          env.DB.prepare('UPDATE crews SET version=version+1 WHERE id=? AND version=?').bind(crew.id,input.version),
+          env.DB.prepare('DELETE FROM crew_members WHERE crew_id=? AND registration_id=? AND changes()=1').bind(crew.id,crewRoute[2])
+        ]);
+        if (!results[0].meta.changes) fail(409,'Cet équipage a changé. Actualise la page.');
+      } else fail(404,'Action introuvable.');
+      return json({ok:true});
+    }
+    if (crew && method==='DELETE') {
+      const result=await env.DB.prepare('DELETE FROM crews WHERE id=? AND version=?').bind(crew.id,input.version).run();
+      if (!result.meta.changes) fail(409,'Cet équipage a changé. Actualise la page.');
+      return json({ok:true});
+    }
+    if (crew && method!=='PATCH') fail(404,'Action introuvable.');
+    const name=text(input.name,60,'Nom de l’équipage');
+    if (!JSON.parse(event.categories).includes(input.category)) fail(400,'Choisis une catégorie de cet événement.');
+    const car=input.car==null || input.car==='' ? '' : text(input.car,100,'Voiture');
+    const crewId=crew?.id || id();
+    const result=crew
+      ? await env.DB.prepare('UPDATE crews SET name=?,category=?,car=?,version=version+1 WHERE id=? AND version=?').bind(name,input.category,car,crewId,input.version).run()
+      : await env.DB.prepare('INSERT INTO crews(id,event_id,departure_id,name,category,car,created_at) VALUES(?,?,?,?,?,?,?)').bind(crewId,event.id,departure.id,name,input.category,car,now()).run();
+    if (!result.meta.changes) fail(409,'Cet équipage a changé. Actualise la page.');
+    return json({id:crewId},crew?200:201);
+  }
   if (path === '/api/events' && method === 'POST') {
     requireRole(actor.user);
     const data = validateEvent(await body(request)), eventId = id();
@@ -296,6 +344,11 @@ export default {
     try { return await api(request, env); }
     catch (error) {
       if (error instanceof HttpError) return json({error:error.message},error.status);
+      const message=String(error.message);
+      if (message.includes('UNIQUE constraint failed: crew_members.')) return json({error:'Ce pilote appartient déjà à un équipage sur ce départ. Actualise la page.'},409);
+      if (message.includes('crew_category_in_use')) return json({error:'Ce pilote est affecté à un équipage de cette catégorie. Retire d’abord son affectation pour changer de catégorie.'},409);
+      if (message.includes('crew_event_in_use')) return json({error:'Un équipage utilise encore ce départ ou cette catégorie. Supprime ou modifie cet équipage avant de continuer.'},409);
+      if (message.includes('crew_membership_invalid') || message.includes('crew_invalid')) return json({error:'Affectation impossible : vérifie le départ, la catégorie et la disponibilité du pilote, puis actualise.'},409);
       if (String(error.message).includes('UNIQUE constraint failed: registrations.')) return json({error:'Une inscription existe déjà pour ce pilote ou ce pseudo sur ce départ. Actualise pour retrouver la tienne.'},409);
       console.error('FMT API failure', error instanceof Error ? error.message.replace(/[a-f0-9]{64}/g,'[redacted]') : 'unknown');
       return json({error:'Le service est momentanément indisponible. Tes changements ne sont pas confirmés ; réessaie dans un instant.'},503);

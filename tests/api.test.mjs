@@ -12,6 +12,7 @@ class D1 {
 }
 function harness(){
  const DB=new D1();
+ DB.db.exec(readFileSync(new URL('../migrations/0004_crews.sql',import.meta.url),'utf8'));
  const env={DB,APP_ORIGIN:ROOT,DISCORD_CLIENT_ID:'app-id',DISCORD_CLIENT_SECRET:'test-only-secret',ADMIN_DISCORD_IDS:ADMIN,ASSETS:{fetch:async()=>new Response('static')}};
  const jars=new Map();
  async function req(path,method='GET',data,actor='guest',options={}){
@@ -34,6 +35,50 @@ function harness(){
  return {DB,env,req,login,jars};
 }
 const eventInput={name:'Daytona 8H',categories:['Hypercar','LMP2 ELMS','GTE'],departures:[{date:'2090-10-15',time:'15:00'},{date:'2090-10-14',time:'14:00'}]};
+test('crews: manager-only writes, category/departure integrity, concurrency and preserved registrations',async()=>{
+ const {req,login,DB}=harness();
+ await login(ADMIN,'admin');await login(PILOT,'pilot');await login(OTHER,'organizer');
+ await req('/api/members/'+OTHER,'PATCH',{role:'organizer'},'admin');
+ assert.equal((await req('/api/events','POST',eventInput,'admin')).status,201);
+ const event=(await req('/api/events')).data.events[0],dep=event.departures[0],second=event.departures[1];
+ const base=`/api/events/${event.id}/departures/${dep.id}`;
+ const payload={name:'FMT 1',category:'Hypercar',car:'Prototype test'};
+ assert.equal((await req(base+'/crews','POST',payload)).status,401);
+ assert.equal((await req(base+'/crews','POST',payload,'pilot')).status,403);
+ const created=await req(base+'/crews','POST',payload,'organizer');assert.equal(created.status,201);
+ const id=created.data.id,crewPath='/api/crews/'+id;
+ const reg=await req(base+'/registrations','POST',{name:'Pilote A',category:'Hypercar',status:'h1,h3'},'pilot');assert.equal(reg.status,201);
+ const bad=await req(base+'/registrations','POST',{name:'Pilote B',category:'GTE',status:'whole'},'guest2');assert.equal(bad.status,201);
+ const elsewhere=await req(`/api/events/${event.id}/departures/${second.id}/registrations`,'POST',{name:'Pilote C',category:'Hypercar',status:'whole'},'guest3');
+ const add=(registrationId,version=1,actor='organizer')=>req(crewPath+'/members','POST',{registrationId,version},actor);
+ assert.equal((await add(reg.data.id,1,'pilot')).status,403);
+ assert.equal((await add(bad.data.id)).status,409);
+ assert.equal((await add(elsewhere.data.id)).status,409);
+ assert.equal((await add(reg.data.id)).status,200);
+ let listing=(await req('/api/events')).data.events[0].departures[0].crews[0];
+ assert.equal(listing.car,'Prototype test');assert.deepEqual(listing.registrationIds,[reg.data.id]);assert.equal(listing.version,2);
+ assert.equal((await req(crewPath,'PATCH',{...payload,version:1},'organizer')).status,409);
+ const duplicate=await req(base+'/crews','POST',{...payload,name:'FMT 2'},'admin');assert.equal(duplicate.status,201);
+ assert.equal((await req('/api/crews/'+duplicate.data.id+'/members','POST',{registrationId:reg.data.id,version:1},'admin')).status,409);
+ assert.equal((await req(crewPath,'PATCH',{...payload,category:'GTE',version:2},'organizer')).status,409);
+ assert.equal((await req('/api/registrations/'+reg.data.id,'PATCH',{name:'Pilote A',category:'GTE',status:'whole',version:1},'pilot')).status,409);
+ assert.equal((await req('/api/events/'+event.id,'PATCH',{...event,categories:['GTE']},'admin')).status,409);
+ assert.equal((await req(crewPath,'DELETE',{version:2},'pilot')).status,403);
+ assert.equal((await req(crewPath+'/members/'+reg.data.id,'DELETE',{version:2},'organizer')).status,200);
+ assert.equal(DB.db.prepare('SELECT count(*) n FROM registrations').get().n,3);
+ assert.equal((await req('/api/registrations/'+reg.data.id,'PATCH',{name:'Pilote A',category:'GTE',status:'whole',version:1},'pilot')).status,200);
+ assert.equal((await req(crewPath,'PATCH',{...payload,category:'GTE',version:3},'organizer')).status,200);
+ assert.equal((await add(reg.data.id,4)).status,200);
+ assert.equal((await req('/api/registrations/'+reg.data.id,'DELETE',{version:2},'pilot')).status,200);
+ assert.equal(DB.db.prepare('SELECT count(*) n FROM crew_members').get().n,0);
+ assert.equal((await req(crewPath,'DELETE',{version:5},'organizer')).status,200);
+ assert.equal(DB.db.prepare('SELECT count(*) n FROM registrations').get().n,2);
+ // An empty crew also protects its departure from deletion.
+ DB.db.prepare('DELETE FROM registrations').run();
+ assert.equal((await req('/api/events/'+event.id,'PATCH',{...event,departures:[second]},'admin')).status,409);
+ assert.equal((await req('/api/events/'+event.id,'DELETE',{version:1},'admin')).status,200);
+ assert.equal(DB.db.prepare('SELECT count(*) n FROM crews').get().n,0);
+});
 test('shared events, actual Discord callback, role grants/revocation, guest recovery and ownership',async()=>{
  const h=harness(),{req,login,DB}=h;
  assert.equal((await req('/api/events','POST',eventInput)).status,401);

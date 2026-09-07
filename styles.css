@@ -1207,6 +1207,54 @@ input:focus {
 .availability-mini-grid { display: grid; grid-template-columns: repeat(var(--duration, 6), minmax(14px, 1fr)); gap: 2px; flex: 1; min-width: 0; padding: 3px; border: 1px solid #4b5054; border-radius: 6px; background: #202326; }
 .availability-mini-hour { display: flex; align-items: center; justify-content: center; min-height: 18px; border-radius: 2px; background-color: var(--phase-color); filter: saturate(.7) brightness(.45); color: #fff; font-size: 9px; font-weight: 900; }
 .availability-mini-hour.present { filter: saturate(1.1) brightness(1.05); box-shadow: 0 0 5px var(--phase-color); }
+.phase-0 { --phase-color: hsl(145 72% 48%); }
+.phase-1 { --phase-color: hsl(139 72% 48%); }
+.phase-2 { --phase-color: hsl(133 72% 48%); }
+.phase-3 { --phase-color: hsl(127 72% 48%); }
+.phase-4 { --phase-color: hsl(121 72% 48%); }
+.phase-5 { --phase-color: hsl(115 72% 48%); }
+.phase-6 { --phase-color: hsl(109 72% 48%); }
+.phase-7 { --phase-color: hsl(103 72% 48%); }
+.phase-8 { --phase-color: hsl(97 72% 48%); }
+.phase-9 { --phase-color: hsl(91 72% 48%); }
+.phase-10 { --phase-color: hsl(85 72% 48%); }
+.phase-11 { --phase-color: hsl(79 72% 48%); }
+.phase-12 { --phase-color: hsl(73 72% 48%); }
+.phase-13 { --phase-color: hsl(67 72% 48%); }
+.phase-14 { --phase-color: hsl(61 72% 48%); }
+.phase-15 { --phase-color: hsl(55 72% 48%); }
+.phase-16 { --phase-color: hsl(49 72% 48%); }
+.phase-17 { --phase-color: hsl(43 72% 48%); }
+.phase-18 { --phase-color: hsl(37 72% 48%); }
+.phase-19 { --phase-color: hsl(31 72% 48%); }
+.phase-20 { --phase-color: hsl(25 72% 48%); }
+.phase-21 { --phase-color: hsl(19 72% 48%); }
+.phase-22 { --phase-color: hsl(13 72% 48%); }
+.phase-23 { --phase-color: hsl(7 72% 48%); }
+.duration-1 { --duration: 1; }
+.duration-2 { --duration: 2; }
+.duration-3 { --duration: 3; }
+.duration-4 { --duration: 4; }
+.duration-5 { --duration: 5; }
+.duration-6 { --duration: 6; }
+.duration-7 { --duration: 7; }
+.duration-8 { --duration: 8; }
+.duration-9 { --duration: 9; }
+.duration-10 { --duration: 10; }
+.duration-11 { --duration: 11; }
+.duration-12 { --duration: 12; }
+.duration-13 { --duration: 13; }
+.duration-14 { --duration: 14; }
+.duration-15 { --duration: 15; }
+.duration-16 { --duration: 16; }
+.duration-17 { --duration: 17; }
+.duration-18 { --duration: 18; }
+.duration-19 { --duration: 19; }
+.duration-20 { --duration: 20; }
+.duration-21 { --duration: 21; }
+.duration-22 { --duration: 22; }
+.duration-23 { --duration: 23; }
+.duration-24 { --duration: 24; }
 .event-creation input { font-size: 16px; min-width: 0; }
 .event-creation .departure-field { align-items: end; }
 .event-creation .remove-departure { height: 42px; }
@@ -1267,4 +1315,82 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
  .pilot-row button { grid-column: 2; padding: 6px; font-size: 12px; }
  .departure-header { align-items: flex-start; flex-direction: column; gap: 5px; }
  .categories .category-button { min-width: 120px; }
+}
+
+/* Test version: one departure, three views, organizer-managed crews. */
+.departure-workspace { background: #101416; border: 1px solid #30383b; border-radius: 16px; overflow: hidden; }
+.departure-switcher { display: flex; align-items: end; gap: 16px; padding: 24px 24px 12px; background: #181e21; }
+.departure-switcher > div:first-child { flex: 1; min-width: 0; }
+.departure-switcher label { display: block; color: #9babae; font-size: 14px; font-weight: 700; letter-spacing: .06em; margin-bottom: 10px; }
+.departure-switcher select, .crew-section select, .crew-section input { width: 100%; min-width: 0; min-height: 48px; background: #101416; color: #f4f7f6; border: 1px solid #475359; border-radius: 8px; padding: 10px; font-size: 16px; }
+.departure-arrows { display: flex; gap: 8px; }
+.departure-arrows button { width: 48px; min-height: 48px; font-size: 22px; }
+.departure-summary { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 0 24px 20px; background: #181e21; color: #b6c4c5; font-size: 14px; }
+.event-views { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; padding: 10px 24px; border-bottom: 1px solid #30383b; }
+.view-button { min-width: 0; min-height: 48px; padding: 10px 4px; border: 1px solid transparent; border-radius: 8px; color: #bac6c8; background: transparent; font-weight: 700; font-size: 16px; }
+.view-button[aria-pressed="true"] { color: #e7fff3; background: #1c4032; border-color: #438768; }
+.departure-content .form-section, .departure-content .pilot-section, .crew-section { padding: 24px; }
+.departure-content .pilot-row { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; border-radius: 10px; }
+.departure-content .pilot-main { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; min-width: 0; }
+.departure-content .pilot-row .edit-button { align-self: flex-end; min-height: 44px; padding: 10px 16px; font-size: 14px; margin: 0; }
+.departure-content .availability-readonly { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0; }
+.departure-content .availability-mini-grid { grid-template-columns: repeat(var(--duration,6),minmax(0,1fr)); }
+.departure-content .availability-mini-hour { min-height: 32px; font-size: 14px; filter: none; background: #262e32; color: #b0babc; box-shadow: none; }
+.departure-content .availability-mini-hour.present { background: var(--phase-color); color: #101416; filter: none; box-shadow: none; }
+.departure-content .timeline-edge { font-size: 14px; }
+.departure-content .availability-hour-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); gap: 10px; }
+.departure-content .hour-card { min-height: 90px; color: #e7efef; background: #182024; border: 1px solid #4b585e; border-top: 5px solid var(--phase-color); filter: none; box-shadow: none; text-shadow: none; }
+.departure-content .hour-card::before { display: none; }
+.departure-content .hour-card.active { background: var(--phase-color); color: #101416; border-color: var(--phase-color); filter: none; box-shadow: inset 0 0 0 2px #101416; text-shadow: none; }
+.departure-content .hour-card-label, .departure-content .hour-card-state { color: inherit; font-size: 14px; opacity: 1; text-shadow: none; }
+.departure-content .special-availability { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 12px; }
+.departure-content .special-button { min-height: 44px; font-size: 14px; }
+.crew-heading, .crew-card-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+.crew-heading h2 { font-size: 24px; margin: 0 0 8px; }
+.crew-heading p, .coverage-note { color: #aababb; font-size: 14px; line-height: 1.6; }
+.crew-heading > div { flex: 1; min-width: 180px; }
+.crew-list { display: grid; gap: 20px; margin-top: 24px; }
+.crew-card { background: #181e21; border: 1px solid #344247; border-radius: 14px; padding: 22px; min-width: 0; }
+.crew-card h3 { font-size: 22px; margin: 12px 0 6px; overflow-wrap: anywhere; }
+.crew-car { color: #c1cfd0; font-size: 16px; margin: 0; overflow-wrap: anywhere; }
+.coverage-summary { padding: 10px 14px; border: 1px solid #415359; border-radius: 8px; color: #deebe9; font-size: 14px; line-height: 1.6; }
+.crew-roster { list-style: none; padding: 0; margin: 20px 0; }
+.crew-roster li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #303b40; }
+.crew-roster li > div { min-width: 0; overflow-wrap: anywhere; }
+.crew-roster small { display: block; font-size: 14px; color: #aababb; margin-top: 5px; }
+.crew-roster button, .crew-actions button, .crew-assignment button { min-height: 44px; }
+.coverage-heading { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; color: #aababb; margin-bottom: 10px; }
+.crew-coverage { display: grid; grid-template-columns: repeat(auto-fit,minmax(105px,1fr)); gap: 6px; }
+.coverage-hour { border-radius: 8px; padding: 12px 6px; text-align: center; background: #222c31; border-top: 4px solid var(--phase-color); }
+.coverage-hour.covered { background: var(--phase-color); color: #101416; }
+.coverage-hour span, .coverage-hour small { display: block; font-size: 14px; }
+.coverage-hour strong { display: block; font-size: 17px; margin: 7px 0; }
+.coverage-hour.gap { color: #c1ced0; border: 1px dashed #718288; border-top: 4px solid var(--phase-color); }
+.crew-assignment { margin-top: 20px; }
+.crew-assignment label { display: block; font-size: 14px; margin-bottom: 8px; }
+.crew-assignment > div, .crew-actions { display: flex; gap: 10px; }
+.crew-actions { justify-content: flex-end; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid #303b40; }
+.crew-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 22px; border: 1px solid #438768; background: #162921; border-radius: 12px; margin: 20px 0; }
+.crew-form h3, .crew-form p, .crew-form .toolbar { grid-column: 1/-1; margin: 0; }
+.crew-form label { font-size: 14px; }
+.crew-form input, .crew-form select { display: block; margin-top: 8px; }
+.unassigned-list { margin-top: 22px; padding: 16px; background: #181e21; border-radius: 10px; }
+.unassigned-list summary { cursor: pointer; min-height: 32px; }
+.unassigned-list li { margin-top: 10px; overflow-wrap: anywhere; }
+@media(max-width:700px) {
+  .departure-switcher { padding: 16px 12px 12px; gap: 8px; }
+  .departure-arrows { flex-direction: column; gap: 4px; }
+  .departure-arrows button { min-height: 44px; width: 44px; }
+  .departure-summary { padding: 0 12px 16px; }
+  .event-views { padding: 8px; gap: 4px; }
+  .view-button { font-size: 14px; }
+  .departure-content .form-section, .departure-content .pilot-section, .crew-section { padding: 14px; }
+  .departure-content .availability-readonly { flex-wrap: wrap; justify-content: space-between; }
+  .departure-content .availability-mini-grid { flex-basis: 100%; order: 3; grid-template-columns: repeat(min(var(--duration,6),6),minmax(0,1fr)); gap: 4px; }
+  .departure-content .availability-hour-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .crew-card { padding: 14px; }
+  .crew-form { grid-template-columns: minmax(0,1fr); padding: 14px; }
+  .crew-assignment > div { flex-direction: column; }
+  .crew-coverage { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .coverage-heading span:nth-child(2) { display: none; }
 }

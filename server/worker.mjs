@@ -264,10 +264,17 @@ async function api(request, env) {
     if (membership) {
       if (method==='POST' && !crewRoute[2]) {
         if (!/^[a-f0-9-]{36}$/.test(input.registrationId || '')) fail(400,'Sélectionne un pilote inscrit.');
+        const selected=await env.DB.prepare('SELECT * FROM registrations WHERE id=?').bind(input.registrationId).first();
+        if (!selected || selected.event_id!==crew.event_id || selected.departure_id!==crew.departure_id) fail(409,'Ce pilote n’est pas inscrit sur ce départ. Actualise la page.');
         // Bump version and assign in one atomic batch; stale writes cannot assign anyone.
         const results=await env.DB.batch([
           env.DB.prepare('UPDATE crews SET version=version+1 WHERE id=? AND version=?').bind(crew.id,input.version),
-          env.DB.prepare('INSERT INTO crew_members(registration_id,crew_id) SELECT ?,? WHERE changes()=1').bind(input.registrationId,crew.id)
+          env.DB.prepare('INSERT INTO crew_members(registration_id,crew_id) SELECT ?,? WHERE changes()=1').bind(input.registrationId,crew.id),
+          env.DB.prepare(`DELETE FROM registrations WHERE id!=? AND event_id=? AND departure_id=? AND category!=? AND (
+            (user_id IS NOT NULL AND user_id=?) OR
+            (guest_hash IS NOT NULL AND guest_hash=?) OR
+            (user_id IS NULL AND guest_hash IS NULL AND owner_user_id IS NOT NULL AND owner_user_id=? AND name_key=?)
+          )`).bind(selected.id,selected.event_id,selected.departure_id,selected.category,selected.user_id,selected.guest_hash,selected.owner_user_id,selected.name_key)
         ]);
         if (!results[0].meta.changes) fail(409,'Cet équipage a changé. Actualise la page.');
       } else if (method==='DELETE' && crewRoute[2]) {

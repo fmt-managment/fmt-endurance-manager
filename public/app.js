@@ -147,9 +147,8 @@ function groupEvents(source,filter,now=Date.now()) {
   return [...groups.values()];
 }
 function renderEventCard({event,next,running,archived,end}) {
-  const totalRegistrations=event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0);
   return `<button class="event-card event-type-${event.eventType||'private'} ${archived?'archived':''}" data-action="open" data-id="${event.id}">
-    <span class="event-card-body"><span class="event-card-title-row"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} <span>· ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${totalRegistrations} inscription${totalRegistrations>1?'s':''}</span></span></span>
+    <span class="event-card-body"><span class="event-card-title-row"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} <span>· ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''}</span></span></span>
     ${circuitVisual(event.circuit,true)}
     <span class="event-category-badges">${event.categories.map(category=>eventBadge(category,eventCategoryCount(event,category))).join('')}</span>
     <span class="event-card-status">${running?'<span class="event-countdown">Course en cours</span>':''}
@@ -171,7 +170,8 @@ function showRecoveryLink() {
   if (!recoveryLink) return;
   app.insertAdjacentHTML('afterbegin',`<section class="recovery-panel"><label for="personalLink">Ton lien personnel pour retrouver et modifier tes inscriptions sans compte</label><input id="personalLink" readonly value="${esc(recoveryLink)}"><p>Conserve ce lien et garde-le privé.</p>${button('copy-link','Copier le lien')}${button('hide-link','Masquer')}</section>`);
 }
-function ownRegistration(departure) { return departure.availability.find(r=>r.mine); }
+function ownRegistrations(departure) { return departure.availability.filter(r=>r.mine); }
+function ownRegistration(departure) { return ownRegistrations(departure)[0]; }
 function draftFor(departure) {
   if (!drafts[departure.id]) {
     const mine=ownRegistration(departure);
@@ -203,8 +203,9 @@ function renderRegistration(reg,departure,duration) {
 }
 function renderRegistrationForm(event,departure) {
   const state=draftFor(departure),duration=event.durationHours||6,parts=state.status==='whole'?Array.from({length:duration},(_,i)=>`h${i+1}`):state.status.split(',').filter(Boolean);
+  const addLabel=canManage()?'+ Ajouter un autre pilote':ownRegistrations(departure).length?'+ Ajouter une autre catégorie':'';
   return `<form class="form-section registration-form" data-kind="registration" data-departure="${departure.id}">
-    <h3 class="form-title">${state.id?'Modifier l’inscription':canManage()?'Inscrire un pilote':'Mon inscription'} ${canManage()?button('new-registration','+ Ajouter un autre pilote',`data-departure="${departure.id}"`,'secondary-button add-pilot-button'):''}</h3>
+    <h3 class="form-title">${state.id?'Modifier l’inscription':canManage()?'Inscrire un pilote':'Mon inscription'} ${addLabel?button('new-registration',addLabel,`data-departure="${departure.id}"`,'secondary-button add-pilot-button'):''}</h3>
     ${state.id&&!departure.availability.find(r=>r.id===state.id)?.mine?'<p class="creation-help">Modification en tant qu’administrateur.</p>':''}
     <label class="form-label" for="name-${departure.id}">Pseudo pilote</label>
     <input id="name-${departure.id}" name="pilotName" data-departure="${departure.id}" value="${esc(state.name)}" maxlength="30" required autocomplete="nickname">
@@ -330,9 +331,9 @@ async function renderMembers() {
   if(!isAdmin())throw Error('Accès réservé aux administrateurs.');
   const result=await api('/api/members');members=result.members;page='members';
   app.innerHTML=`${button('home','← Retour','','secondary-button back-button')}<h1 class="page-title">GESTION DES MEMBRES</h1>
-    <p class="creation-help">Un membre apparaît après sa première connexion Discord. Les organisateurs gèrent les courses et les équipages. Les administrateurs peuvent aussi supprimer les événements, modifier les inscriptions des autres pilotes et attribuer les rôles. Les administrateurs principaux sont protégés.</p>${errorBox()}
+    <p class="creation-help">Un pilote apparaît ici après sa première connexion Discord. Le rôle Organisateur permet de créer et modifier les événements.</p>${errorBox()}
     <div class="member-list">${members.map(member=>`<form class="member-row" data-kind="member" data-id="${member.id}"><div><strong>${esc(member.name)}</strong><small>Discord : ${member.id}</small></div>
-      ${member.roleLocked?'<span>Administrateur principal · protégé</span>':`<label><span class="sr-only">Rôle de ${esc(member.name)}</span><select name="role"><option value="pilot" ${member.role==='pilot'?'selected':''}>Pilote</option><option value="organizer" ${member.role==='organizer'?'selected':''}>Organisateur</option><option value="admin" ${member.role==='admin'?'selected':''}>Administrateur</option></select></label><button class="secondary-button" type="submit">Enregistrer</button>`}</form>`).join('')}</div>`;
+      ${member.role==='admin'?'<span>Administrateur principal</span>':`<label><span class="sr-only">Rôle de ${esc(member.name)}</span><select name="role"><option value="pilot" ${member.role==='pilot'?'selected':''}>Pilote</option><option value="organizer" ${member.role==='organizer'?'selected':''}>Organisateur</option></select></label><button class="secondary-button" type="submit">Enregistrer</button>`}</form>`).join('')}</div>`;
 }
 function renderMyEntries() {
   page='my-entries';
@@ -427,7 +428,7 @@ async function perform(action,target) {
     case 'new-registration':{
       selectedDepartureId=target.dataset.departure;
       const departure=event.departures.find(d=>d.id===target.dataset.departure);
-      drafts[departure.id]={name:'',category:'',cars:[],carAny:false,status:'',preferredPilot:'',id:null,version:null};
+      drafts[departure.id]={name:canManage()?'':pilotName,category:'',cars:[],carAny:false,status:'',preferredPilot:'',id:null,version:null};
       renderEvent();document.getElementById('name-'+departure.id)?.focus();break;
     }
     case 'category':{selectedDepartureId=target.dataset.departure;const state=draftFor(event.departures.find(d=>d.id===target.dataset.departure));state.category=target.dataset.value;state.cars=(state.cars||[]).filter(car=>CARS[state.category]?.includes(car));state.carAny=false;renderEvent();break;}
@@ -497,7 +498,7 @@ document.addEventListener('submit',async event=>{
       await api(draft.id?'/api/crews/'+draft.id:`/api/events/${currentEventId}/departures/${departureId}/crews`,draft.id?'PATCH':'POST',{name:form.elements.crewName.value,category:form.elements.crewCategory.value,car:form.elements.crewCar.value,version:draft.version});
       crewDraft=null;await refreshAfterSave('Équipage enregistré. Tu peux maintenant y affecter les pilotes.');
     }
-    else if(form.dataset.kind==='member'){await api('/api/members/'+form.dataset.id,'PATCH',{role:form.elements.role.value});await load();if(isAdmin()){await renderMembers();app.insertAdjacentHTML('afterbegin','<p class="creation-success" role="status">Autorisations mises à jour.</p>');}else renderHome('Autorisations mises à jour.');}
+    else if(form.dataset.kind==='member'){await api('/api/members/'+form.dataset.id,'PATCH',{role:form.elements.role.value});await renderMembers();app.insertAdjacentHTML('afterbegin','<p class="creation-success" role="status">Autorisations mises à jour.</p>');}
   }catch(error){showError(error);}finally{busy=false;if(submit.isConnected)submit.disabled=false;}
 });
 setInterval(()=>{

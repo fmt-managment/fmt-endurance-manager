@@ -1198,8 +1198,8 @@ select:focus { border-color: var(--green); outline: none; }
 .hyper { --category-color: #ed2420; }
 .lmp2 { --category-color: #1263a5; }
 .lmp3 { --category-color: #8c3980; }
-.gt3 { --category-color: #f07808; }
-.gte { --category-color: #a7afb8; }
+.gt3 { --category-color: #20b96b; }
+.gte { --category-color: #f07808; }
 .event-category-option:has(input:checked) { border-color: var(--category-color); background: color-mix(in srgb, var(--category-color) 22%, var(--panel)); box-shadow: inset 0 -3px var(--category-color); }
 .event-category-option input { accent-color: var(--category-color); flex-shrink: 0; }
 .event-category-option .category-logo { width: 44px; height: 42px; object-fit: contain; flex-shrink: 0; }
@@ -1638,6 +1638,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .crew-card[class*="crew-palette-"] h3 { color: var(--crew-color); }
 .pilot-car { color: #b9c7c8; font-size: 13px; }
 .car-choice-label { display: block; margin-top: 18px; }
+.assignment-effect { margin: 12px 0; padding: 10px 14px; border-left: 3px solid #64cfa0; background: #182d26; color: #dcefe5; font-size: 14px; line-height: 1.5; }
+.registration-form select { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #475359; border-radius: 8px; color: #edf4f0; background: #171e21; color-scheme: dark; }
+.registration-form input[readonly] { color: #b9c7c8; }
+.registration-form .form-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.registration-form-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.crew-card[class*="crew-palette-"] .crew-pilot-name { color: var(--crew-color); }
+.registration-form .compact-hours .hour-card.active { box-shadow: none; color: #092018; text-shadow: none; }
+.race-recap { padding: 16px 20px; }
+.recap-intro { margin-bottom: 12px; }
+.creation-fieldset > legend { padding: 0 8px; color: #edf4f0; font-weight: 700; }
 .car-choice { display: block; width: 100%; max-width: 560px; min-height: 44px; margin-top: 7px; padding: 9px 12px; border: 1px solid #475359; border-radius: 8px; background: #101416; color: #f4f7f6; }
 .registration-form .category-area { display: block; min-width: 0; }
 .registration-form .category-area .categories { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px; width: 100%; }

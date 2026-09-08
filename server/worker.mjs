@@ -60,8 +60,40 @@ async function identity(request, env) {
   return {user, guestHash: /^[a-f0-9]{64}$/.test(guest) ? await hash(guest) : null, guestToken: /^[a-f0-9]{64}$/.test(guest) ? guest : null};
 }
 function owned(reg, actor) {
-  return !!((actor.user && (reg.user_id === actor.user.id || reg.owner_user_id === actor.user.id)) ||
+  return !!((actor.user && (reg.participant_user_id === actor.user.id || reg.user_id === actor.user.id || reg.owner_user_id === actor.user.id)) ||
     (actor.guestHash && reg.guest_hash === actor.guestHash));
+}
+function personal(reg, actor) {
+  return !!((actor.user && (reg.participant_user_id === actor.user.id || reg.user_id === actor.user.id)) ||
+    (!actor.user && !reg.participant_created_by && actor.guestHash && reg.participant_guest_hash === actor.guestHash));
+}
+const registrationSelect = `SELECT r.*,p.user_id AS participant_user_id,p.guest_hash AS participant_guest_hash,
+ p.created_by AS participant_created_by,p.name AS participant_name FROM registrations r JOIN participants p ON p.id=r.participant_id`;
+async function registrationParticipant(env, actor, input, data) {
+  const manager=!!actor.user && ['admin','organizer'].includes(actor.user.role);
+  if (input.participantId) {
+    const participant=await env.DB.prepare('SELECT * FROM participants WHERE id=?').bind(input.participantId).first();
+    if (!participant) fail(404,'Ce pilote est introuvable. Actualise la page.');
+    const existing=await env.DB.prepare(registrationSelect+' WHERE r.participant_id=?').bind(participant.id).all();
+    const self=!!(actor.user && participant.user_id===actor.user.id) || !!(actor.guestHash && participant.guest_hash===actor.guestHash);
+    if (!manager && !self && !existing.results.some(r=>owned(r,actor))) fail(403,'Tu ne peux pas inscrire ce pilote.');
+    return participant;
+  }
+  if (input.forOther===true && !manager) fail(403,'Seuls les organisateurs peuvent inscrire un autre pilote.');
+  if (input.forOther===true) {
+    // Reuse a known profile deliberately; a matching name never grants ownership.
+    const existing=await env.DB.prepare('SELECT id FROM participants WHERE lower(name)=lower(?) LIMIT 1').bind(data.name).first();
+    if (existing) fail(409,'Un pilote porte déjà ce pseudo. Choisis sa fiche dans « Pilote déjà inscrit ».');
+    const participant={id:id(),name:data.name,user_id:null,guest_hash:null,created_by:actor.user.id};
+    await env.DB.prepare('INSERT INTO participants(id,name,created_by,created_at) VALUES(?,?,?,?)').bind(participant.id,participant.name,actor.user.id,now()).run();
+    return participant;
+  }
+  if (actor.user) {
+    await env.DB.prepare('INSERT INTO participants(id,name,user_id,created_by,created_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id) WHERE user_id IS NOT NULL DO NOTHING').bind(id(),data.name,actor.user.id,actor.user.id,now()).run();
+    return env.DB.prepare('SELECT * FROM participants WHERE user_id=?').bind(actor.user.id).first();
+  }
+  await env.DB.prepare('INSERT INTO participants(id,name,guest_hash,created_at) VALUES(?,?,?,?) ON CONFLICT(guest_hash) WHERE guest_hash IS NOT NULL DO NOTHING').bind(id(),data.name,actor.guestHash,now()).run();
+  return env.DB.prepare('SELECT * FROM participants WHERE guest_hash=?').bind(actor.guestHash).first();
 }
 async function body(request) {
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) fail(415, 'Format JSON requis.');
@@ -169,11 +201,11 @@ function publicRegistration(reg, actor) {
   try { cars = JSON.parse(reg.car_preferences || '[]'); } catch {}
   if (!Array.isArray(cars) || !cars.length) cars = reg.car ? [reg.car] : [];
   cars = cars.map(car => LEGACY_CAR_ALIASES.get(car) || car);
-  return {id:reg.id, name:reg.name, category:reg.category, car:cars[0] || reg.car || '', cars, carAny:Boolean(reg.car_any), status:reg.status, preferredPilot:reg.preferred_pilot || '', version:reg.version, mine:owned(reg, actor), canEdit:owned(reg, actor) || actor.user?.role === 'admin'};
+  return {id:reg.id, participantId:reg.participant_id, name:reg.participant_name||reg.name, category:reg.category, car:cars[0] || reg.car || '', cars, carAny:Boolean(reg.car_any), status:reg.status, preferredPilot:reg.preferred_pilot || '', version:reg.version, mine:personal(reg, actor), managed:owned(reg,actor)&&!personal(reg,actor), canEdit:owned(reg, actor) || actor.user?.role === 'admin'};
 }
 async function listEvents(env, actor) {
   const rows = (await env.DB.prepare('SELECT * FROM events ORDER BY created_at DESC, id DESC').all()).results;
-  const registrations = (await env.DB.prepare('SELECT * FROM registrations ORDER BY created_at').all()).results;
+  const registrations = (await env.DB.prepare(registrationSelect+' ORDER BY r.created_at,r.id').all()).results;
   const crews = (await env.DB.prepare('SELECT id,event_id,departure_id,name,category,car,version FROM crews ORDER BY created_at,id').all()).results;
   const memberships = (await env.DB.prepare('SELECT crew_id,registration_id FROM crew_members').all()).results;
   const grouped = new Map();
@@ -210,6 +242,8 @@ async function oauthCallback(request, env) {
     await env.DB.batch([
       env.DB.prepare('INSERT INTO users(id,name,created_at) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name').bind(profile.id, display, now()),
       ...(guestHash ? [env.DB.prepare('UPDATE registrations SET owner_user_id=? WHERE guest_hash=? AND owner_user_id IS NULL').bind(profile.id, guestHash)] : []),
+      ...(guestHash ? [env.DB.prepare(`UPDATE participants SET user_id=? WHERE guest_hash=? AND user_id IS NULL AND created_by IS NULL
+        AND NOT EXISTS(SELECT 1 FROM participants WHERE user_id=?)`).bind(profile.id,guestHash,profile.id)] : []),
       env.DB.prepare('INSERT INTO sessions(token_hash,user_id,expires_at) VALUES(?,?,?)').bind(await hash(session), profile.id, now() + 7 * DAY)
     ]);
     const old = cookie(request, COOKIE_SESSION);
@@ -249,6 +283,10 @@ async function api(request, env) {
     return json({link:canonical + '/#access=' + actor.guestToken});
   }
   if (path === '/api/events' && method === 'GET') return json({events:await listEvents(env, actor)});
+  if (path === '/api/participants' && method === 'GET') {
+    requireRole(actor.user);
+    return json({participants:(await env.DB.prepare('SELECT id,name FROM participants ORDER BY name,id').all()).results});
+  }
   const crewCreate = path.match(/^\/api\/events\/([a-f0-9-]{36})\/departures\/([a-f0-9-]{36})\/crews$/);
   const crewRoute = path.match(/^\/api\/crews\/([a-f0-9-]{36})(?:\/members(?:\/([a-f0-9-]{36}))?)?$/);
   if ((crewCreate && method==='POST') || (crewRoute && ['POST','PATCH','DELETE'].includes(method))) {
@@ -270,13 +308,10 @@ async function api(request, env) {
         const results=await env.DB.batch([
           env.DB.prepare('UPDATE crews SET version=version+1 WHERE id=? AND version=?').bind(crew.id,input.version),
           env.DB.prepare('INSERT INTO crew_members(registration_id,crew_id) SELECT ?,? WHERE changes()=1').bind(input.registrationId,crew.id),
-          env.DB.prepare(`DELETE FROM registrations WHERE id!=? AND event_id=? AND departure_id=? AND category!=? AND (
-            (user_id IS NOT NULL AND user_id=?) OR
-            (guest_hash IS NOT NULL AND guest_hash=?) OR
-            (user_id IS NULL AND guest_hash IS NULL AND owner_user_id IS NOT NULL AND owner_user_id=? AND name_key=?)
-          )`).bind(selected.id,selected.event_id,selected.departure_id,selected.category,selected.user_id,selected.guest_hash,selected.owner_user_id,selected.name_key)
+          env.DB.prepare(`DELETE FROM registrations WHERE changes()=1 AND id!=? AND event_id=? AND departure_id=? AND participant_id=?`).bind(selected.id,selected.event_id,selected.departure_id,selected.participant_id)
         ]);
         if (!results[0].meta.changes) fail(409,'Cet équipage a changé. Actualise la page.');
+        return json({ok:true,removedRegistrations:results[2].meta.changes});
       } else if (method==='DELETE' && crewRoute[2]) {
         const results=await env.DB.batch([
           env.DB.prepare('UPDATE crews SET version=version+1 WHERE id=? AND version=?').bind(crew.id,input.version),
@@ -333,20 +368,24 @@ async function api(request, env) {
     const departure = departureById(event, departureMatch[2]);
     if (departure.startsAt <= Date.now()) fail(409, 'Ce départ est passé. Les inscriptions sont fermées.');
     const input = await body(request), data = validateRegistration(input, event);
-    const managedRegistration = !!actor.user && ['admin','organizer'].includes(actor.user.role);
-    const guestToken = managedRegistration ? token() : actor.user ? null : actor.guestToken || token();
-    const guestHash = guestToken ? await hash(guestToken) : null;
-    const userId = managedRegistration ? null : actor.user?.id || null;
+    const guestToken = actor.user ? null : actor.guestToken || token();
+    if (guestToken) { actor.guestToken=guestToken;actor.guestHash=await hash(guestToken); }
+    const participant=await registrationParticipant(env,actor,input,data);
+    const userId=participant.user_id;
+    // Managed profiles retain a non-public token to satisfy the legacy table check.
+    const guestHash=userId?null:participant.guest_hash||await hash(token());
     const ownerUserId = actor.user?.id || null;
     const regId = id();
-    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,owner_user_id,guest_hash,name,name_key,category,car,car_preferences,car_any,status,preferred_pilot,created_at)
-      SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,ownerUserId,guestHash,data.name,data.nameKey,data.category,data.car,JSON.stringify(data.cars),data.carAny?1:0,data.status,data.preferredPilot,now(),event.id,event.version).run();
+    // An existing profile keeps its name when another organizer adds a category.
+    if (input.participantId) { data.name=participant.name;data.nameKey=data.name.normalize('NFKC').toLocaleLowerCase('fr-FR'); }
+    const result = await env.DB.prepare(`INSERT INTO registrations(id,event_id,departure_id,user_id,owner_user_id,guest_hash,name,name_key,category,car,car_preferences,car_any,status,preferred_pilot,created_at,participant_id)
+      SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? FROM events WHERE id=? AND version=?`).bind(regId,event.id,departure.id,userId,ownerUserId,guestHash,data.name,data.nameKey,data.category,data.car,JSON.stringify(data.cars),data.carAny?1:0,data.status,data.preferredPilot,now(),participant.id,event.id,event.version).run();
     if (!result.meta.changes) fail(409, 'Cet événement a changé. Actualise avant de t’inscrire.');
     return json({id:regId, recoveryLink:guestToken ? canonical + '/#access=' + guestToken : null}, 201, guestToken ? [setCookie(COOKIE_GUEST, guestToken, 365 * DAY)] : []);
   }
   const regMatch = path.match(/^\/api\/registrations\/([a-f0-9-]{36})$/);
   if (regMatch && ['PATCH','DELETE'].includes(method)) {
-    const reg = await env.DB.prepare('SELECT * FROM registrations WHERE id=?').bind(regMatch[1]).first();
+    const reg = await env.DB.prepare(registrationSelect+' WHERE r.id=?').bind(regMatch[1]).first();
     if (!reg) fail(404, 'Inscription introuvable.');
     if (!owned(reg,actor) && actor.user?.role !== 'admin') fail(403, 'Cette inscription ne t’appartient pas. Utilise ton lien personnel ou ton compte Discord.');
     const event = await eventById(env, reg.event_id), departure = departureById(event,reg.departure_id);
@@ -357,7 +396,11 @@ async function api(request, env) {
     if (method === 'DELETE') result = await env.DB.prepare('DELETE FROM registrations WHERE id=? AND version=?').bind(reg.id,input.version).run();
     else {
       const data = validateRegistration(input,event);
-      result = await env.DB.prepare(`UPDATE registrations SET name=?,name_key=?,category=?,car=?,car_preferences=?,car_any=?,status=?,preferred_pilot=?,version=version+1 WHERE id=? AND version=? AND EXISTS(SELECT 1 FROM events WHERE id=? AND version=?)`).bind(data.name,data.nameKey,data.category,data.car,JSON.stringify(data.cars),data.carAny?1:0,data.status,data.preferredPilot,reg.id,input.version,event.id,event.version).run();
+      const results=await env.DB.batch([
+        env.DB.prepare(`UPDATE registrations SET name=?,name_key=?,category=?,car=?,car_preferences=?,car_any=?,status=?,preferred_pilot=?,version=version+1 WHERE id=? AND version=? AND EXISTS(SELECT 1 FROM events WHERE id=? AND version=?)`).bind(data.name,data.nameKey,data.category,data.car,JSON.stringify(data.cars),data.carAny?1:0,data.status,data.preferredPilot,reg.id,input.version,event.id,event.version),
+        env.DB.prepare('UPDATE participants SET name=? WHERE id=? AND changes()=1').bind(data.name,reg.participant_id)
+      ]);
+      result=results[0];
     }
     if (!result.meta.changes) fail(409, 'Les données ont changé. Actualise avant de réessayer.');
     return json({ok:true});
@@ -386,15 +429,14 @@ export default {
     catch (error) {
       if (error instanceof HttpError) return json({error:error.message},error.status);
       const message=String(error.message);
+      if (message.includes('participant_already_assigned')) return json({error:'Ce pilote est déjà affecté à un équipage sur ce départ. Modifie son inscription existante, ou retire-le de l’équipage avant de changer de catégorie ou de le déclarer indisponible.'},409);
+      if (message.includes('participant_required') || message.includes('participant_fixed')) return json({error:'Recharge le site pour retrouver la fiche du pilote.'},409);
+      if (message.includes('no such table: participants') || message.includes('no such column: r.participant_id')) return json({error:'La mise à jour de la base attend la migration 0012_participants.sql.'},503);
       if (message.includes('UNIQUE constraint failed: crew_members.')) return json({error:'Ce pilote appartient déjà à un équipage sur ce départ. Actualise la page.'},409);
       if (message.includes('crew_category_in_use')) return json({error:'Ce pilote est affecté à un équipage de cette catégorie. Retire d’abord son affectation pour changer de catégorie.'},409);
       if (message.includes('crew_event_in_use')) return json({error:'Un équipage utilise encore ce départ ou cette catégorie. Supprime ou modifie cet équipage avant de continuer.'},409);
       if (message.includes('crew_membership_invalid') || message.includes('crew_invalid')) return json({error:'Affectation impossible : vérifie le départ, la catégorie et la disponibilité du pilote, puis actualise.'},409);
-      if (message.includes('UNIQUE constraint failed: registrations.event_id, registrations.departure_id, registrations.user_id') ||
-          message.includes('UNIQUE constraint failed: registrations.event_id, registrations.departure_id, registrations.guest_hash')) {
-        return json({error:'La base utilise encore l’ancien schéma d’inscription. Applique la migration 0011_multi_category_registrations.sql une seule fois, puis recharge le site.'},503);
-      }
-      if (String(error.message).includes('UNIQUE constraint failed: registrations.')) return json({error:'Une inscription existe déjà pour ce pilote ou ce pseudo sur ce départ. Actualise pour retrouver la tienne.'},409);
+      if (message.includes('UNIQUE constraint failed: registrations.')) return json({error:'Ce pilote ou ce pseudo est déjà inscrit dans cette catégorie pour ce départ. Modifie l’inscription existante ou choisis une autre catégorie.'},409);
       console.error('FMT API failure', error instanceof Error ? error.message.replace(/[a-f0-9]{64}/g,'[redacted]') : 'unknown');
       return json({error:'Le service est momentanément indisponible. Tes changements ne sont pas confirmés ; réessaie dans un instant.'},503);
     }

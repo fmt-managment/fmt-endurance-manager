@@ -1551,6 +1551,42 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: 0 2px 8px color-mix(in srgb, var(--phase-color) 65%, transparent);
 }
 
+/* Phone only: all hours remain visible without horizontal scrolling. */
+@media (max-width: 640px) {
+  .registration-form .availability-hour-grid.compact-hours {
+    grid-template-columns: repeat(min(var(--duration, 6), 12), minmax(0, 1fr));
+    gap: 2px;
+    overflow: visible;
+  }
+  .registration-form .compact-hours .hour-card {
+    height: 48px;
+    min-height: 44px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 0;
+  }
+  .registration-form .compact-hours .hour-card-number { font-size: 11px; }
+  .registration-form .compact-hours .hour-card-state { font-size: 11px; }
+  .registration-form .special-availability { margin-top: 8px; }
+  .pilot-row .availability-readonly {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px;
+    min-width: 0;
+  }
+  .pilot-row .availability-readonly .timeline-edge:last-child { text-align: right; }
+  .pilot-row .availability-readonly .availability-mini-grid {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    order: 3;
+    grid-template-columns: repeat(min(var(--duration, 6), 12), minmax(0, 1fr));
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+  }
+  .pilot-row .availability-mini-hour { min-width: 0; min-height: 26px; font-size: 10px; }
+}
+
 /* Crew identity colors are stable for a crew, regardless of its category. */
 .crew-pilot-group { margin: 12px 0; padding: 10px 12px; border: 1px solid var(--crew-color); border-left: 4px solid var(--crew-color); border-radius: 9px; background: color-mix(in srgb, var(--crew-color) 8%, #151c1f); }
 .crew-pilot-group-header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; color: var(--crew-color); font-size: 14px; }

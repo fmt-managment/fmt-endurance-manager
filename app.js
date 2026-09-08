@@ -50,6 +50,12 @@ function logo(category) {
   return config?.image ? `<img class="category-logo" src="/images/${config.image}" alt="">` : `<span class="category-text-logo" aria-hidden="true">${esc(category)}</span>`;
 }
 function badge(category) { return `<span class="event-category-badge ${categories[category]?.css || ''}">${logo(category)}<span>${esc(category)}</span></span>`; }
+function eventCategoryCount(event,category) {
+  return event.departures.reduce((total,departure)=>total+departure.availability.filter(reg=>reg.category===category&&reg.status!=='unavailable').length,0);
+}
+function eventBadge(category,count) {
+  return `<span class="event-category-badge ${categories[category]?.css || ''}">${logo(category)}<span class="event-category-copy"><strong>${esc(category)}</strong><small>${count} inscrit${count>1?'s':''}</small></span></span>`;
+}
 function eventTypeBadge(type) { const item=EVENT_TYPES[type]||EVENT_TYPES.private; return `<span class="event-type-badge ${item.css}">${item.label}</span>`; }
 function circuitInfo(id) { return CIRCUITS.find(c=>c.id===id) || null; }
 function circuitLabel(id) { return circuitInfo(id)?.name || 'Circuit à préciser'; }
@@ -141,12 +147,13 @@ function groupEvents(source,filter,now=Date.now()) {
   return [...groups.values()];
 }
 function renderEventCard({event,next,running,archived,end}) {
+  const totalRegistrations=event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0);
   return `<button class="event-card event-type-${event.eventType||'private'} ${archived?'archived':''}" data-action="open" data-id="${event.id}">
-    <span class="event-card-main"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} · ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${event.departures.reduce((sum,d)=>sum+d.availability.filter(r=>r.status!=='unavailable').length,0)} inscription(s)</span></span>
+    <span class="event-card-body"><span class="event-card-title-row"><span class="event-name">${esc(event.name)}</span><span class="event-info">${eventTypeBadge(event.eventType)} <span>· ${event.durationHours||6} h · ${event.departures.length} départ${event.departures.length>1?'s':''} · ${totalRegistrations} inscription${totalRegistrations>1?'s':''}</span></span></span>
     ${circuitVisual(event.circuit,true)}
-    <span class="event-category-badges">${event.categories.map(badge).join('')}</span>
-    ${running?'<span class="event-countdown">Course en cours</span>':''}
-    <span class="event-countdown ${archived?'finished':''}">${next?`Prochain départ : ${esc(dateLabel(next))} à ${esc(next.time)} · <span data-countdown="${next.startsAt}">${countdown(next.startsAt)}</span>`:archived?`Terminé le ${esc(dateLabel({startsAt:end}))}`:running?'Le dernier départ est encore en course.':'Dates à confirmer'}</span>
+    <span class="event-category-badges">${event.categories.map(category=>eventBadge(category,eventCategoryCount(event,category))).join('')}</span>
+    <span class="event-card-status">${running?'<span class="event-countdown">Course en cours</span>':''}
+    <span class="event-countdown ${archived?'finished':''}">${next?`Prochain départ : ${esc(dateLabel(next))} à ${esc(next.time)} · <span data-countdown="${next.startsAt}">${countdown(next.startsAt)}</span>`:archived?`Terminé le ${esc(dateLabel({startsAt:end}))}`:running?'Le dernier départ est encore en course.':'Dates à confirmer'}</span></span></span>
   </button>`;
 }
 function renderHome(message='') {
@@ -231,7 +238,7 @@ function renderEvent(message='') {
     <section class="race-recap" aria-label="Récapitulatif de la course">
       <div class="recap-intro"><div><p class="recap-kicker">${eventSection==='crews'?'GESTION DES ÉQUIPAGES':'RÉCAPITULATIF DE LA COURSE'}</p><h2>${esc(event.name)}</h2><p>${eventSection==='crews'?'Les organisateurs composent les équipages à partir des pilotes inscrits.':'Les départs et les inscriptions sont regroupés dans les volets ci-dessous.'}</p></div><span class="recap-countdown">${nextDeparture?`Prochain départ <strong data-countdown="${nextDeparture.startsAt}">${countdown(nextDeparture.startsAt)}</strong>`:'Course terminée'}</span></div>
       <div class="recap-stats"><div><strong>${event.durationHours||6} h</strong><span>durée</span></div><div><strong>${event.departures.length}</strong><span>départ${event.departures.length>1?'s':''}</span></div><div><strong>${totalPilots}</strong><span>pilote${totalPilots>1?'s':''}</span></div><div><strong>${totalCrews}</strong><span>équipage${totalCrews>1?'s':''}</span></div></div>
-      <div class="recap-circuit"><strong>Circuit</strong><span>${esc(circuitLabel(event.circuit))}</span></div><div class="recap-categories"><span>Catégories :</span>${event.categories.map(badge).join('')}</div>
+      <div class="recap-circuit"><strong>Circuit</strong><span>${esc(circuitLabel(event.circuit))}</span></div><div class="recap-categories"><span>Catégories et inscriptions :</span>${event.categories.map(category=>eventBadge(category,eventCategoryCount(event,category))).join('')}</div>
     </section>
     ${eventSection==='crews'?renderCrewPage(event,nextDeparture):`<section class="departure-accordion" aria-label="Départs de la course">${event.departures.map((departure,index)=>renderDeparturePanel(event,departure,index,departure.id===nextDeparture?.id||departure.id===selectedDepartureId)).join('')}</section>`}`;
   showRecoveryLink();
@@ -323,9 +330,9 @@ async function renderMembers() {
   if(!isAdmin())throw Error('Accès réservé aux administrateurs.');
   const result=await api('/api/members');members=result.members;page='members';
   app.innerHTML=`${button('home','← Retour','','secondary-button back-button')}<h1 class="page-title">GESTION DES MEMBRES</h1>
-    <p class="creation-help">Un pilote apparaît ici après sa première connexion Discord. Le rôle Organisateur permet de créer et modifier les événements.</p>${errorBox()}
+    <p class="creation-help">Un membre apparaît après sa première connexion Discord. Les organisateurs gèrent les courses et les équipages. Les administrateurs peuvent aussi supprimer les événements, modifier les inscriptions des autres pilotes et attribuer les rôles. Les administrateurs principaux sont protégés.</p>${errorBox()}
     <div class="member-list">${members.map(member=>`<form class="member-row" data-kind="member" data-id="${member.id}"><div><strong>${esc(member.name)}</strong><small>Discord : ${member.id}</small></div>
-      ${member.role==='admin'?'<span>Administrateur principal</span>':`<label><span class="sr-only">Rôle de ${esc(member.name)}</span><select name="role"><option value="pilot" ${member.role==='pilot'?'selected':''}>Pilote</option><option value="organizer" ${member.role==='organizer'?'selected':''}>Organisateur</option></select></label><button class="secondary-button" type="submit">Enregistrer</button>`}</form>`).join('')}</div>`;
+      ${member.roleLocked?'<span>Administrateur principal · protégé</span>':`<label><span class="sr-only">Rôle de ${esc(member.name)}</span><select name="role"><option value="pilot" ${member.role==='pilot'?'selected':''}>Pilote</option><option value="organizer" ${member.role==='organizer'?'selected':''}>Organisateur</option><option value="admin" ${member.role==='admin'?'selected':''}>Administrateur</option></select></label><button class="secondary-button" type="submit">Enregistrer</button>`}</form>`).join('')}</div>`;
 }
 function renderMyEntries() {
   page='my-entries';
@@ -490,7 +497,7 @@ document.addEventListener('submit',async event=>{
       await api(draft.id?'/api/crews/'+draft.id:`/api/events/${currentEventId}/departures/${departureId}/crews`,draft.id?'PATCH':'POST',{name:form.elements.crewName.value,category:form.elements.crewCategory.value,car:form.elements.crewCar.value,version:draft.version});
       crewDraft=null;await refreshAfterSave('Équipage enregistré. Tu peux maintenant y affecter les pilotes.');
     }
-    else if(form.dataset.kind==='member'){await api('/api/members/'+form.dataset.id,'PATCH',{role:form.elements.role.value});await renderMembers();app.insertAdjacentHTML('afterbegin','<p class="creation-success" role="status">Autorisations mises à jour.</p>');}
+    else if(form.dataset.kind==='member'){await api('/api/members/'+form.dataset.id,'PATCH',{role:form.elements.role.value});await load();if(isAdmin()){await renderMembers();app.insertAdjacentHTML('afterbegin','<p class="creation-success" role="status">Autorisations mises à jour.</p>');}else renderHome('Autorisations mises à jour.');}
   }catch(error){showError(error);}finally{busy=false;if(submit.isConnected)submit.disabled=false;}
 });
 setInterval(()=>{

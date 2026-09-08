@@ -24,7 +24,7 @@ const categories = {
   'LMP2 WEC':{image:'LMP2.png',css:'lmp2'},
   LMP3:{image:'P3.png',css:'lmp3'},
   GT3:{image:'GT3.png',css:'gt3'},
-  GTE:{css:'gte'}
+  GTE:{image:'GTE.png',css:'gte'}
 };
 const CARS = {
   Hypercar: ['Alpine A424','Aston Martin Valkyrie AMR LMH','BMW M Hybrid V8','Cadillac V-Series.R','Ferrari 499P','Genesis GMR-001 LMDh','Glickenhaus SCG 007','Isotta Fraschini Tipo 6-C','Lamborghini SC63','Peugeot 9X8','Porsche 963','Toyota GR010 Hybrid','Vanwall Vandervell 680'],
@@ -315,16 +315,20 @@ function renderEventForm(event=null) {
   app.innerHTML=`${button('home','← Retour','','secondary-button back-button')}
     <h1 class="page-title">${event?'MODIFIER L’ÉVÉNEMENT':'NOUVEL ÉVÉNEMENT'}</h1>
     <form class="form-panel event-creation" data-kind="event">
-      <label class="form-label" for="eventName">Nom de l’événement</label><input id="eventName" name="eventName" maxlength="100" value="${esc(event?.name||'')}" placeholder="Ex : Daytona 8H" required>
-      <label class="form-label" for="eventDuration">Durée de la course (heures)</label><input id="eventDuration" name="eventDuration" type="number" min="1" max="24" step="1" value="${esc(event?.durationHours||6)}" required><p class="creation-help">Cette durée crée automatiquement une case de disponibilité pour chaque heure de course.</p>
-      <label class="form-label" for="eventType">Type d’événement</label><select id="eventType" name="eventType" class="event-type-select">${Object.entries(EVENT_TYPES).map(([key,item])=>`<option value="${key}" ${((event?.eventType||'private')===key)?'selected':''}>${item.label}</option>`).join('')}</select><p class="creation-help">La couleur sera visible sur la page des événements et dans le détail de la course.</p>
-      <label class="form-label" for="eventCircuit">Circuit</label><select id="eventCircuit" name="eventCircuit" class="event-circuit-select" required><option value="">Sélectionner un circuit</option>${CIRCUITS.map(c=>`<option value="${c.id}" ${(event?.circuit||'')===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select><p class="creation-help">Les images doivent être placées dans <code>public/images/circuits/</code> avec le nom du circuit (par exemple <code>daytona.png</code>).</p>
-      <fieldset class="creation-fieldset"><legend class="form-label">Catégories autorisées</legend><p class="creation-help">Une ou plusieurs catégories.</p>
+      <div class="creation-intro"><span class="creation-kicker">${event?'ÉDITION':'CONFIGURATION'} DE LA COURSE</span><h2>${event?'Mettre à jour la course':'Préparer une nouvelle course'}</h2><p>Renseigne les informations essentielles, puis ajoute les départs et les catégories ouvertes aux pilotes.</p></div>
+      <section class="creation-card creation-basics"><div class="creation-card-heading"><span class="creation-step">01</span><div><h2>Informations générales</h2><p>Le nom, le format et le circuit apparaîtront dans le récapitulatif.</p></div></div>
+        <div class="creation-field-grid"><label class="form-label" for="eventName">Nom de l’événement<input id="eventName" name="eventName" maxlength="100" value="${esc(event?.name||'')}" placeholder="Ex : Daytona 8H" required></label>
+          <label class="form-label" for="eventDuration">Durée de la course<input id="eventDuration" name="eventDuration" type="number" min="1" max="24" step="1" value="${esc(event?.durationHours||6)}" required><small>De 1 à 24 heures. Une case sera créée pour chaque heure.</small></label>
+          <label class="form-label" for="eventType">Type d’événement<select id="eventType" name="eventType" class="event-type-select">${Object.entries(EVENT_TYPES).map(([key,item])=>`<option value="${key}" ${((event?.eventType||'private')===key)?'selected':''}>${item.label}</option>`).join('')}</select><small>La couleur sera reprise sur les cartes et le détail.</small></label>
+          <label class="form-label" for="eventCircuit">Circuit<select id="eventCircuit" name="eventCircuit" class="event-circuit-select" required><option value="">Sélectionner un circuit</option>${CIRCUITS.map(c=>`<option value="${c.id}" ${(event?.circuit||'')===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select><small>L’image du circuit sera affichée automatiquement.</small></label>
+        </div>
+      </section>
+      <fieldset class="creation-card creation-fieldset"><div class="creation-card-heading"><span class="creation-step">02</span><div><legend>Catégories autorisées</legend><p>Choisis une ou plusieurs catégories disponibles pour cette course.</p></div></div>
         <div class="event-category-options">${CATEGORIES.map(category=>`<label class="event-category-option ${categories[category].css}"><input type="checkbox" name="eventCategory" value="${esc(category)}" ${event?.categories.includes(category)?'checked':''}>${logo(category)}<span>${esc(category)}</span></label>`).join('')}</div></fieldset>
-      <fieldset class="creation-fieldset"><legend class="form-label">Départs possibles</legend><p class="creation-help">Les dates et heures sont celles de Paris, pour tous les pilotes.</p>
+      <fieldset class="creation-card creation-fieldset"><div class="creation-card-heading"><span class="creation-step">03</span><div><legend>Départs possibles</legend><p>Les dates et heures sont saisies en heure de Paris.</p></div></div>
         <div id="departureFields" class="departure-fields">${(event?.departures||[{}]).map(departureFields).join('')}</div>${button('add-departure','+ Ajouter un départ','','secondary-button add-departure-button')}</fieldset>
       ${event?'<p class="creation-help">Un départ avec des inscrits ne peut pas être supprimé, ni une catégorie encore utilisée. Préviens les pilotes si tu changes un horaire.</p>':''}
-      ${errorBox()}<button type="submit" class="primary-button">${event?'ENREGISTRER LES MODIFICATIONS':'CRÉER L’ÉVÉNEMENT'}</button>
+      <div class="creation-actions">${errorBox()}<button type="submit" class="primary-button">${event?'ENREGISTRER LES MODIFICATIONS':'CRÉER L’ÉVÉNEMENT'}</button></div>
     </form>`;
   updateRemoveButtons();
 }

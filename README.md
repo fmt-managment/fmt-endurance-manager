@@ -17,6 +17,8 @@ Les droits sont vérifiés côté serveur pour chaque action. Le pseudo ne donne
 
 Les deux catégories LMP2 sont distinctes mais utilisent le même logo P2. GTE utilise un badge texte car le dépôt ne contient pas de logo GTE. Les pilotes peuvent indiquer une voiture LMU facultative lors de leur inscription ; le choix est contrôlé côté serveur selon la catégorie. Les horaires sont interprétés en heure de Paris, été comme hiver. Les inscriptions se verrouillent au départ. Un départ avec des inscrits ne peut pas être supprimé, ni une catégorie encore utilisée. Modifier un horaire n’envoie pas de notification : prévenez les pilotes.
 
+Un pilote peut conserver une inscription par catégorie sur le même départ. Le bouton **Ajouter une catégorie** apparaît après la première inscription, y compris pour un organisateur qui inscrit son propre pseudo. Dès qu’un organisateur affecte une de ces inscriptions à un équipage, les autres catégories du même pilote sur ce départ sont automatiquement retirées.
+
 ## Configuration préparée pour votre Worker existant
 
 Le fichier `wrangler.jsonc` est maintenant renseigné pour le Worker `app` et la base D1 déjà créée (identifiant repris de votre capture). Avec le sous-domaine de compte `endurance-manager`, l’adresse publique sera `https://app.endurance-manager.workers.dev`. Il déclare la liaison `DB` et le serveur. L’ajout de cette liaison par le formulaire Cloudflare n’est plus nécessaire : `wrangler deploy` appliquera cette configuration lors d’un déploiement réussi.
@@ -44,6 +46,8 @@ Gardez l’adresse gratuite actuelle. Une seule adresse canonique est acceptée 
 4. Vérifiez la présence des tables `users`, `sessions`, `oauth_states`, `events`, `registrations`, `rate_limits`, `crews` et `crew_members`.
 
 Ce script crée le schéma ; il ne contient pas d’utilisateurs, de courses de démonstration ou de secrets. Ne le réexécutez pas sur une base déjà initialisée. Conservez les migrations appliquées et utilisez une nouvelle migration pour les changements futurs. Vérifiez que les migrations `0002` à `0009` sont déjà appliquées ; une base déjà à jour jusqu’à `0008` doit recevoir `migrations/0009_registration_owner.sql`.
+
+Pour activer les inscriptions dans plusieurs catégories, appliquez ensuite `migrations/0011_multi_category_registrations.sql` une seule fois. Cette migration conserve les inscriptions et les équipages existants. Elle ne renvoie aucun tableau de résultats dans la console D1 : c’est normal pour une migration SQL. Pour vérifier qu’elle est bien passée, exécutez `SELECT name FROM sqlite_master WHERE type='index' AND name LIKE 'idx_registration%';` et vérifiez la présence de `idx_registration_user_category`, `idx_registration_guest_category` et `idx_registration_name_category`.
 
 ## 3. Créer l’application Discord
 
@@ -114,8 +118,8 @@ Utilisez la même base, le même schéma et la même application Discord.
 2. Remplacez le nom par celui du Worker existant ; ne créez pas un second projet par erreur.
 3. Renseignez l’identifiant D1, l’adresse, le Client ID et les identifiants des administrateurs.
 4. Ajoutez `DISCORD_CLIENT_SECRET` dans les secrets de ce Worker via Cloudflare. Ne l’écrivez pas dans la configuration Git.
-5. Déployez avec le processus Git du Worker existant. Le fichier de configuration déclenche `npm run build:workers`, sert `public` et utilise `server/worker.mjs` comme point d’entrée.
-6. Si vous travaillez avec Wrangler en ligne de commande, l’équivalent est `npx wrangler deploy` une fois la configuration complétée et la base initialisée.
+5. Déployez avec le processus Git du Worker existant. Utilisez comme commande de déploiement `npm run deploy:workers` : elle applique d’abord les migrations D1 distantes, puis déploie le Worker. Le fichier de configuration sert `public` et utilise `server/worker.mjs` comme point d’entrée.
+6. Si vous travaillez avec Wrangler en ligne de commande, l’équivalent est `npm run deploy:workers` une fois la configuration complétée et la base initialisée.
 
 Pour Workers, ne faites pas servir une compilation Pages : utilisez bien `build:workers`. Le script de compilation Workers ne copie pas `_worker.js` dans les fichiers publics.
 

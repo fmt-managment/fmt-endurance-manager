@@ -18,6 +18,7 @@ function harness(){
  DB.db.exec(readFileSync(new URL('../migrations/0007_registration_car_preferences.sql',import.meta.url),'utf8'));
  DB.db.exec(readFileSync(new URL('../migrations/0008_event_circuit.sql',import.meta.url),'utf8'));
  DB.db.exec(readFileSync(new URL('../migrations/0009_registration_owner.sql',import.meta.url),'utf8'));
+ DB.db.exec(readFileSync(new URL('../migrations/0011_multi_category_registrations.sql',import.meta.url),'utf8'));
  const env={DB,APP_ORIGIN:ROOT,DISCORD_CLIENT_ID:'app-id',DISCORD_CLIENT_SECRET:'test-only-secret',ADMIN_DISCORD_IDS:ADMIN,ASSETS:{fetch:async()=>new Response('static')}};
  const jars=new Map();
  async function req(path,method='GET',data,actor='guest',options={}){
@@ -40,6 +41,23 @@ function harness(){
  return {DB,env,req,login,jars};
 }
 const eventInput={name:'Daytona 8H',categories:['Hypercar','LMP2 ELMS','GTE'],departures:[{date:'2090-10-15',time:'15:00'},{date:'2090-10-14',time:'14:00'}]};
+test('one pilot may register in multiple categories until an organizer assigns one to a crew',async()=>{
+ const {req,login}=harness();
+ await login(ADMIN,'admin');await login(PILOT,'pilot');
+ const created=await req('/api/events','POST',{...eventInput,name:'Multi catégories',categories:['Hypercar','GT3']},'admin');
+ const event=(await req('/api/events')).data.events[0],departure=event.departures[0];
+ const path=`/api/events/${created.data.id}/departures/${departure.id}/registrations`;
+ const hyper=await req(path,'POST',{name:'Pilote multi',category:'Hypercar',status:'whole'},'pilot');assert.equal(hyper.status,201);
+ const gt3=await req(path,'POST',{name:'Pilote multi',category:'GT3',status:'whole'},'pilot');assert.equal(gt3.status,201);
+ assert.notEqual(hyper.data.id,gt3.data.id);
+ const before=(await req('/api/events','GET',null,'pilot')).data.events.find(e=>e.id===created.data.id).departures[0].availability;
+ assert.deepEqual(before.map(r=>r.category).sort(),['GT3','Hypercar']);
+ const crew=await req(`/api/events/${created.data.id}/departures/${departure.id}/crews`,'POST',{name:'GT3 équipe',category:'GT3',car:'Ferrari 296 LMGT3'},'admin');assert.equal(crew.status,201);
+ const member=await req(`/api/crews/${crew.data.id}/members`,'POST',{registrationId:gt3.data.id,version:1},'admin');assert.equal(member.status,200);
+ const after=(await req('/api/events','GET',null,'pilot')).data.events.find(e=>e.id===created.data.id).departures[0];
+ assert.deepEqual(after.availability.map(r=>r.category),['GT3']);
+ assert.deepEqual(after.crews[0].registrationIds,[gt3.data.id]);
+});
 test('crews: manager-only writes, category/departure integrity, concurrency and preserved registrations',async()=>{
  const {req,login,DB}=harness();
  await login(ADMIN,'admin');await login(PILOT,'pilot');await login(OTHER,'organizer');

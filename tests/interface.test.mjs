@@ -3,6 +3,46 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
+test('agenda sorts unsorted departures and groups upcoming races by Paris weeks and months',()=>{
+  const h=interfaceHarness();
+  const result=h.run(`(() => {
+    const race=(name,dates)=>({name,durationHours:6,departures:dates.map(date=>({startsAt:Date.parse(date)}))});
+    return groupEvents([
+      race('October',['2026-10-12T10:00:00Z']),
+      race('Later',['2026-09-24T10:00:00Z']),
+      race('Multiple',['2026-09-13T10:00:00Z','2026-09-08T10:00:00Z','2026-09-01T10:00:00Z']),
+      race('Next week',['2026-09-14T10:00:00Z']),
+      race('Soonest',['2026-09-07T12:00:00Z'])
+    ],'upcoming',Date.parse('2026-09-07T08:00:00Z'));
+  })()`);
+  assert.deepEqual(Array.from(result,g=>g.label),['Cette semaine','La semaine prochaine','Plus tard en septembre','octobre']);
+  assert.deepEqual(Array.from(result[0].items,x=>x.event.name),['Soonest','Multiple']);
+  assert.equal(result[0].items[1].next.startsAt,Date.parse('2026-09-08T10:00:00Z'));
+});
+
+test('archive uses the end of the last race and sorts newest finishes first',()=>{
+  const h=interfaceHarness();
+  const result=h.run(`(() => {
+    const now=Date.parse('2026-09-07T12:00:00Z');
+    const race=(name,start,durationHours)=>({name,durationHours,departures:[{startsAt:Date.parse(start)}]});
+    const source=[race('Old','2026-09-02T00:00:00Z',6),race('Running','2026-09-07T00:00:00Z',24),race('Just finished','2026-09-07T06:00:00Z',6),{name:'Undated',departures:[]}];
+    return {active:groupEvents(source,'upcoming',now),archive:groupEvents(source,'archived',now)};
+  })()`);
+  assert.equal(result.active[0].label,'En cours');
+  assert.equal(result.active[0].items[0].event.name,'Running');
+  assert.equal(result.active[1].label,'Dates à confirmer');
+  assert.deepEqual(Array.from(result.archive[0].items,x=>x.event.name),['Just finished','Old']);
+});
+
+test('agenda handles Paris midnight, Sunday to Monday, DST and new year',()=>{
+  const h=interfaceHarness();
+  const group=(now,date)=>h.run(`groupEvents([{name:'Race',departures:[{startsAt:Date.parse('${date}')}]}],'upcoming',Date.parse('${now}'))[0].label`);
+  assert.equal(group('2026-09-06T21:30:00Z','2026-09-06T22:30:00Z'),'La semaine prochaine');
+  assert.equal(group('2026-09-06T22:15:00Z','2026-09-07T12:00:00Z'),'Cette semaine');
+  assert.equal(group('2026-10-25T00:30:00Z','2026-10-25T23:30:00Z'),'La semaine prochaine');
+  assert.equal(group('2026-12-20T12:00:00Z','2027-01-15T12:00:00Z'),'janvier 2027');
+});
+
 function interfaceHarness(role='pilot',duration=6) {
   const app={innerHTML:'',querySelector:()=>null,insertAdjacentHTML(){}};
   const document={getElementById:()=>app,addEventListener(){}};

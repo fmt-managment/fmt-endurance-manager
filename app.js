@@ -203,9 +203,11 @@ function renderRegistration(reg,departure,duration) {
 }
 function renderRegistrationForm(event,departure) {
   const state=draftFor(departure),duration=event.durationHours||6,parts=state.status==='whole'?Array.from({length:duration},(_,i)=>`h${i+1}`):state.status.split(',').filter(Boolean);
-  const addLabel=canManage()?'+ Ajouter un autre pilote':ownRegistrations(departure).length?'+ Ajouter une autre catégorie':'';
+  const ownCount=ownRegistrations(departure).length;
+  const addButtons=`${canManage()?button('new-registration','+ Inscrire un pilote',`data-departure="${departure.id}" data-mode="pilot"`,'secondary-button add-pilot-button'):''}${ownCount?button('new-registration','+ Ajouter une catégorie',`data-departure="${departure.id}" data-mode="category"`,'secondary-button add-pilot-button'):''}`;
+  const formTitle=state.id?'Modifier l’inscription':state.mode==='category'?'Ajouter une catégorie':canManage()?'Inscrire un pilote':'Mon inscription';
   return `<form class="form-section registration-form" data-kind="registration" data-departure="${departure.id}">
-    <h3 class="form-title">${state.id?'Modifier l’inscription':canManage()?'Inscrire un pilote':'Mon inscription'} ${addLabel?button('new-registration',addLabel,`data-departure="${departure.id}"`,'secondary-button add-pilot-button'):''}</h3>
+    <h3 class="form-title">${formTitle}<span class="registration-form-actions">${addButtons}</span></h3>
     ${state.id&&!departure.availability.find(r=>r.id===state.id)?.mine?'<p class="creation-help">Modification en tant qu’administrateur.</p>':''}
     <label class="form-label" for="name-${departure.id}">Pseudo pilote</label>
     <input id="name-${departure.id}" name="pilotName" data-departure="${departure.id}" value="${esc(state.name)}" maxlength="30" required autocomplete="nickname">
@@ -428,7 +430,8 @@ async function perform(action,target) {
     case 'new-registration':{
       selectedDepartureId=target.dataset.departure;
       const departure=event.departures.find(d=>d.id===target.dataset.departure);
-      drafts[departure.id]={name:canManage()?'':pilotName,category:'',cars:[],carAny:false,status:'',preferredPilot:'',id:null,version:null};
+      const categoryMode=target.dataset.mode==='category',existing=ownRegistrations(departure)[0];
+      drafts[departure.id]={name:categoryMode?(existing?.name||pilotName):(canManage()?'':pilotName),category:'',cars:[],carAny:false,status:'',preferredPilot:'',id:null,version:null,mode:categoryMode?'category':'pilot'};
       renderEvent();document.getElementById('name-'+departure.id)?.focus();break;
     }
     case 'category':{selectedDepartureId=target.dataset.departure;const state=draftFor(event.departures.find(d=>d.id===target.dataset.departure));state.category=target.dataset.value;state.cars=(state.cars||[]).filter(car=>CARS[state.category]?.includes(car));state.carAny=false;renderEvent();break;}
